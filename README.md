@@ -36,6 +36,6 @@ const api = new Wrapper();
 api.postCode("hellow world!").then(console.log);
 // or using callbacks
 api.postCode("hellow world!", (e, d) => {
-	console.log(d);
+    console.log(d);
 });
 ```
