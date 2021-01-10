@@ -1,0 +1,38 @@
+{
+	"name": "imperial-node",
+	"version": "1.0.0",
+	"description": "imperialb.in API wrapper made for Node",
+	"main": "./lib/cjs/index.js",
+	"module": "./lib/esm/index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "eslint src/**/*.ts --fix",
+		"build": "rimraf lib && tsc -p tsconfig.json  && tsc -p tsconfig.cjs.json",
+		"prepublish": "npm run lint && npm run build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pxseu/imperialb.in-node.git"
+	},
+	"keywords": [
+		"imperial",
+		"imperialb.in"
+	],
+	"author": "pxseu <contact.pxseu@gmail.com>",
+	"license": "MPL-2.0",
+	"bugs": {
+		"url": "https://github.com/pxseu/imperialb.in-node/issues"
+	},
+	"homepage": "https://github.com/pxseu/imperialb.in-node#readme",
+	"dependencies": {},
+	"devDependencies": {
+		"@types/node": "^14.14.20",
+		"@typescript-eslint/eslint-plugin": "^4.12.0",
+		"@typescript-eslint/parser": "^4.12.0",
+		"eslint": "^7.17.0",
+		"eslint-config-prettier": "^7.1.0",
+		"nodemon": "^2.0.7",
+		"rimraf": "^3.0.2",
+		"typescript": "^4.1.3"
+	}
+}

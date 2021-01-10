@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "moduleResolution": "node",
+        "target": "ES5",
+        "module": "ES2020",
+        "outDir": "./lib/esm",
+        "sourceRoot": "src",
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "allowJs": false,
+        "alwaysStrict": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "declaration": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "removeComments": true,
+    },
+    "exclude": [
+        "node_modules",
+    ],
+    "include": [
+        "./src/**/*.ts",
+    ]
+}
