@@ -4,6 +4,6 @@ node_modules
 tsconfig.cjs.json
 tsconfig.json
 yarn.lock
-.eslint
 .eslintignore
+.eslintrc
 test.js
