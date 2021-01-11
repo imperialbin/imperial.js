@@ -23,12 +23,15 @@ export interface ImperialResponseGetCode {
 	document: string;
 }
 
-export type parsedError = Error & {
+/**
+ *  Parsed errors that are made if there was an issue with the API
+ */
+export interface parsedError extends Error {
 	json?: Record<string, unknown>;
 	statusCode: number | undefined;
 	statusCodeText: string;
 	rateLimitReset?: number;
-};
+}
 
 interface prepareParams {
 	method: string;
@@ -49,7 +52,13 @@ interface postOptions {
  */
 
 export class Wrapper {
-	constructor(private token: string | null = null) {}
+	private _token: string | null = null;
+
+	constructor(token?: string) {
+		if (token) {
+			this._token = token;
+		}
+	}
 
 	private _HOSTNAME = "www.imperialb.in";
 	private _HOSTNAMEREGEX = /w?w?w?\.?imperialb.in/gi;
@@ -113,7 +122,7 @@ export class Wrapper {
 	}
 
 	/**
-	 *  Post code the code to the API
+	 *  Create a document
 	 *  @param text The text to be sent
 	 *  @returns Promise with the data
 	 *  @example postCode("hi!").then(console.log); // Prints the response to console
@@ -121,7 +130,7 @@ export class Wrapper {
 	public postCode(text: string): Promise<ImperialResponsePostCode>;
 
 	/**
-	 *  Post code the code to the API
+	 *  Create a document
 	 *  @param text The text to be sent
 	 *  @param opts Additional options for the request **REQUIRES API KEY IN CONSTRUCTOR**
 	 *  @returns Promise with the data
@@ -129,7 +138,7 @@ export class Wrapper {
 	 */
 	public postCode(text: string, opts: postOptions): Promise<ImperialResponsePostCode>;
 	/**
-	 *  Post code the code to the API
+	 *  Create a document
 	 *  @param text The text to be sent
 	 *  @param cb Function called after the data is sent or if there was an error
 	 *  @example postCode("hi!", (e, d) => {if (!e) console.log(d);}) // Prints the response to console
@@ -141,7 +150,7 @@ export class Wrapper {
 	): void;
 
 	/**
-	 *  Post code the code to the API
+	 *  Create a document
 	 *  @param text The text to be sent
 	 *  @param opts Additional options for the request **REQUIRES API KEY IN CONSTRUCTOR**
 	 *  @param cb Function called after the data is sent or if there was an error
@@ -173,8 +182,8 @@ export class Wrapper {
 			};
 		}
 
-		if (this.token) {
-			params.apiToken = this.token;
+		if (this._token) {
+			params.apiToken = this._token;
 		}
 
 		const searchParams = new URLSearchParams();
@@ -212,17 +221,17 @@ export class Wrapper {
 	}
 
 	/**
-	 *	 Get the code from the Api
+	 *	 Get a document from the API
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *	@example getCode("someid").then(console.log); // Logs the response to the console
 	 */
 	public getCode(id: string): Promise<ImperialResponseGetCode>;
 
 	/**
-	 *	 Get the code from the Api
+	 *	 Get a document from the API
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param cb Function called after the data is fetched or if there was an error
-	 *	@example getCode("someid").then(console.log); // Logs the response to the console
+	 *	@example getCode("someid"), (e, d) => { if (!e) console.log(d) }; // Logs the response to the console
 	 */
 	public getCode(id: string, cb: (error: unknown, data?: ImperialResponseGetCode) => void): void;
 
