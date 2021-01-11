@@ -1,7 +1,7 @@
 {
 	"name": "imperial-node",
 	"version": "1.0.0",
-	"description": "imperialb.in API wrapper made for Node",
+	"description": "Imperial API wrapper in Node.js",
 	"main": "./lib/cjs/index.js",
 	"module": "./lib/esm/index.js",
 	"scripts": {
