@@ -62,7 +62,7 @@ export class Wrapper {
 			method,
 			headers: {
 				...headers,
-				"User-Agent": "imperialb.in-node; (+https://github.com/pxseu/imperialb.in-node)",
+				"User-Agent": "imperial-node; (+https://github.com/pxseu/imperial-node)",
 			},
 		};
 	}
