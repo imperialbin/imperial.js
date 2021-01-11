@@ -33,9 +33,9 @@ import { Wrapper } from "imperial-node";
 
 const api = new Wrapper();
 
-api.postCode("hellow world!").then(console.log);
+api.postCode("hello world!").then(console.log);
 // or using callbacks
-api.postCode("hellow world!", (e, d) => {
+api.postCode("hello world!", (e, d) => {
     console.log(d);
 });
 ```
