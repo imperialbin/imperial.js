@@ -27,8 +27,6 @@ const setParams = ({ optionsOrCallback, text, apiToken }: setParamsProps): URLSe
 
 	if (typeof optionsOrCallback !== "function") {
 		params = Object.assign(params, optionsOrCallback);
-
-		console.log(optionsOrCallback);
 	}
 
 	const searchParams = new URLSearchParams();
