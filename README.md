@@ -27,15 +27,15 @@ $ yarn add imperial-node
 # Example Usage
 
 ```js
-const { Wrapper } = require("imperial-node");
+const { Imperial } = require("imperial-node");
 // or using import/export
-import { Wrapper } from "imperial-node";
+import { Imperial } from "imperial-node";
 
-const api = new Wrapper();
+const api = new Imperial();
 
 api.postCode("hello world!").then(console.log);
 // or using callbacks
 api.postCode("hello world!", (e, d) => {
-    console.log(d);
+	console.log(d);
 });
 ```

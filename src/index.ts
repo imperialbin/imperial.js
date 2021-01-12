@@ -1,57 +1,29 @@
 import { IncomingMessage } from "http";
 import https from "https";
-import { URL, URLSearchParams } from "url";
+import { URL } from "url";
 import { codes as humanReadable } from "./helpers/httpCodes";
+import niceError from "./helpers/niceError";
+import {
+	ImperialResponseGetCode,
+	ImperialResponsePostCode,
+	postOptions,
+	prepareParams,
+} from "./helpers/interfaces";
+import setParams from "./helpers/setPostCodeParams";
 
-/**
- *  `postCode` response that gets return from the Wrapper
- */
-export interface ImperialResponsePostCode {
-	success: boolean;
-	documentId: string;
-	rawLink: string;
-	formattedLink: string;
-	expiresIn: string;
-	instantDelete: boolean;
-}
-
-/**
- *  `getCode` response that gets return from the Wrapper
- */
-export interface ImperialResponseGetCode {
-	success: boolean;
-	document: string;
-}
-
-/**
- *  Parsed errors that are made if there was an issue with the API
- */
-export interface parsedError extends Error {
-	json?: Record<string, unknown>;
-	statusCode: number | undefined;
-	statusCodeText: string;
-	rateLimitReset?: number;
-}
-
-interface prepareParams {
-	method: string;
-	headers?: Record<string, unknown>;
-	path: string;
-}
-
-interface postOptions {
-	longerUrls?: boolean;
-	instantDelete?: boolean;
-	imageEmbed?: boolean;
-	expiration?: number;
-}
+export type {
+	ImperialResponseGetCode,
+	ImperialResponsePostCode,
+	postOptions,
+	prepareParams,
+} from "./helpers/interfaces";
 
 /**
  *  The API wrapper class
  * @param token Your API token
  */
 
-export class Wrapper {
+export class Imperial {
 	private _token: string | null = null;
 
 	constructor(token?: string) {
@@ -63,7 +35,7 @@ export class Wrapper {
 	private _HOSTNAME = "www.imperialb.in";
 	private _HOSTNAMEREGEX = /w?w?w?\.?imperialb.in/gi;
 
-	private _prepareRequest({ method, headers, path }: prepareParams): Record<string, unknown> {
+	private _prepareRequest({ method, headers, path }: prepareParams): https.RequestOptions {
 		return {
 			hostname: this._HOSTNAME,
 			port: 443,
@@ -104,14 +76,7 @@ export class Wrapper {
 							errorMessage = json.message;
 						}
 
-						reject(
-							Object.assign(new Error(errorMessage), {
-								json,
-								statusCode: response.statusCode,
-								statusCodeText: humanReadable.get(response.statusCode),
-								rateLimitReset: response.headers["x-ratelimit-reset"],
-							})
-						);
+						reject(niceError({ errorMessage, json, statusCode: response.statusCode }));
 					}
 				} catch (err) {
 					reject(err);
@@ -171,32 +136,13 @@ export class Wrapper {
 	): Promise<ImperialResponsePostCode> | void {
 		const callBack = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
 
-		let params: Record<string, unknown> = {
-			code: text,
-		};
-
-		if (typeof optionsOrCallback === "object") {
-			params = {
-				...optionsOrCallback,
-				...params,
-			};
-		}
-
-		if (this._token) {
-			params.apiToken = this._token;
-		}
-
-		const searchParams = new URLSearchParams();
-
-		for (const prop in params) {
-			searchParams.set(prop, String(params[prop]));
-		}
+		const params = setParams({ optionsOrCallback, text, apiToken: this._token });
 
 		const opts = this._prepareRequest({
 			method: "POST",
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded",
-				"Content-Length": Buffer.byteLength(searchParams.toString()),
+				"Content-Length": Buffer.byteLength(params.toString()),
 			},
 			path: "/postCode",
 		});
@@ -207,7 +153,7 @@ export class Wrapper {
 					resolve(this._parseResponse(response));
 				});
 				request.on("error", reject);
-				request.write(searchParams.toString());
+				request.write(params.toString());
 				request.end();
 			});
 		}
@@ -216,7 +162,7 @@ export class Wrapper {
 			this._parseResponse(response).then((data) => callBack(null, data), callBack);
 		});
 		request.on("error", callBack);
-		request.write(searchParams.toString());
+		request.write(params.toString());
 		request.end();
 	}
 
@@ -258,12 +204,32 @@ export class Wrapper {
 
 		if (!cb)
 			return new Promise((resolve, reject) => {
+				const splitPath = opts.path?.split("/");
+
+				if (!splitPath || splitPath[splitPath.length - 1] === "") {
+					/* This is to prevent the magic 302 redirect */
+					const mockStatus = 400;
+
+					reject(niceError({ statusCode: mockStatus }));
+					return;
+				}
+
 				const request = https.request(opts, (response) => {
 					resolve(this._parseResponse(response));
 				});
 				request.on("error", reject);
 				request.end();
 			});
+
+		const splitPath = opts.path?.split("/");
+
+		if (!splitPath || splitPath[splitPath.length - 1] === "") {
+			/* This is to prevent the magic 302 redirect and tell the user something is wrong */
+			const mockStatus = 400;
+			const errorMessage = `No documentId was provided.`;
+			cb(niceError({ statusCode: mockStatus, errorMessage }));
+			return;
+		}
 
 		const request = https.request(opts, (response) => {
 			this._parseResponse(response).then((data) => cb(null, data), cb);
