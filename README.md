@@ -36,6 +36,6 @@ const api = new Imperial();
 api.postCode("hello world!").then(console.log);
 // or using callbacks
 api.postCode("hello world!", (e, d) => {
-	console.log(d);
+	if (!e) console.log(d);
 });
 ```
