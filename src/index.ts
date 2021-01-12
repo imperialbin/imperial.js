@@ -1,4 +1,4 @@
-import { IncomingMessage } from "http";
+import { IncomingMessage, OutgoingHttpHeaders } from "http";
 import https from "https";
 import { URL } from "url";
 import { codes as humanReadable } from "./helpers/httpCodes";
@@ -7,7 +7,6 @@ import {
 	ImperialResponseGetCode,
 	ImperialResponsePostCode,
 	postOptions,
-	prepareParams,
 } from "./helpers/interfaces";
 import setParams from "./helpers/setPostCodeParams";
 
@@ -15,8 +14,13 @@ export type {
 	ImperialResponseGetCode,
 	ImperialResponsePostCode,
 	postOptions,
-	prepareParams,
 } from "./helpers/interfaces";
+
+interface prepareParams {
+	method: string;
+	headers?: OutgoingHttpHeaders;
+	path: string;
+}
 
 /**
  *  The API wrapper class
@@ -36,15 +40,18 @@ export class Imperial {
 	private _HOSTNAMEREGEX = /w?w?w?\.?imperialb.in/gi;
 
 	private _prepareRequest({ method, headers, path }: prepareParams): https.RequestOptions {
+		const defaultHeaders = {
+			"User-Agent": "imperial-node; (+https://github.com/pxseu/imperial-node)",
+		};
+
+		headers = Object.assign(headers, defaultHeaders);
+
 		return {
 			hostname: this._HOSTNAME,
 			port: 443,
 			path: `/api${path}`,
 			method,
-			headers: {
-				...headers,
-				"User-Agent": "imperial-node; (+https://github.com/pxseu/imperial-node)",
-			},
+			headers,
 		};
 	}
 
@@ -143,6 +150,7 @@ export class Imperial {
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded",
 				"Content-Length": Buffer.byteLength(params.toString()),
+				Accept: "application/json",
 			},
 			path: "/postCode",
 		});
@@ -200,6 +208,9 @@ export class Imperial {
 		const opts = this._prepareRequest({
 			method: "GET",
 			path: `/getCode/${documentId}`,
+			headers: {
+				Accept: "application/json",
+			},
 		});
 
 		if (!cb)

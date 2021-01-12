@@ -27,9 +27,3 @@ export interface postOptions {
 	imageEmbed?: boolean;
 	expiration?: number;
 }
-
-export interface prepareParams {
-	method: string;
-	headers?: Record<string, unknown>;
-	path: string;
-}

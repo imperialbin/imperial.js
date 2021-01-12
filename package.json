@@ -1,13 +1,12 @@
 {
 	"name": "imperial-node",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Imperial API wrapper in Node.js",
-	"main": "./lib/cjs/index.js",
-	"module": "./lib/esm/index.js",
+	"main": "./lib/index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"lint": "eslint src/**/*.ts --fix",
-		"build": "rimraf lib && tsc -p tsconfig.json  && tsc -p tsconfig.cjs.json",
+		"build": "rimraf lib && tsc",
 		"prepare": "npm run lint && npm run build"
 	},
 	"repository": {

@@ -28,8 +28,6 @@ $ yarn add imperial-node
 
 ```js
 const { Imperial } = require("imperial-node");
-// or using import/export
-import { Imperial } from "imperial-node";
 
 const api = new Imperial();
 

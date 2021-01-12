@@ -13,15 +13,11 @@ interface setParamsProps {
 }
 
 const setParams = ({ optionsOrCallback, text, apiToken }: setParamsProps): URLSearchParams => {
-	const defaultParams: postOptions = {
+	let params: _internalPostOptions = {
 		longerUrls: false,
 		instantDelete: false,
 		imageEmbed: false,
 		expiration: 5,
-	};
-
-	let params: _internalPostOptions = {
-		...defaultParams,
 		code: text,
 	};
 
@@ -30,10 +26,9 @@ const setParams = ({ optionsOrCallback, text, apiToken }: setParamsProps): URLSe
 	}
 
 	if (typeof optionsOrCallback !== "function") {
-		params = {
-			...optionsOrCallback,
-			...params,
-		};
+		params = Object.assign(params, optionsOrCallback);
+
+		console.log(optionsOrCallback);
 	}
 
 	const searchParams = new URLSearchParams();
