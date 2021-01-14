@@ -1,6 +1,6 @@
 {
 	"name": "imperial-node",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "Imperial API wrapper in Node.js",
 	"main": "./lib/index.js",
 	"scripts": {
