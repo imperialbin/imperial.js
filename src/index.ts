@@ -6,15 +6,13 @@ import niceError from "./helpers/niceError";
 import {
 	ImperialResponseGetCode,
 	ImperialResponsePostCode,
+	ImperialResponseCommon,
 	postOptions,
+	_internalPostOptions,
 } from "./helpers/interfaces";
 import setParams from "./helpers/setPostCodeParams";
 
-export type {
-	ImperialResponseGetCode,
-	ImperialResponsePostCode,
-	postOptions,
-} from "./helpers/interfaces";
+export type { ImperialResponseGetCode, ImperialResponsePostCode, postOptions } from "./helpers/interfaces";
 
 interface prepareParams {
 	method: string;
@@ -33,12 +31,20 @@ export class Imperial {
 	constructor(token?: string) {
 		if (token) {
 			this._token = token;
+
+			this._checkToken(token).then((data) => {
+				if (!data.success) {
+					/* Mock status to show that the user is unauthorized */
+					const mockStatus = 401;
+
+					throw niceError({ errorMessage: data.message, statusCode: mockStatus });
+				}
+			});
 		}
 	}
 
 	private _HOSTNAME = "www.imperialb.in";
-	private _HOSTNAMEREGEX = /w?w?w?\.?imperialb.in/gi;
-
+	private _HOSTNAMEREGEX = /^(www\.)?imperialb\.in$/i;
 	private _prepareRequest({ method, headers, path }: prepareParams): https.RequestOptions {
 		const defaultHeaders = {
 			"User-Agent": "imperial-node; (+https://github.com/pxseu/imperial-node)",
@@ -72,12 +78,16 @@ export class Imperial {
 						/* Ignore parse error */
 					}
 
-					if (response.statusCode === 200 && json && json.success === true) {
+					if (response.statusCode === 200 && json) {
 						resolve(json);
 					} else {
+						if (response.statusCode === 302) {
+							/* If there was a 302 it means the request failed */
+							response.statusCode = 400;
+						}
+
 						let errorMessage =
-							humanReadable.get(response.statusCode) ??
-							`Response code ${response.statusCode}`;
+							humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`;
 
 						if (json?.message) {
 							errorMessage = json.message;
@@ -90,6 +100,29 @@ export class Imperial {
 				}
 			});
 			response.on("error", reject);
+		});
+	}
+
+	private _checkToken(token: string): Promise<ImperialResponseCommon> {
+		const params = setParams({ apiToken: token });
+
+		const opts = this._prepareRequest({
+			method: "GET",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Content-Length": Buffer.byteLength(params.toString()),
+				Accept: "application/json",
+			},
+			path: "/checkApiToken",
+		});
+
+		return new Promise((resolve, reject) => {
+			const request = https.request(opts, (response) => {
+				resolve(this._parseResponse(response));
+			});
+			request.on("error", reject);
+			request.write(params.toString());
+			request.end();
 		});
 	}
 
@@ -116,10 +149,7 @@ export class Imperial {
 	 *  @example postCode("hi!", (e, d) => {if (!e) console.log(d);}) // Prints the response to console
 	 */
 
-	public postCode(
-		text: string,
-		cb: (error: unknown, data?: ImperialResponsePostCode) => void
-	): void;
+	public postCode(text: string, cb: (error: unknown, data?: ImperialResponsePostCode) => void): void;
 
 	/**
 	 *  Create a document
@@ -136,14 +166,30 @@ export class Imperial {
 
 	public postCode(
 		text: string,
-		optionsOrCallback?:
-			| ((error: unknown, data?: ImperialResponsePostCode) => void)
-			| postOptions,
+		optionsOrCallback?: ((error: unknown, data?: ImperialResponsePostCode) => void) | postOptions,
 		cb?: (error: unknown, data?: ImperialResponsePostCode) => void
 	): Promise<ImperialResponsePostCode> | void {
 		const callBack = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
 
-		const params = setParams({ optionsOrCallback, text, apiToken: this._token });
+		let jsonParams: _internalPostOptions = {
+			longerUrls: false,
+			instantDelete: false,
+			imageEmbed: false,
+			expiration: 5,
+			code: text,
+		};
+
+		if (this._token) {
+			jsonParams.apiToken = this._token;
+		}
+
+		if (typeof optionsOrCallback !== "function") {
+			console.log(jsonParams);
+			jsonParams = Object.assign(jsonParams, optionsOrCallback);
+			console.log(jsonParams);
+		}
+
+		const params = setParams(jsonParams);
 
 		const opts = this._prepareRequest({
 			method: "POST",
@@ -215,32 +261,12 @@ export class Imperial {
 
 		if (!cb)
 			return new Promise((resolve, reject) => {
-				const splitPath = opts.path?.split("/");
-
-				if (!splitPath || splitPath[splitPath.length - 1] === "") {
-					/* This is to prevent the magic 302 redirect */
-					const mockStatus = 400;
-
-					reject(niceError({ statusCode: mockStatus }));
-					return;
-				}
-
 				const request = https.request(opts, (response) => {
 					resolve(this._parseResponse(response));
 				});
 				request.on("error", reject);
 				request.end();
 			});
-
-		const splitPath = opts.path?.split("/");
-
-		if (!splitPath || splitPath[splitPath.length - 1] === "") {
-			/* This is to prevent the magic 302 redirect and tell the user something is wrong */
-			const mockStatus = 400;
-			const errorMessage = `No documentId was provided.`;
-			cb(niceError({ statusCode: mockStatus, errorMessage }));
-			return;
-		}
 
 		const request = https.request(opts, (response) => {
 			this._parseResponse(response).then((data) => cb(null, data), cb);

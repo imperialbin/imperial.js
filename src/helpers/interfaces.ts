@@ -19,6 +19,14 @@ export interface ImperialResponseGetCode {
 }
 
 /**
+ *  Common responses that get returned from the server
+ */
+export interface ImperialResponseCommon {
+	success: boolean;
+	message: string;
+}
+
+/**
  *  Options that a user can pass in the `opts` object
  */
 export interface postOptions {
@@ -26,4 +34,10 @@ export interface postOptions {
 	instantDelete?: boolean;
 	imageEmbed?: boolean;
 	expiration?: number;
+}
+
+export interface _internalPostOptions extends postOptions {
+	code: string;
+	apiToken?: string;
+	[key: string]: unknown;
 }
