@@ -2,24 +2,14 @@ name: Release
 
 on:
     push:
-        branches:
-            - senpai
+        tags:
+            - "v*"
 
 jobs:
     release:
         runs-on: ubuntu-latest
 
         steps:
-            - name: "Wait for status checks"
-              id: waitforstatuschecks
-              uses: WyriHaximus/github-action-wait-for-status@0.1.0
-
-              with:
-                  ignoreActions: Release
-                  checkInterval: 13
-              env:
-                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
             - name: Checkout repository
               uses: actions/checkout@v2
 
@@ -47,5 +37,4 @@ jobs:
               run: yarn build
 
             - name: Deploy
-              if: steps.waitforstatuschecks.outputs.status == 'success'
               run: yarn publish --non-interactive
