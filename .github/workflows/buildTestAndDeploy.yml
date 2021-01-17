@@ -1,4 +1,4 @@
-name: Test and deploy
+name: Build, test and deploy
 
 on:
     push:
@@ -7,7 +7,7 @@ on:
         branches: [senpai]
 
 jobs:
-    Test and deploy:
+    Build-test-and-deploy:
         runs-on: ubuntu-latest
 
         steps:
