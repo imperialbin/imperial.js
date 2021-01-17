@@ -9,3 +9,4 @@ yarn.lock
 .eslintrc
 test.js
 apikey.txt
+yarn-error.log

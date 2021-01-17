@@ -1,0 +1,46 @@
+name: Test and deploy
+
+on:
+    push:
+        branches: [senpai]
+    pull_request:
+        branches: [senpai]
+
+jobs:
+    Test and deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            - name: Setup node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+
+            - name: Install yarn
+              run: npm i yarn@1.22.10 -g
+
+            - name: Login to npm
+              shell: bash
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: |
+                  rm -rf ~/.npmrc
+                  touch ~/.npmrc
+                  echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+
+            - name: Install dependencies
+              run: yarn ci
+
+            - name: Build
+              run: yarn build
+
+            - name: Lint
+              run: yarn lint
+
+            - name: Test
+              run: yarn test
+
+            - name: Deploy
+              run: yarn publish --non-interactive
