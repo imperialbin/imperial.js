@@ -12,7 +12,7 @@ jobs:
             - uses: actions/checkout@v2
 
             - name: Check package version
-              uses: technote-space/package-version-check-action@v1
+              uses: technote-space/package-version-check-action@v1.5.2
               with:
                   GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
                   COMMIT_MESSAGE: "version bump"
