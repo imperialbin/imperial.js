@@ -1,11 +1,11 @@
-name: Build, test and deploy
+name: Release
 
 on:
     push:
         tags:
             - "v*"
 jobs:
-    Build-test-and-deploy:
+    release:
         runs-on: ubuntu-latest
 
         steps:
