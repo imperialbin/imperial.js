@@ -1,0 +1,31 @@
+name: Build and test
+
+on: pull_request
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            - name: Setup node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+
+            - name: Install yarn
+              run: npm i yarn@1.22.10 -g
+
+            - name: Install dependencies
+              shell: bash
+              run: yarn ci
+
+            - name: Build
+              run: yarn build
+
+            - name: Lint
+              run: yarn lint
+
+            - name: Test
+              run: yarn test
