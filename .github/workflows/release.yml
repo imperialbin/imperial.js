@@ -11,6 +11,7 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v2
+
             - name: Setup node
               uses: actions/setup-node@v1
               with:
@@ -19,7 +20,7 @@ jobs:
             - name: Install yarn
               run: npm i yarn@1.22.10 -g
 
-            - name: Login to npm
+            - name: Setup credentials
               shell: bash
               env:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
