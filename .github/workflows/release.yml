@@ -2,10 +2,13 @@ name: Release
 
 on:
     push:
-        tags:
-            - "v*"
+        branches:
+            - senpai
+
 jobs:
     release:
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
         runs-on: ubuntu-latest
 
         steps:
@@ -30,7 +33,6 @@ jobs:
                   echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
 
             - name: Install dependencies
-              shell: bash
               run: yarn ci
 
             - name: Build
