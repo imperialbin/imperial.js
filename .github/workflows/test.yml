@@ -1,11 +1,9 @@
-name: Build, test and deploy
+name: Build and test
 
-on:
-    push:
-        branches: [senpai]
+on: [pull_request, push]
 
 jobs:
-    Build-test-and-deploy:
+    build-and-test:
         runs-on: ubuntu-latest
 
         steps:
@@ -19,15 +17,6 @@ jobs:
             - name: Install yarn
               run: npm i yarn@1.22.10 -g
 
-            - name: Login to npm
-              shell: bash
-              env:
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-              run: |
-                  rm -rf ~/.npmrc
-                  touch ~/.npmrc
-                  echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
-
             - name: Install dependencies
               shell: bash
               run: yarn ci
@@ -40,6 +29,3 @@ jobs:
 
             - name: Test
               run: yarn test
-
-            - name: Deploy
-              run: yarn publish --non-interactive
