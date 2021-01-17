@@ -29,11 +29,19 @@ $ yarn add imperial-node
 ```js
 const { Imperial } = require("imperial-node");
 
-const api = new Imperial();
+const api = new Imperial(/* you can pass the token here */);
 
 api.postCode("hello world!").then(console.log);
 // or using callbacks
 api.postCode("hello world!", (e, d) => {
+	if (!e) console.log(d);
+});
+
+api.getCode("https://imperialb.in/p/pxseuwu/g0gmj4p3fbt") // or just "g0gmj4p3fbt"
+	.then(console.log);
+// or using callbacks
+api.getCode("https://imperialb.in/p/pxseuwu/g0gmj4p3fbt", (e, d) => {
+	// or just "g0gmj4p3fbt"
 	if (!e) console.log(d);
 });
 ```
