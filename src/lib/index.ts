@@ -34,8 +34,8 @@ export class Imperial {
 		}
 	}
 
-	private _HOSTNAME = "www.imperialb.in";
-	private _HOSTNAMEREGEX = /^(www\.)?imperialb\.in$/i;
+	private _HOSTNAME = "imperialb.in"; // should have beeb default to this lol
+	private _HOSTNAMEREGEX = /^(www\.)?imperial(b\.in|bin.com)$/i;
 	private _prepareRequest({ method, headers, path }: prepareParams): https.RequestOptions {
 		const defaultHeaders = {
 			"User-Agent": "imperial-node; (+https://github.com/pxseu/imperial-node)",
