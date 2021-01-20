@@ -1,6 +1,9 @@
 name: Build and test
 
-on: [push]
+on:
+  push:
+    branches:
+        - senpai
 
 jobs:
     build-and-test:
