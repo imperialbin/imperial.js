@@ -1,6 +1,9 @@
 name: Build and test
 
-on: [pull_request, push, pull_request_target]
+on:
+  push:
+    branches:
+        - senpai
 
 jobs:
     build-and-test:
