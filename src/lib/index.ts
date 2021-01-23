@@ -34,11 +34,12 @@ export class Imperial {
 		}
 	}
 
-	private _HOSTNAME = "imperialb.in"; // should have beeb default to this lol
+	private _HOSTNAME = "imperialb.in"; // should have been default to this lol
 	private _HOSTNAMEREGEX = /^(www\.)?imperial(b\.in|bin.com)$/i;
 	private _prepareRequest({ method, headers, path }: prepareParams): https.RequestOptions {
 		const defaultHeaders = {
 			"User-Agent": "imperial-node; (+https://github.com/pxseu/imperial-node)",
+			Authorization: this._token ?? "",
 		};
 
 		headers = Object.assign(headers, defaultHeaders);
@@ -71,6 +72,7 @@ export class Imperial {
 					if (response.statusCode === 200 && json) {
 						resolve(json);
 					} else {
+						console.log(response);
 						if (response.statusCode === 302) {
 							/* If there was a 302 it means the request failed */
 							response.statusCode = 400;
@@ -145,10 +147,6 @@ export class Imperial {
 			expiration: 5,
 			code: text,
 		};
-
-		if (this._token) {
-			jsonParams.apiToken = this._token;
-		}
 
 		if (typeof optionsOrCallback !== "function") {
 			jsonParams = Object.assign(jsonParams, optionsOrCallback);
@@ -229,6 +227,7 @@ export class Imperial {
 			method: "GET",
 			path: `/getCode/${documentId}`,
 			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
 				Accept: "application/json",
 			},
 		});
@@ -275,21 +274,18 @@ export class Imperial {
 	public verify(
 		cb?: (error: unknown, data?: ImperialResponseCommon) => void
 	): Promise<ImperialResponseCommon> | void {
-		const params = setParams({ apiToken: this._token });
-
 		const opts = this._prepareRequest({
 			method: "GET",
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded",
-				"Content-Length": Buffer.byteLength(params.toString()),
 				Accept: "application/json",
 			},
-			path: "/checkApiToken",
+			path: `/checkApiToken/${encodeURIComponent(String(this._token))}`,
 		});
 
 		if (!cb) {
 			return new Promise((resolve, reject) => {
-				if (!this._token) {
+				if (!this._token || this._token == String()) {
 					reject(niceError({ statusCode: 0, errorMessage: "No token to verify!" }));
 					return;
 				}
@@ -298,12 +294,11 @@ export class Imperial {
 					resolve(this._parseResponse(response));
 				});
 				request.on("error", reject);
-				request.write(params.toString());
 				request.end();
 			});
 		}
 
-		if (!this._token) {
+		if (!this._token || this._token == String()) {
 			cb(niceError({ statusCode: 0, errorMessage: "No token to verify!" }));
 			return;
 		}
@@ -312,7 +307,6 @@ export class Imperial {
 			this._parseResponse(response).then((d) => cb(null, d), cb);
 		});
 		request.on("error", cb);
-		request.write(params.toString());
 		request.end();
 	}
 }
