@@ -72,7 +72,6 @@ export class Imperial {
 					if (response.statusCode === 200 && json) {
 						resolve(json);
 					} else {
-						console.log(response);
 						if (response.statusCode === 302) {
 							/* If there was a 302 it means the request failed */
 							response.statusCode = 400;
