@@ -10,7 +10,7 @@ import {
 	postOptions,
 	_internalPostOptions,
 } from "./helpers/interfaces";
-import setParams from "./helpers/setPostCodeParams";
+import { validateToken } from "./helpers/isValidToken";
 
 export type { ImperialResponseGetCode, ImperialResponsePostCode, postOptions } from "./helpers/interfaces";
 
@@ -22,7 +22,7 @@ interface prepareParams {
 
 /**
  *  The API wrapper class
- * @param token Your API token
+ * @param token Your API token (Optional but required for some settings)
  */
 
 export class Imperial {
@@ -35,9 +35,11 @@ export class Imperial {
 	}
 
 	private _HOSTNAME = "imperialb.in"; // should have been default to this lol
-	private _HOSTNAMEREGEX = /^(www\.)?imperial(b\.in|bin.com)$/i;
-	private _prepareRequest({ method, headers, path }: prepareParams): https.RequestOptions {
+	private _HOSTNAMEREGEX = /^(www\.)?imperialb(\.in|in.com)$/i;
+
+	private _prepareRequest({ method, headers = {}, path }: prepareParams): https.RequestOptions {
 		const defaultHeaders = {
+			"Content-Type": "application/json", // best thing to happen
 			"User-Agent": "imperial-node; (+https://github.com/pxseu/imperial-node)",
 			Authorization: this._token ?? "",
 		};
@@ -139,7 +141,7 @@ export class Imperial {
 	): Promise<ImperialResponsePostCode> | void {
 		const callBack = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
 
-		let jsonParams: _internalPostOptions = {
+		let jsonData: _internalPostOptions = {
 			longerUrls: false,
 			instantDelete: false,
 			imageEmbed: false,
@@ -148,20 +150,18 @@ export class Imperial {
 		};
 
 		if (typeof optionsOrCallback !== "function") {
-			jsonParams = Object.assign(jsonParams, optionsOrCallback);
+			jsonData = Object.assign(jsonData, optionsOrCallback);
+			jsonData.code = text; // a little backup if someone were to pass code so it doesn't break
 		}
 
-		const params = setParams(jsonParams);
-
-		const opts = this._prepareRequest({
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				"Content-Length": Buffer.byteLength(params.toString()),
-				Accept: "application/json",
-			},
-			path: "/postCode",
-		});
+		const data = JSON.stringify(jsonData),
+			opts = this._prepareRequest({
+				method: "POST",
+				path: "/postCode",
+				headers: {
+					"Content-Length": Buffer.byteLength(data.toString()),
+				},
+			});
 
 		if (!callBack) {
 			return new Promise((resolve, reject) => {
@@ -173,7 +173,7 @@ export class Imperial {
 					resolve(this._parseResponse(response));
 				});
 				request.on("error", reject);
-				request.write(params.toString());
+				request.write(data.toString());
 				request.end();
 			});
 		}
@@ -187,7 +187,7 @@ export class Imperial {
 			this._parseResponse(response).then((data) => callBack(null, data), callBack);
 		});
 		request.on("error", callBack);
-		request.write(params.toString());
+		request.write(data.toString());
 		request.end();
 	}
 
@@ -225,10 +225,6 @@ export class Imperial {
 		const opts = this._prepareRequest({
 			method: "GET",
 			path: `/getCode/${documentId}`,
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				Accept: "application/json",
-			},
 		});
 
 		if (!cb)
@@ -275,17 +271,18 @@ export class Imperial {
 	): Promise<ImperialResponseCommon> | void {
 		const opts = this._prepareRequest({
 			method: "GET",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				Accept: "application/json",
-			},
 			path: `/checkApiToken/${encodeURIComponent(String(this._token))}`,
 		});
 
 		if (!cb) {
 			return new Promise((resolve, reject) => {
-				if (!this._token || this._token == String()) {
-					reject(niceError({ statusCode: 0, errorMessage: "No token to verify!" }));
+				if (!validateToken(this._token)) {
+					reject(
+						niceError({
+							statusCode: 0,
+							errorMessage: "No or invalid token were provided in the constructor!",
+						})
+					);
 					return;
 				}
 
@@ -297,8 +294,8 @@ export class Imperial {
 			});
 		}
 
-		if (!this._token || this._token == String()) {
-			cb(niceError({ statusCode: 0, errorMessage: "No token to verify!" }));
+		if (!validateToken(this._token)) {
+			cb(niceError({ statusCode: 0, errorMessage: "No or invalid token were provided in the constructor!" }));
 			return;
 		}
 

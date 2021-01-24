@@ -32,7 +32,10 @@ test("verify - invalid token", async (t) => {
 		t.match(res.message, /\sinvalid!$/i, "message should say it's invalid");
 		t.end();
 	} catch (e) {
-		if (e && e.statusCode === 429) {
+		if (e.message == "No or invalid token were provided in the constructor!") {
+			t.pass(e.message);
+			t.end();
+		} else if (e && e.statusCode === 429) {
 			t.fail(e.statusCodeText);
 			t.end();
 		} else {
