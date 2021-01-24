@@ -5,15 +5,15 @@ import { codes as humanReadable } from "./httpCodes";
  */
 export interface parsedError extends Error {
 	json?: Record<string, unknown>;
-	statusCode: number | undefined;
-	statusCodeText: string;
+	statusCode?: number;
+	statusCodeText?: string;
 	rateLimitReset?: number;
 }
 
 interface niceErrorParams {
 	errorMessage?: string;
-	statusCode: number | undefined;
-	json?: Record<string, unknown> | undefined;
+	statusCode?: number;
+	json?: Record<string, unknown>;
 }
 
 /**
@@ -22,14 +22,14 @@ interface niceErrorParams {
 const niceError = ({ errorMessage, statusCode, json }: niceErrorParams): parsedError => {
 	let _errorMessage = errorMessage;
 
-	if (!_errorMessage) {
+	if (!_errorMessage && statusCode) {
 		_errorMessage = humanReadable.get(statusCode);
 	}
 
 	return Object.assign(new Error(errorMessage), {
 		json,
 		statusCode: statusCode,
-		statusCodeText: humanReadable.get(statusCode) ?? "",
+		statusCodeText: humanReadable.get(statusCode),
 	});
 };
 

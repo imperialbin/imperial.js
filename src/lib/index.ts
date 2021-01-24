@@ -12,7 +12,7 @@ import {
 } from "./helpers/interfaces";
 import { validateToken } from "./helpers/isValidToken";
 
-export type { ImperialResponseGetCode, ImperialResponsePostCode, postOptions } from "./helpers/interfaces";
+export type { ImperialResponseGetCode, ImperialResponsePostCode, postOptions };
 
 interface prepareParams {
 	method: string;
@@ -22,7 +22,8 @@ interface prepareParams {
 
 /**
  *  The API wrapper class
- * @param token Your API token (Optional but required for some settings)
+ *  @param token Your API token (Optional but required for some settings)
+ *  @author https://github.com/pxseu
  */
 
 export class Imperial {
@@ -72,26 +73,26 @@ export class Imperial {
 						/* Ignore parse error */
 					}
 					if (response.statusCode === 200 && json) {
-						resolve(json);
-					} else {
-						if (response.statusCode === 302) {
-							/* If there was a 302 it means the request failed */
-							response.statusCode = 400;
-						}
-
-						let errorMessage =
-							humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`;
-
-						if (json?.message) {
-							errorMessage = json.message;
-						}
-
-						reject(niceError({ errorMessage, json, statusCode: response.statusCode }));
+						return resolve(json);
 					}
+
+					if (response.statusCode === 302) {
+						/* If there was a 302 it means the request failed */
+						response.statusCode = 400;
+					}
+
+					let errorMessage = humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`;
+
+					if (json?.message) {
+						errorMessage = json.message;
+					}
+
+					reject(niceError({ errorMessage, json, statusCode: response.statusCode }));
 				} catch (err) {
 					reject(err);
 				}
 			});
+
 			response.on("error", reject);
 		});
 	}
@@ -166,7 +167,7 @@ export class Imperial {
 		if (!callBack) {
 			return new Promise((resolve, reject) => {
 				if (!text || text === String()) {
-					reject(niceError({ errorMessage: "No text was provided!", statusCode: 0 }));
+					reject(niceError({ errorMessage: "No text was provided!" }));
 					return;
 				}
 				const request = https.request(opts, (response) => {
@@ -179,7 +180,7 @@ export class Imperial {
 		}
 
 		if (!text || text === String()) {
-			callBack(niceError({ errorMessage: "No text was provided!", statusCode: 0 }));
+			callBack(niceError({ errorMessage: "No text was provided!" }));
 			return;
 		}
 
@@ -230,7 +231,7 @@ export class Imperial {
 		if (!cb)
 			return new Promise((resolve, reject) => {
 				if (!id || id === String()) {
-					reject(niceError({ statusCode: 0, errorMessage: "No documentId was provided!" }));
+					reject(niceError({ errorMessage: "No documentId was provided!" }));
 					return;
 				}
 
@@ -242,7 +243,7 @@ export class Imperial {
 			});
 
 		if (!id || id === String()) {
-			cb(niceError({ statusCode: 0, errorMessage: "No documentId was provided!" }));
+			cb(niceError({ errorMessage: "No documentId was provided!" }));
 			return;
 		}
 
@@ -279,8 +280,7 @@ export class Imperial {
 				if (!validateToken(this._token)) {
 					reject(
 						niceError({
-							statusCode: 0,
-							errorMessage: "No or invalid token were provided in the constructor!",
+							errorMessage: "No or invalid token was provided in the constructor!",
 						})
 					);
 					return;
@@ -295,7 +295,7 @@ export class Imperial {
 		}
 
 		if (!validateToken(this._token)) {
-			cb(niceError({ statusCode: 0, errorMessage: "No or invalid token were provided in the constructor!" }));
+			cb(niceError({ errorMessage: "No or invalid token were provided in the constructor!" }));
 			return;
 		}
 

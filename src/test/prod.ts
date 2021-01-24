@@ -32,7 +32,7 @@ test("verify - invalid token", async (t) => {
 		t.match(res.message, /\sinvalid!$/i, "message should say it's invalid");
 		t.end();
 	} catch (e) {
-		if (e.message == "No or invalid token were provided in the constructor!") {
+		if (e.message == "No or invalid token was provided in the constructor!") {
 			t.pass(e.message);
 			t.end();
 		} else if (e && e.statusCode === 429) {
@@ -70,7 +70,7 @@ test("verify - no token", async (t) => {
 		t.fail("should have thrown an error");
 		t.end();
 	} catch (e) {
-		if (e && e.statusCode === 0) {
+		if (e && e.message === "No or invalid token was provided in the constructor!") {
 			t.pass(`Throws an error: "${e}"`);
 			t.end();
 		} else if (e && e.statusCode === 429) {
@@ -109,7 +109,7 @@ test("postCode - invalid", async (t) => {
 		t.fail("should have thrown an error");
 		t.end();
 	} catch (e) {
-		if (e && e.statusCode === 0) {
+		if (e && e.message === "No text was provided!") {
 			t.pass(`Throws an error: "${e}"`);
 			t.end();
 		} else if (e && e.statusCode === 429) {
@@ -148,7 +148,7 @@ test("getCode - invalid", async (t) => {
 		t.fail("should have thrown an error");
 		t.end();
 	} catch (e) {
-		if (e && e.statusCode === 0) {
+		if (e && e.message === "No documentId was provided!") {
 			t.pass(`Throws an error: "${e}"`);
 			t.end();
 		} else if (e && e.statusCode === 429) {

@@ -38,6 +38,5 @@ export interface postOptions {
 
 export interface _internalPostOptions extends postOptions {
 	code: string;
-	apiToken?: string;
 	[key: string]: unknown;
 }
