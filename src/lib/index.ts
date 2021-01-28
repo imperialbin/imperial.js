@@ -2,7 +2,7 @@ import { IncomingMessage, OutgoingHttpHeaders } from "http";
 import https from "https";
 import { URL } from "url";
 import { codes as humanReadable } from "./helpers/httpCodes";
-import niceError from "./helpers/niceError";
+import errorParser from "./helpers/niceError";
 import {
 	ImperialResponseGetCode,
 	ImperialResponsePostCode,
@@ -87,7 +87,9 @@ export class Imperial {
 						errorMessage = json.message;
 					}
 
-					reject(niceError({ errorMessage, json, statusCode: response.statusCode }));
+					reject(
+						errorParser({ errorMessage: new Error(errorMessage), json, statusCode: response.statusCode })
+					);
 				} catch (err) {
 					reject(err);
 				}
@@ -167,7 +169,7 @@ export class Imperial {
 		if (!callBack) {
 			return new Promise((resolve, reject) => {
 				if (!text || text === String()) {
-					reject(niceError({ errorMessage: "No text was provided!" }));
+					reject(new Error("No text was provided!"));
 					return;
 				}
 				const request = https.request(opts, (response) => {
@@ -180,7 +182,7 @@ export class Imperial {
 		}
 
 		if (!text || text === String()) {
-			callBack(niceError({ errorMessage: "No text was provided!" }));
+			callBack(new Error("No text was provided!"));
 			return;
 		}
 
@@ -193,17 +195,17 @@ export class Imperial {
 	}
 
 	/**
-	 *	 Get a document from the API
+	 *  Get a document from the API
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *	@example getCode("someid").then(console.log); // Logs the response to the console
+	 *  @example getCode("someid").then(console.log); // Logs the response to the console
 	 */
 	public getCode(id: string): Promise<ImperialResponseGetCode>;
 
 	/**
-	 *	 Get a document from the API
+	 *  Get a document from the API
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param cb Function called after the data is fetched or if there was an error
-	 *	@example getCode("someid"), (e, d) => { if (!e) console.log(d) }; // Logs the response to the console
+	 *  @example getCode("someid"), (e, d) => { if (!e) console.log(d) }; // Logs the response to the console
 	 */
 	public getCode(id: string, cb: (error: unknown, data?: ImperialResponseGetCode) => void): void;
 
@@ -231,7 +233,7 @@ export class Imperial {
 		if (!cb)
 			return new Promise((resolve, reject) => {
 				if (!id || id === String()) {
-					reject(niceError({ errorMessage: "No documentId was provided!" }));
+					reject(new Error("No documentId was provided!"));
 					return;
 				}
 
@@ -243,7 +245,7 @@ export class Imperial {
 			});
 
 		if (!id || id === String()) {
-			cb(niceError({ errorMessage: "No documentId was provided!" }));
+			cb(new Error("No documentId was provided!"));
 			return;
 		}
 
@@ -255,13 +257,13 @@ export class Imperial {
 	}
 
 	/**
-	 *	 Check if your token is valid **Only use when provided the token in the constructor**
-	 *	@example verify().then(console.log) // shows if the token is valid
+	 *  Check if your token is valid **Only use when provided the token in the constructor**
+	 *  @example verify().then(console.log) // shows if the token is valid
 	 */
 	public verify(): Promise<ImperialResponseCommon>;
 
 	/**
-	 *	 Check if your token is valid **Only use when provided the token in the constructor**
+	 *  Check if your token is valid **Only use when provided the token in the constructor**
 	 *  @param cb Function called after the data is fetched or if there was an error
 	 *  @example verify((e, d) => {if (!e) console.log(d)}) // shows if the token is valid
 	 */
@@ -278,11 +280,7 @@ export class Imperial {
 		if (!cb) {
 			return new Promise((resolve, reject) => {
 				if (!validateToken(this._token)) {
-					reject(
-						niceError({
-							errorMessage: "No or invalid token was provided in the constructor!",
-						})
-					);
+					reject(new Error("No or invalid token was provided in the constructor!"));
 					return;
 				}
 
@@ -295,7 +293,7 @@ export class Imperial {
 		}
 
 		if (!validateToken(this._token)) {
-			cb(niceError({ errorMessage: "No or invalid token were provided in the constructor!" }));
+			cb(new Error("No or invalid token was provided in the constructor!"));
 			return;
 		}
 
