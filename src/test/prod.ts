@@ -1,7 +1,8 @@
 /* Amazing tests done at 6 am */
+/* eslint-disable */
 
 import test from "tape";
-// @ts-expect-error no types
+// @ts-ignore
 import tapDiff from "tap-diff";
 import { readFileSync } from "fs";
 import { Imperial } from "../lib";
@@ -104,7 +105,7 @@ test("postCode - valid", async (t) => {
 test("postCode - invalid", async (t) => {
 	try {
 		const client = new Imperial(apikey);
-		// @ts-expect-error we are testing that
+		// @ts-ignore
 		await client.postCode();
 		t.fail("should have thrown an error");
 		t.end();
@@ -143,7 +144,7 @@ test("getCode - valid", async (t) => {
 test("getCode - invalid", async (t) => {
 	try {
 		const client = new Imperial(apikey);
-		// @ts-expect-error we are testing that
+		// @ts-ignore
 		await client.getCode();
 		t.fail("should have thrown an error");
 		t.end();
