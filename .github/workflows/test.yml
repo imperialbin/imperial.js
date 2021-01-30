@@ -31,9 +31,9 @@ jobs:
 
             - name: Prepare Test
               run: |
-                  touch apikey.txt
-                  echo $IMPERIAL_TOKEN > apikey.txt
-                  echo $VALID_DOCUMENT_URL >> apikey.txt
+                  touch test_data.txt
+                  echo $IMPERIAL_TOKEN > test_data.txt
+                  echo $VALID_DOCUMENT_URL >> test_data.txt
               env:
                   IMPERIAL_TOKEN: ${{ secrets.IMPERIAL_TOKEN}}
                   VALID_DOCUMENT_URL: ${{ secrets.VALID_DOCUMENT_URL }}
