@@ -93,8 +93,12 @@ test("postCode - valid", async (t) => {
 	try {
 		const client = new Imperial(apikey);
 		const res = await client.postCode("hi from test!", { instantDelete: true });
-		t.ok(res.success, "request should be completed");
+		t.ok(res.success, "First request should be completed");
 		t.strictEqual(res.instantDelete, true, "instantDelete should be set to true");
+
+		const res2 = await client.postCode("hi from test!");
+		t.ok(res2.success, "Second request should be completed");
+		t.strictEqual(res2.instantDelete, false, "instantDelete should be set to false");
 		t.end();
 	} catch (e) {
 		if (e && e.statusCode === 429) {
