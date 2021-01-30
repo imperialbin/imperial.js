@@ -104,4 +104,4 @@ dist
 .tern-port
 
 test.js
-apikey.txt
+test_data.txt

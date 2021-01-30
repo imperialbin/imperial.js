@@ -58,6 +58,16 @@ api.verify((e, d) => {
 
 # Running Locally
 
+Before you start create a new text file in the root of the package named: `test_data.txt`. \
+In that file provide the data like so:
+
+```
+<Your Imperial token here>
+<Valid document url>
+```
+
+Then do:
+
 ```sh
 $ npm ci
 $ npm run build

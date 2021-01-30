@@ -9,21 +9,44 @@ import { Imperial } from "../lib";
 
 test.createStream().pipe(tapDiff()).pipe(process.stdout);
 
-const apikey = ((): string | null => {
-	const path = `${__dirname}/../../apikey.txt`;
+const [apikey, documentUrl] = ((): string[] => {
+	const path = `${__dirname}/../../test_data.txt`;
 	let fileContent: null | string = null;
 	try {
 		fileContent = readFileSync(path, "utf-8").trim();
 	} catch (err) {
 		/* File not found */
 	}
-	return fileContent;
+
+	if (!fileContent) return [];
+
+	return fileContent.split(/\r?\n/);
 })();
 
-if (!apikey) {
-	console.log("> No token provided, aborting tests!");
+if (!apikey || !documentUrl) {
+	console.log("> No token or valid documentUrl provided, aborting tests!");
 	process.exit(0);
 }
+
+console.log(apikey, documentUrl);
+
+test("verify - valid token", async (t) => {
+	try {
+		const client = new Imperial(apikey);
+		const res = await client.verify();
+		t.ok(res.success, "token should be valid");
+		t.match(res.message, /\svalid!$/i, "message should say it's valid");
+		t.end();
+	} catch (e) {
+		if (e && e.statusCode === 429) {
+			t.fail(e.statusCodeText);
+			t.end();
+		} else {
+			t.fail(e);
+			t.end();
+		}
+	}
+});
 
 test("verify - invalid token", async (t) => {
 	try {
@@ -37,24 +60,6 @@ test("verify - invalid token", async (t) => {
 			t.pass(e.message);
 			t.end();
 		} else if (e && e.statusCode === 429) {
-			t.fail(e.statusCodeText);
-			t.end();
-		} else {
-			t.fail(e);
-			t.end();
-		}
-	}
-});
-
-test("verify - valid token", async (t) => {
-	try {
-		const client = new Imperial(apikey);
-		const res = await client.verify();
-		t.ok(res.success, "token should be valid");
-		t.match(res.message, /\svalid!$/i, "message should say it's valid");
-		t.end();
-	} catch (e) {
-		if (e && e.statusCode === 429) {
 			t.fail(e.statusCodeText);
 			t.end();
 		} else {
@@ -126,7 +131,7 @@ test("postCode - invalid", async (t) => {
 test("getCode - valid", async (t) => {
 	try {
 		const client = new Imperial(apikey);
-		const res = await client.getCode("https://imperialb.in/pxseuwu/fw37bo286knssafupduhl9hjo25pylw");
+		const res = await client.getCode(documentUrl); // new magic epic url
 		t.ok(res.success, "request should be completed");
 		t.strictEqual(typeof res.document, "string", "document should be type of string");
 		t.end();
