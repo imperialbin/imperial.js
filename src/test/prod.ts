@@ -28,8 +28,6 @@ if (!apikey || !documentUrl) {
 	process.exit(0);
 }
 
-console.log(apikey, documentUrl);
-
 test("verify - valid token", async (t) => {
 	try {
 		const client = new Imperial(apikey);
