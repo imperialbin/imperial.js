@@ -8,7 +8,6 @@ import {
 	postOptions,
 } from "./helpers/interfaces";
 import { validateToken } from "./helpers/isValidToken";
-import { createRequest } from "./helpers/request";
 import { parseResponse } from "./helpers/responseParser";
 
 export type { ImperialResponseGetCode, ImperialResponsePostCode, postOptions };
