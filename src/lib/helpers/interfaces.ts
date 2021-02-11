@@ -1,4 +1,8 @@
 /**
+ *  Global interfaces that the user can import
+ */
+
+/**
  *  `postCode` response that gets return from the Wrapper
  */
 export interface ImperialResponsePostCode {
@@ -34,9 +38,4 @@ export interface postOptions {
 	instantDelete?: boolean;
 	imageEmbed?: boolean;
 	expiration?: number;
-}
-
-export interface _internalPostOptions extends postOptions {
-	code: string;
-	[key: string]: unknown;
 }

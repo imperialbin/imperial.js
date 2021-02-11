@@ -1,24 +1,32 @@
-import { IncomingMessage, OutgoingHttpHeaders } from "http";
-import https from "https";
+import { OutgoingHttpHeaders } from "http";
+import { request, RequestOptions } from "https";
 import { URL } from "url";
-import { codes as humanReadable } from "./helpers/httpCodes";
-import errorParser from "./helpers/niceError";
 import {
 	ImperialResponseGetCode,
 	ImperialResponsePostCode,
 	ImperialResponseCommon,
 	postOptions,
-	_internalPostOptions,
 } from "./helpers/interfaces";
 import { validateToken } from "./helpers/isValidToken";
+import { createRequest } from "./helpers/request";
+import { parseResponse } from "./helpers/responseParser";
 
 export type { ImperialResponseGetCode, ImperialResponsePostCode, postOptions };
 
+/* Internal inetfaces that should not be exported */
 interface prepareParams {
 	method: string;
 	headers?: OutgoingHttpHeaders;
 	path: string;
 }
+
+interface internalPostOptions extends postOptions {
+	code: string;
+	[key: string]: unknown;
+}
+
+const HOSTNAME = "imperialb.in"; // Domain to do request with
+const HOSTNAMEREGEX = /^(www\.)?imperialb(\.in|in.com)$/i; // Simple regex to check if a domain is valid
 
 /**
  *  The API wrapper class
@@ -27,76 +35,24 @@ interface prepareParams {
  */
 
 export class Imperial {
-	private _token: string | null = null;
+	constructor(private token?: string) {}
 
-	constructor(token?: string) {
-		if (token) {
-			this._token = token;
-		}
-	}
-
-	private _HOSTNAME = "imperialb.in"; // should have been default to this lol
-	private _HOSTNAMEREGEX = /^(www\.)?imperialb(\.in|in.com)$/i;
-
-	private _prepareRequest({ method, headers = {}, path }: prepareParams): https.RequestOptions {
+	private _prepareRequest({ method, headers = {}, path }: prepareParams): RequestOptions {
 		const defaultHeaders = {
 			"Content-Type": "application/json", // best thing to happen
-			"User-Agent": "imperial-node; (+https://github.com/pxseu/imperial-node)",
-			Authorization: this._token ?? "",
+			"User-Agent": "imperial-node; (+https://github.com/imperialbin/imperial-node)",
+			Authorization: this.token ?? "",
 		};
 
 		headers = Object.assign(headers, defaultHeaders);
 
 		return {
-			hostname: this._HOSTNAME,
+			hostname: HOSTNAME,
 			port: 443,
 			path: `/api${path}`,
 			method,
 			headers,
 		};
-	}
-
-	private _parseResponse(response: IncomingMessage): Promise<never> {
-		return new Promise((resolve, reject) => {
-			const data: string[] = [];
-			response.on("data", (chunk: string) => {
-				data.push(chunk);
-			});
-			response.on("end", () => {
-				try {
-					const responseData = data.join(String());
-					let json;
-
-					try {
-						json = JSON.parse(responseData);
-					} catch (e) {
-						/* Ignore parse error */
-					}
-					if (response.statusCode === 200 && json) {
-						return resolve(json);
-					}
-
-					if (response.statusCode === 302) {
-						/* If there was a 302 it means the request failed */
-						response.statusCode = 400;
-					}
-
-					let errorMessage = humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`;
-
-					if (json?.message) {
-						errorMessage = json.message;
-					}
-
-					reject(
-						errorParser({ errorMessage: new Error(errorMessage), json, statusCode: response.statusCode })
-					);
-				} catch (err) {
-					reject(err);
-				}
-			});
-
-			response.on("error", reject);
-		});
 	}
 
 	/**
@@ -144,7 +100,13 @@ export class Imperial {
 	): Promise<ImperialResponsePostCode> | void {
 		const callBack = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
 
-		let jsonData: _internalPostOptions = {
+		if (!text || text === String()) {
+			const err = new Error("No text was provided!");
+			if (!callBack) return Promise.reject(err);
+			return callBack(err);
+		}
+
+		let data: internalPostOptions = {
 			longerUrls: false,
 			instantDelete: false,
 			imageEmbed: false,
@@ -153,45 +115,21 @@ export class Imperial {
 		};
 
 		if (typeof optionsOrCallback !== "function") {
-			jsonData = Object.assign(jsonData, optionsOrCallback);
-			jsonData.code = text; // a little backup if someone were to pass code so it doesn't break
+			data = Object.assign(data, optionsOrCallback);
+			data.code = text; // a little backup if someone were to pass code so it doesn't break
 		}
 
-		const data = JSON.stringify(jsonData),
-			opts = this._prepareRequest({
-				method: "POST",
-				path: "/postCode",
-				headers: {
-					"Content-Length": Buffer.byteLength(data.toString()),
-				},
-			});
+		const dataString = JSON.stringify(data);
 
-		if (!callBack) {
-			return new Promise((resolve, reject) => {
-				if (!text || text === String()) {
-					reject(new Error("No text was provided!"));
-					return;
-				}
-				const request = https.request(opts, (response) => {
-					resolve(this._parseResponse(response));
-				});
-				request.on("error", reject);
-				request.write(data.toString());
-				request.end();
-			});
-		}
-
-		if (!text || text === String()) {
-			callBack(new Error("No text was provided!"));
-			return;
-		}
-
-		const request = https.request(opts, (response) => {
-			this._parseResponse(response).then((data) => callBack(null, data), callBack);
+		const opts = this._prepareRequest({
+			method: "POST",
+			path: "/document",
+			headers: {
+				"Content-Length": Buffer.byteLength(dataString),
+			},
 		});
-		request.on("error", callBack);
-		request.write(data.toString());
-		request.end();
+
+		return createRequest<ImperialResponsePostCode>(opts, cb, dataString);
 	}
 
 	/**
@@ -213,11 +151,21 @@ export class Imperial {
 		id: string,
 		cb?: (error: unknown, data?: ImperialResponseGetCode) => void
 	): Promise<ImperialResponseGetCode> | void {
-		let documentId = encodeURIComponent(id);
+		if (!id || id === String()) {
+			// Throw an error if the data was empty to not stress the servers
+			const err = new Error("No documentId was provided!");
+
+			if (!cb) return Promise.reject(err);
+			return cb(err);
+		}
+
+		let documentId = encodeURIComponent(id); // Make the user inputed data encoded so it doesn't break stuff
 
 		try {
+			// Try to parse a url
 			const url = new URL(id);
-			if (this._HOSTNAMEREGEX.test(url.hostname)) {
+			if (HOSTNAMEREGEX.test(url.hostname)) {
+				// If the domain matches imperial extract data after last slash
 				const splitPath = url.pathname.split("/");
 				documentId = splitPath.length > 0 ? splitPath[splitPath.length - 1] : String();
 			}
@@ -227,33 +175,23 @@ export class Imperial {
 
 		const opts = this._prepareRequest({
 			method: "GET",
-			path: `/getCode/${documentId}`,
+			path: `/document/${documentId}`,
 		});
 
 		if (!cb)
 			return new Promise((resolve, reject) => {
-				if (!id || id === String()) {
-					reject(new Error("No documentId was provided!"));
-					return;
-				}
-
-				const request = https.request(opts, (response) => {
-					resolve(this._parseResponse(response));
+				const localrequest = request(opts, (response) => {
+					resolve(parseResponse(response));
 				});
-				request.on("error", reject);
-				request.end();
+				localrequest.on("error", reject);
+				localrequest.end();
 			});
 
-		if (!id || id === String()) {
-			cb(new Error("No documentId was provided!"));
-			return;
-		}
-
-		const request = https.request(opts, (response) => {
-			this._parseResponse(response).then((data) => cb(null, data), cb);
+		const localrequest = request(opts, (response) => {
+			parseResponse(response).then((data) => cb(null, data), cb);
 		});
-		request.on("error", cb);
-		request.end();
+		localrequest.on("error", cb);
+		localrequest.end();
 	}
 
 	/**
@@ -272,35 +210,30 @@ export class Imperial {
 	public verify(
 		cb?: (error: unknown, data?: ImperialResponseCommon) => void
 	): Promise<ImperialResponseCommon> | void {
+		if (!this.token || !validateToken(this.token)) {
+			const err = new Error("No or invalid token was provided in the constructor!");
+			if (!cb) return Promise.reject(err);
+			return cb(err);
+		}
+
 		const opts = this._prepareRequest({
 			method: "GET",
-			path: `/checkApiToken/${encodeURIComponent(String(this._token))}`,
+			path: `/checkApiToken/${encodeURIComponent(this.token)}`,
 		});
 
-		if (!cb) {
+		if (!cb)
 			return new Promise((resolve, reject) => {
-				if (!validateToken(this._token)) {
-					reject(new Error("No or invalid token was provided in the constructor!"));
-					return;
-				}
-
-				const request = https.request(opts, (response) => {
-					resolve(this._parseResponse(response));
+				const localrequest = request(opts, (response) => {
+					resolve(parseResponse(response));
 				});
-				request.on("error", reject);
-				request.end();
+				localrequest.on("error", reject);
+				localrequest.end();
 			});
-		}
 
-		if (!validateToken(this._token)) {
-			cb(new Error("No or invalid token was provided in the constructor!"));
-			return;
-		}
-
-		const request = https.request(opts, (response) => {
-			this._parseResponse(response).then((d) => cb(null, d), cb);
+		const localrequest = request(opts, (response) => {
+			parseResponse(response).then((d) => cb(null, d), cb);
 		});
-		request.on("error", cb);
-		request.end();
+		localrequest.on("error", cb);
+		localrequest.end();
 	}
 }
