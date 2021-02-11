@@ -129,7 +129,21 @@ export class Imperial {
 			},
 		});
 
-		return createRequest<ImperialResponsePostCode>(opts, cb, dataString);
+		if (!callBack)
+			return new Promise((resolve, reject) => {
+				const httpRequest = request(opts, (response) => {
+					resolve(parseResponse(response));
+				});
+				httpRequest.on("error", reject);
+				httpRequest.write(dataString);
+				httpRequest.end();
+			});
+
+		const httpRequest = request(opts, (response) => {
+			parseResponse(response).then((data) => callBack(null, data), cb);
+		});
+		httpRequest.on("error", callBack);
+		httpRequest.end();
 	}
 
 	/**
@@ -180,18 +194,18 @@ export class Imperial {
 
 		if (!cb)
 			return new Promise((resolve, reject) => {
-				const localrequest = request(opts, (response) => {
+				const httpRequest = request(opts, (response) => {
 					resolve(parseResponse(response));
 				});
-				localrequest.on("error", reject);
-				localrequest.end();
+				httpRequest.on("error", reject);
+				httpRequest.end();
 			});
 
-		const localrequest = request(opts, (response) => {
+		const httpRequest = request(opts, (response) => {
 			parseResponse(response).then((data) => cb(null, data), cb);
 		});
-		localrequest.on("error", cb);
-		localrequest.end();
+		httpRequest.on("error", cb);
+		httpRequest.end();
 	}
 
 	/**
@@ -223,17 +237,17 @@ export class Imperial {
 
 		if (!cb)
 			return new Promise((resolve, reject) => {
-				const localrequest = request(opts, (response) => {
+				const httpRequest = request(opts, (response) => {
 					resolve(parseResponse(response));
 				});
-				localrequest.on("error", reject);
-				localrequest.end();
+				httpRequest.on("error", reject);
+				httpRequest.end();
 			});
 
-		const localrequest = request(opts, (response) => {
+		const httpRequest = request(opts, (response) => {
 			parseResponse(response).then((d) => cb(null, d), cb);
 		});
-		localrequest.on("error", cb);
-		localrequest.end();
+		httpRequest.on("error", cb);
+		httpRequest.end();
 	}
 }
