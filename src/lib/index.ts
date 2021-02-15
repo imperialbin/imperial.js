@@ -1,16 +1,17 @@
-import { OutgoingHttpHeaders } from "http";
+import { IncomingMessage, OutgoingHttpHeaders } from "http";
 import { request, RequestOptions } from "https";
 import { URL } from "url";
 import {
-	postOptions,
+	Interfaces,
+	createOptions,
 	ImperialResponseCommon,
 	ImperialResponseGetDocument,
 	ImperialResponseCreateDocument,
 } from "./helpers/interfaces";
 import { validateToken } from "./helpers/isValidToken";
-import { parseResponse } from "./helpers/responseParser";
+import { codes as humanReadable } from "./helpers/httpCodes";
 
-export type { ImperialResponseGetDocument, ImperialResponseCreateDocument, postOptions };
+export type { Interfaces };
 
 /* Internal inetfaces that should not be exported */
 interface prepareParams {
@@ -19,7 +20,7 @@ interface prepareParams {
 	path: string;
 }
 
-interface internalPostOptions extends postOptions {
+interface internalPostOptions extends createOptions {
 	code: string;
 	[key: string]: unknown;
 }
@@ -74,7 +75,7 @@ export class Imperial {
 	 *  @example createDocument("hi!", { longerUrls: true }).then(console.log); // Prints the response to console
 	 *  @returns `Promise<ImperialResponseCreateDocument>`
 	 */
-	public createDocument(text: string, opts: postOptions): Promise<ImperialResponseCreateDocument>;
+	public createDocument(text: string, opts: createOptions): Promise<ImperialResponseCreateDocument>;
 
 	/**
 	 *  Create a document
@@ -97,7 +98,7 @@ export class Imperial {
 	 */
 	public createDocument(
 		text: string,
-		opts: postOptions,
+		opts: createOptions,
 		cb: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): void;
 
@@ -106,7 +107,7 @@ export class Imperial {
 	 */
 	public createDocument(
 		text: string,
-		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | postOptions,
+		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | createOptions,
 		cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): Promise<ImperialResponseCreateDocument> | void {
 		const callback = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
@@ -348,7 +349,7 @@ export class Imperial {
 	 *  // Prints the response to console
 	 *  @deprecated Since 1.2.3, use `createDocument` instead
 	 */
-	public postCode(text: string, opts: postOptions): Promise<ImperialResponseCreateDocument>;
+	public postCode(text: string, opts: createOptions): Promise<ImperialResponseCreateDocument>;
 
 	/**
 	 *  Create a document
@@ -371,7 +372,7 @@ export class Imperial {
 	 */
 	public postCode(
 		text: string,
-		opts: postOptions,
+		opts: createOptions,
 		cb: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): void;
 
@@ -381,7 +382,7 @@ export class Imperial {
 	 */
 	public postCode(
 		text: string,
-		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | postOptions,
+		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | createOptions,
 		cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): Promise<ImperialResponseCreateDocument> | void {
 		process.emitWarning(
@@ -392,4 +393,48 @@ export class Imperial {
 		// @ts-expect-error eqeqeq
 		return this.createDocument(text, optionsOrCallback, cb);
 	}
+}
+
+function parseResponse(response: IncomingMessage): Promise<never> {
+	return new Promise((resolve, reject) => {
+		const data: string[] = [];
+		// Collect all data chunks
+		response.on("data", (chunk: string) => {
+			data.push(chunk);
+		});
+
+		response.on("end", () => {
+			try {
+				const responseData = data.join(String());
+				let json;
+
+				try {
+					json = JSON.parse(responseData);
+				} catch (e) {
+					/* Ignore parse error */
+				}
+
+				if (response.statusCode === 200 && json) {
+					return resolve(json);
+				}
+
+				if (response.statusCode === 302) {
+					/* When we encouter a 302 the request was not correct and the server decied to redirect us */
+					response.statusCode = 400;
+				}
+
+				reject(
+					new Error(
+						json?.message
+							? json.message
+							: humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`
+					)
+				);
+			} catch (err) {
+				reject(err);
+			}
+		});
+
+		response.on("error", reject);
+	});
 }

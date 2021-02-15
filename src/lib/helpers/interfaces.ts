@@ -3,7 +3,18 @@
  */
 
 /**
- *  `postCode` response that gets return from the Wrapper
+ *  Single type to export
+ */
+
+export interface Interfaces {
+	createOptions: createOptions;
+	ImperialResponseCommon: ImperialResponseCommon;
+	ImperialResponseGetDocument: ImperialResponseGetDocument;
+	ImperialResponseCreateDocument: ImperialResponseCreateDocument;
+}
+
+/**
+ *  `createDocument` response
  */
 export interface ImperialResponseCreateDocument {
 	success: boolean;
@@ -15,7 +26,7 @@ export interface ImperialResponseCreateDocument {
 }
 
 /**
- *  `getCode` response that gets return from the Wrapper
+ *  `getDocument` response
  */
 export interface ImperialResponseGetDocument {
 	success: boolean;
@@ -31,9 +42,9 @@ export interface ImperialResponseCommon {
 }
 
 /**
- *  Options that a user can pass in the `opts` object
+ *  Options for creating the document
  */
-export interface postOptions {
+export interface createOptions {
 	longerUrls?: boolean;
 	instantDelete?: boolean;
 	imageEmbed?: boolean;
