@@ -5,7 +5,7 @@
 /**
  *  `postCode` response that gets return from the Wrapper
  */
-export interface ImperialResponsePostCode {
+export interface ImperialResponseCreateDocument {
 	success: boolean;
 	documentId: string;
 	rawLink: string;
@@ -17,7 +17,7 @@ export interface ImperialResponsePostCode {
 /**
  *  `getCode` response that gets return from the Wrapper
  */
-export interface ImperialResponseGetCode {
+export interface ImperialResponseGetDocument {
 	success: boolean;
 	document: string;
 }

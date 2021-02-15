@@ -2,15 +2,15 @@ import { OutgoingHttpHeaders } from "http";
 import { request, RequestOptions } from "https";
 import { URL } from "url";
 import {
-	ImperialResponseGetCode,
-	ImperialResponsePostCode,
-	ImperialResponseCommon,
 	postOptions,
+	ImperialResponseCommon,
+	ImperialResponseGetDocument,
+	ImperialResponseCreateDocument,
 } from "./helpers/interfaces";
 import { validateToken } from "./helpers/isValidToken";
 import { parseResponse } from "./helpers/responseParser";
 
-export type { ImperialResponseGetCode, ImperialResponsePostCode, postOptions };
+export type { ImperialResponseGetDocument, ImperialResponseCreateDocument, postOptions };
 
 /* Internal inetfaces that should not be exported */
 interface prepareParams {
@@ -29,11 +29,14 @@ const HOSTNAMEREGEX = /^(www\.)?imperialb(\.in|in.com)$/i; // Simple regex to ch
 
 /**
  *  The API wrapper class
- *  @param token Your API token (Optional but required for some settings)
  *  @author https://github.com/pxseu
  */
 
 export class Imperial {
+	/**
+	 *  `Imperial` constructor
+	 *  @param token Your API token
+	 */
 	constructor(private token?: string) {}
 
 	private _prepareRequest({ method, headers = {}, path }: prepareParams): RequestOptions {
@@ -58,51 +61,68 @@ export class Imperial {
 	 *  Create a document
 	 *  @param text The text to be sent
 	 *  @returns Promise with the data
-	 *  @example postCode("hi!").then(console.log); // Prints the response to console
+	 *  @example createDocument("hi!").then(console.log);
+	 *  // Prints the response to console
+	 *  @returns `Promise<ImperialResponseCreateDocument>`
 	 */
-	public postCode(text: string): Promise<ImperialResponsePostCode>;
+	public createDocument(text: string): Promise<ImperialResponseCreateDocument>;
 
 	/**
 	 *  Create a document
 	 *  @param text The text to be sent
 	 *  @param opts Additional options for the request **Api key is required**
 	 *  @returns Promise with the data
-	 *  @example postCode("hi!", { longerUrls: true }).then(console.log); // Prints the response to console
+	 *  @example createDocument("hi!", { longerUrls: true }).then(console.log); // Prints the response to console
+	 *  @returns `Promise<ImperialResponseCreateDocument>`
 	 */
-	public postCode(text: string, opts: postOptions): Promise<ImperialResponsePostCode>;
+	public createDocument(text: string, opts: postOptions): Promise<ImperialResponseCreateDocument>;
+
 	/**
 	 *  Create a document
 	 *  @param text The text to be sent
 	 *  @param cb Function called after the data is sent or if there was an error
-	 *  @example postCode("hi!", (e, d) => {if (!e) console.log(d);}) // Prints the response to console
+	 *  @example createDocument("hi!", (e, d) => {if (!e) console.log(d);})
+	 *  // Prints the response to console
+	 *  @returns `void`
 	 */
-
-	public postCode(text: string, cb: (error: unknown, data?: ImperialResponsePostCode) => void): void;
+	public createDocument(text: string, cb: (error: unknown, data?: ImperialResponseCreateDocument) => void): void;
 
 	/**
 	 *  Create a document
 	 *  @param text The text to be sent
 	 *  @param opts Additional options for the request **Api key is required**
 	 *  @param cb Function called after the data is sent or if there was an error
-	 *  @example postCode("hi!", (e, d) => {if (!e) console.log(d);}) // Prints the response to console
+	 *  @example createDocument("hi!", (e, d) => {if (!e) console.log(d);})
+	 *  // Prints the response to console
+	 *  @returns `void`
 	 */
-	public postCode(
+	public createDocument(
 		text: string,
 		opts: postOptions,
-		cb: (error: unknown, data?: ImperialResponsePostCode) => void
+		cb: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): void;
 
-	public postCode(
+	/**
+	 *  Create a document
+	 */
+	public createDocument(
 		text: string,
-		optionsOrCallback?: ((error: unknown, data?: ImperialResponsePostCode) => void) | postOptions,
-		cb?: (error: unknown, data?: ImperialResponsePostCode) => void
-	): Promise<ImperialResponsePostCode> | void {
-		const callBack = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
+		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | postOptions,
+		cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
+	): Promise<ImperialResponseCreateDocument> | void {
+		const callback = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
 
 		if (!text || text === String()) {
 			const err = new Error("No text was provided!");
-			if (!callBack) return Promise.reject(err);
-			return callBack(err);
+			if (!callback) return Promise.reject(err);
+			return callback(err);
+		}
+
+		if (typeof text !== "string") {
+			// Throw an error if the data is not a string
+			const err = new TypeError("Parameter `text` must be a string!");
+			if (!cb) return Promise.reject(err);
+			return cb(err);
 		}
 
 		let data: internalPostOptions = {
@@ -113,7 +133,7 @@ export class Imperial {
 			code: text,
 		};
 
-		if (typeof optionsOrCallback !== "function") {
+		if (optionsOrCallback && typeof optionsOrCallback !== "function") {
 			data = Object.assign(data, optionsOrCallback);
 			data.code = text; // a little backup if someone were to pass code so it doesn't break
 		}
@@ -128,7 +148,7 @@ export class Imperial {
 			},
 		});
 
-		if (!callBack)
+		if (!callback)
 			return new Promise((resolve, reject) => {
 				const httpRequest = request(opts, (response) => {
 					resolve(parseResponse(response));
@@ -139,35 +159,49 @@ export class Imperial {
 			});
 
 		const httpRequest = request(opts, (response) => {
-			parseResponse(response).then((data) => callBack(null, data), cb);
+			parseResponse(response).then((data) => callback(null, data), cb);
 		});
-		httpRequest.on("error", callBack);
+		httpRequest.on("error", callback);
+		httpRequest.write(dataString);
 		httpRequest.end();
 	}
 
 	/**
 	 *  Get a document from the API
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *  @example getCode("someid").then(console.log); // Logs the response to the console
+	 *  @example getDocument("someid").then(console.log);
+	 *  // Logs the response to the console
+	 *  @returns `Promise<ImperialResponseGetDocument>`
 	 */
-	public getCode(id: string): Promise<ImperialResponseGetCode>;
+	public getDocument(id: string): Promise<ImperialResponseGetDocument>;
 
 	/**
 	 *  Get a document from the API
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example getCode("someid"), (e, d) => { if (!e) console.log(d) }; // Logs the response to the console
+	 *  @example getDocument("someid"), (e, d) => { if (!e) console.log(d) };
+	 *  // Logs the response to the console
+	 *  @returns `void`
 	 */
-	public getCode(id: string, cb: (error: unknown, data?: ImperialResponseGetCode) => void): void;
+	public getDocument(id: string, cb: (error: unknown, data?: ImperialResponseGetDocument) => void): void;
 
-	public getCode(
+	/**
+	 *  Get a document from the API
+	 */
+	public getDocument(
 		id: string,
-		cb?: (error: unknown, data?: ImperialResponseGetCode) => void
-	): Promise<ImperialResponseGetCode> | void {
+		cb?: (error: unknown, data?: ImperialResponseGetDocument) => void
+	): Promise<ImperialResponseGetDocument> | void {
 		if (!id || id === String()) {
 			// Throw an error if the data was empty to not stress the servers
 			const err = new Error("No documentId was provided!");
+			if (!cb) return Promise.reject(err);
+			return cb(err);
+		}
 
+		if (typeof id !== "string") {
+			// Throw an error if the data is not a string
+			const err = new TypeError("Parameter `id` must be a string!");
 			if (!cb) return Promise.reject(err);
 			return cb(err);
 		}
@@ -209,17 +243,24 @@ export class Imperial {
 
 	/**
 	 *  Check if your token is valid **Only use when provided the token in the constructor**
-	 *  @example verify().then(console.log) // shows if the token is valid
+	 *  @example verify().then(console.log)
+	 *  // shows if the token is valid
+	 *  @returns `Promise<ImperialResponseCommon>`
 	 */
 	public verify(): Promise<ImperialResponseCommon>;
 
 	/**
 	 *  Check if your token is valid **Only use when provided the token in the constructor**
 	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example verify((e, d) => {if (!e) console.log(d)}) // shows if the token is valid
+	 *  @example verify((e, d) => {if (!e) console.log(d)})
+	 *  // shows if the token is valid
+	 *  @returns `void`
 	 */
 	public verify(cb?: (error: unknown, data?: ImperialResponseCommon) => void): void;
 
+	/**
+	 *  Check if your token is valid **Only use when provided the token in the constructor**
+	 */
 	public verify(
 		cb?: (error: unknown, data?: ImperialResponseCommon) => void
 	): Promise<ImperialResponseCommon> | void {
@@ -248,5 +289,108 @@ export class Imperial {
 		});
 		httpRequest.on("error", cb);
 		httpRequest.end();
+	}
+
+	/* Deprecated stuff */
+
+	/**
+	 *  Get a document from the API
+	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @example getDocument("someid").then(console.log);
+	 *  // Logs the response to the console
+	 *  @returns `Promise<ImperialResponseGetDocument>`
+	 *  @deprecated Since 1.2.3, use `getDocument` instead
+	 */
+	public getCode(id: string): Promise<ImperialResponseGetDocument>;
+
+	/**
+	 *  Get a document from the API
+	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param cb Function called after the data is fetched or if there was an error
+	 *  @example getDocument("someid"), (e, d) => { if (!e) console.log(d) };
+	 *  // Logs the response to the console
+	 *  @returns `void`
+	 *  @deprecated Since 1.2.3, use `getDocument` instead
+	 */
+	public getCode(id: string, cb: (error: unknown, data?: ImperialResponseGetDocument) => void): void;
+
+	/**
+	 *  @deprecated Since 1.2.3, use `getDocument` instead
+	 */
+	public getCode(
+		id: string,
+		cb?: (error: unknown, data?: ImperialResponseGetDocument) => void
+	): Promise<ImperialResponseGetDocument> | void {
+		process.emitWarning(
+			"Using `getCode` will soon stop working. " + "Use the new `getDocument` instead.",
+			"DeprecationWarning"
+		);
+
+		// @ts-expect-error eqeqeq
+		return this.getDocument(id, cb);
+	}
+
+	/**
+	 *  Create a document
+	 *  @param text The text to be sent
+	 *  @returns Promise with the data
+	 *  @example postCode("hi!").then(console.log);
+	 *  // Prints the response to console
+	 *  @deprecated Since 1.2.3, use `createDocument` instead
+	 */
+	public postCode(text: string): Promise<ImperialResponseCreateDocument>;
+
+	/**
+	 *  Create a document
+	 *  @param text The text to be sent
+	 *  @param opts Additional options for the request **Api key is required**
+	 *  @returns Promise with the data
+	 *  @example postCode("hi!", { longerUrls: true }).then(console.log);
+	 *  // Prints the response to console
+	 *  @deprecated Since 1.2.3, use `createDocument` instead
+	 */
+	public postCode(text: string, opts: postOptions): Promise<ImperialResponseCreateDocument>;
+
+	/**
+	 *  Create a document
+	 *  @param text The text to be sent
+	 *  @param cb Function called after the data is sent or if there was an error
+	 *  @example postCode("hi!", (e, d) => {if (!e) console.log(d);})
+	 *  // Prints the response to console
+	 *  @deprecated Since 1.2.3, use `createDocument` instead
+	 */
+	public postCode(text: string, cb: (error: unknown, data?: ImperialResponseCreateDocument) => void): void;
+
+	/**
+	 *  Create a document
+	 *  @param text The text to be sent
+	 *  @param opts Additional options for the request **Api key is required**
+	 *  @param cb Function called after the data is sent or if there was an error
+	 *  @example postCode("hi!", (e, d) => {if (!e) console.log(d);})
+	 *  // Prints the response to console
+	 *  @deprecated Since 1.2.3, use `createDocument` instead
+	 */
+	public postCode(
+		text: string,
+		opts: postOptions,
+		cb: (error: unknown, data?: ImperialResponseCreateDocument) => void
+	): void;
+
+	/**
+	 *  Create a document
+	 *  @deprecated Since 1.2.3, use `createDocument` instead
+	 */
+	public postCode(
+		text: string,
+		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | postOptions,
+		cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
+	): Promise<ImperialResponseCreateDocument> | void {
+		process.emitWarning(
+			"Using `postCode` will soon stop working. " + "Use the new `createDocument` instead.",
+			"DeprecationWarning"
+		);
+
+		// @ts-expect-error eqeqeq
+		return this.createDocument(text, optionsOrCallback, cb);
 	}
 }
