@@ -4,7 +4,7 @@
 	"description": "Imperial API wrapper in Node.js",
 	"main": "./dist/lib/index.js",
 	"scripts": {
-		"test": "node ./dist/test/prod",
+		"test": "node --no-warnings ./dist/test/prod",
 		"lint": "eslint src/**/*.ts --fix",
 		"build": "rimraf dist && tsc",
 		"ci": "rm -rf node_modules && yarn install --frozen-lockfile"
