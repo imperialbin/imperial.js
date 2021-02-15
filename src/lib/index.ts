@@ -31,7 +31,6 @@ const HOSTNAMEREGEX = /^(www\.)?imperialb(\.in|in.com)$/i; // Simple regex to ch
  *  The API wrapper class
  *  @author https://github.com/pxseu
  */
-
 export class Imperial {
 	/**
 	 *  `Imperial` constructor
