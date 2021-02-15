@@ -30,20 +30,33 @@ $ yarn add imperial-node
 
 ```js
 const { Imperial } = require("imperial-node");
+// or for ts users
+import { Imperial } from "imperial-node";
 
-const api = new Imperial(/* you can pass the token here */);
+const api = new Imperial(/* Required for Document settings */);
 
-api.postCode("hello world!").then(console.log, console.error);
+// import type { Interfaces } from "imperial-node"
+// for ts folks
+
+const createDocumentSettings/* :Interfaces.createOptions */ = {
+    longerUrls?: boolean;
+	instantDelete?: boolean;
+	imageEmbed?: boolean;
+	expiration?: number;
+};
+
+api.createDocument("hello world!", createDocumentSettings /* this is optional */).then(console.log, console.error);
 // or using callbacks
-api.postCode("hello world!", (e, d) => {
+api.createDocument("hello world!", createDocumentSettings /* this is optional */, (e, d) => {
 	if (e) return console.error(e);
 	console.log(d);
 });
 
-api.getCode("https://imperialb.in/pxseuwu/g0gmj4p3fbt") // or just "g0gmj4p3fbt"
-	.then(console.log);
+api.getDocument("https://imperialb.in/pxseuwu/g0gmj4p3fbt")
+	// or just "g0gmj4p3fbt"
+	.then(console.log, console.error);
 // or using callbacks
-api.getCode("https://imperialb.in/pxseuwu/g0gmj4p3fbt", (e, d) => {
+api.getDocument("https://imperialb.in/pxseuwu/g0gmj4p3fbt", (e, d) => {
 	if (e) return console.error(e);
 	console.log(d);
 });
