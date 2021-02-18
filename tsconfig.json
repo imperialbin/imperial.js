@@ -5,8 +5,8 @@
         "target": "ES6",
         "module": "CommonJS",
         "outDir": "./dist/",
-        "sourceRoot": "src",
-        "sourceMap": true,
+        /* "sourceMap": false,
+        "sourceRoot": "src", */
         "esModuleInterop": true,
         "allowJs": false,
         "alwaysStrict": true,
@@ -19,7 +19,8 @@
         "strictNullChecks": true,
         "strictBindCallApply": true,
         "strictPropertyInitialization": true,
-        "removeComments": true,
+        "removeComments": false,
+        "pretty": true,
     },
     "exclude": [
         "node_modules",

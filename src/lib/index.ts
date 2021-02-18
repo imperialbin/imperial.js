@@ -315,6 +315,7 @@ export class Imperial {
 	public getCode(id: string, cb: (error: unknown, data?: ImperialResponseGetDocument) => void): void;
 
 	/**
+	 *  Get a document from the API
 	 *  @deprecated Since 1.2.3, use `getDocument` instead
 	 */
 	public getCode(
