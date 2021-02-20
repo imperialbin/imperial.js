@@ -23,17 +23,14 @@ jobs:
             - name: Install dependencies
               run: yarn ci
 
-            - name: Build
-              run: yarn build
-
             - name: Lint
               run: yarn lint
 
             - name: Prepare Test
               run: |
-                  touch test_data.txt
-                  echo $IMPERIAL_TOKEN > test_data.txt
-                  echo $VALID_DOCUMENT_URL >> test_data.txt
+                  touch .env
+                  echo "IMPERIAL_TOKEN = $IMPERIAL_TOKEN" > .env
+                  echo "IMPERIAL_VALID_DOCUMENT_URL = $VALID_DOCUMENT_URL" >> .env
               env:
                   IMPERIAL_TOKEN: ${{ secrets.IMPERIAL_TOKEN}}
                   VALID_DOCUMENT_URL: ${{ secrets.VALID_DOCUMENT_URL }}
