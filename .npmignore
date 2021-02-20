@@ -8,5 +8,4 @@ yarn.lock
 .eslintignore
 .eslintrc
 test.js
-test_data.txt
 yarn-error.log
