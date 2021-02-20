@@ -22,7 +22,7 @@
         "forceConsistentCasingInFileNames": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        // chuj
+        // false stuff
         "allowJs": false,
         "removeComments": false,
     },
