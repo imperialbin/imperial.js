@@ -3,17 +3,6 @@
  */
 
 /**
- *  Single type to export
- */
-
-export interface Interfaces {
-	createOptions: createOptions;
-	ImperialResponseCommon: ImperialResponseCommon;
-	ImperialResponseGetDocument: ImperialResponseGetDocument;
-	ImperialResponseCreateDocument: ImperialResponseCreateDocument;
-}
-
-/**
  *  `createDocument` response
  */
 export interface ImperialResponseCreateDocument {

@@ -2,7 +2,6 @@ import { IncomingMessage, OutgoingHttpHeaders } from "http";
 import { request, RequestOptions } from "https";
 import { URL } from "url";
 import {
-	Interfaces,
 	createOptions,
 	ImperialResponseCommon,
 	ImperialResponseGetDocument,
@@ -11,7 +10,7 @@ import {
 import { validateToken } from "./helpers/isValidToken";
 import { codes as humanReadable } from "./helpers/httpCodes";
 
-export type { Interfaces };
+export * as Interfaces from "./helpers/interfaces";
 
 /* Internal inetfaces that should not be exported */
 interface prepareParams {
@@ -25,9 +24,6 @@ interface internalPostOptions extends createOptions {
 	[key: string]: unknown;
 }
 
-const HOSTNAME = "imperialb.in"; // Domain to do request with
-const HOSTNAMEREGEX = /^(www\.)?imperialb(\.in|in.com)$/i; // Simple regex to check if a domain is valid
-
 /**
  *  The API wrapper class
  *  @author https://github.com/pxseu
@@ -39,7 +35,10 @@ export class Imperial {
 	 */
 	constructor(private token?: string) {}
 
-	private _prepareRequest({ method, headers = {}, path }: prepareParams): RequestOptions {
+	private HOSTNAME = "imperialb.in"; // Domain to do request with
+	private HOSTNAMEREGEX = /^(www\.)?imperialb(\.in|in.com)$/i; // Simple regex to check if a domain is valid
+
+	private prepareRequest({ method, headers = {}, path }: prepareParams): RequestOptions {
 		const defaultHeaders = {
 			"Content-Type": "application/json", // best thing to happen
 			"User-Agent": "imperial-node; (+https://github.com/imperialbin/imperial-node)",
@@ -49,13 +48,57 @@ export class Imperial {
 		headers = Object.assign(headers, defaultHeaders);
 
 		return {
-			hostname: HOSTNAME,
+			hostname: this.HOSTNAME,
 			port: 443,
 			path: `/api${path}`,
 			method,
 			headers,
 		};
 	}
+
+	private parseResponse = (response: IncomingMessage): Promise<never> => {
+		return new Promise((resolve, reject) => {
+			const data: string[] = [];
+			// Collect all data chunks
+			response.on("data", (chunk: string) => {
+				data.push(chunk);
+			});
+
+			response.on("end", () => {
+				try {
+					const responseData = data.join(String());
+					let json;
+
+					try {
+						json = JSON.parse(responseData);
+					} catch (e) {
+						/* Ignore parse error */
+					}
+
+					if (response.statusCode === 200 && json) {
+						return resolve(json);
+					}
+
+					if (response.statusCode === 302) {
+						/* When we encouter a 302 the request was not correct and the server decied to redirect us */
+						response.statusCode = 400;
+					}
+
+					reject(
+						new Error(
+							json?.message
+								? json.message
+								: humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`
+						)
+					);
+				} catch (err) {
+					reject(err);
+				}
+			});
+
+			response.on("error", reject);
+		});
+	};
 
 	/**
 	 *  Create a document
@@ -113,7 +156,7 @@ export class Imperial {
 		const callback = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
 
 		if (!text || text === String()) {
-			const err = new Error("No text was provided!");
+			const err = new Error("No `text` was provided!");
 			if (!callback) return Promise.reject(err);
 			return callback(err);
 		}
@@ -140,7 +183,7 @@ export class Imperial {
 
 		const dataString = JSON.stringify(data);
 
-		const opts = this._prepareRequest({
+		const opts = this.prepareRequest({
 			method: "POST",
 			path: "/document",
 			headers: {
@@ -151,7 +194,7 @@ export class Imperial {
 		if (!callback)
 			return new Promise((resolve, reject) => {
 				const httpRequest = request(opts, (response) => {
-					resolve(parseResponse(response));
+					resolve(this.parseResponse(response));
 				});
 				httpRequest.on("error", reject);
 				httpRequest.write(dataString);
@@ -159,7 +202,7 @@ export class Imperial {
 			});
 
 		const httpRequest = request(opts, (response) => {
-			parseResponse(response).then((data) => callback(null, data), cb);
+			this.parseResponse(response).then((data) => callback(null, data), cb);
 		});
 		httpRequest.on("error", callback);
 		httpRequest.write(dataString);
@@ -194,7 +237,7 @@ export class Imperial {
 	): Promise<ImperialResponseGetDocument> | void {
 		if (!id || id === String()) {
 			// Throw an error if the data was empty to not stress the servers
-			const err = new Error("No documentId was provided!");
+			const err = new Error("No `id` was provided!");
 			if (!cb) return Promise.reject(err);
 			return cb(err);
 		}
@@ -211,7 +254,7 @@ export class Imperial {
 		try {
 			// Try to parse a url
 			const url = new URL(id);
-			if (HOSTNAMEREGEX.test(url.hostname)) {
+			if (this.HOSTNAMEREGEX.test(url.hostname)) {
 				// If the domain matches imperial extract data after last slash
 				const splitPath = url.pathname.split("/");
 				documentId = splitPath.length > 0 ? splitPath[splitPath.length - 1] : String();
@@ -220,7 +263,7 @@ export class Imperial {
 			/* Don't do anything with the URL prase error */
 		}
 
-		const opts = this._prepareRequest({
+		const opts = this.prepareRequest({
 			method: "GET",
 			path: `/document/${documentId}`,
 		});
@@ -228,14 +271,14 @@ export class Imperial {
 		if (!cb)
 			return new Promise((resolve, reject) => {
 				const httpRequest = request(opts, (response) => {
-					resolve(parseResponse(response));
+					resolve(this.parseResponse(response));
 				});
 				httpRequest.on("error", reject);
 				httpRequest.end();
 			});
 
 		const httpRequest = request(opts, (response) => {
-			parseResponse(response).then((data) => cb(null, data), cb);
+			this.parseResponse(response).then((data) => cb(null, data), cb);
 		});
 		httpRequest.on("error", cb);
 		httpRequest.end();
@@ -270,7 +313,7 @@ export class Imperial {
 			return cb(err);
 		}
 
-		const opts = this._prepareRequest({
+		const opts = this.prepareRequest({
 			method: "GET",
 			path: `/checkApiToken/${encodeURIComponent(this.token)}`,
 		});
@@ -278,14 +321,14 @@ export class Imperial {
 		if (!cb)
 			return new Promise((resolve, reject) => {
 				const httpRequest = request(opts, (response) => {
-					resolve(parseResponse(response));
+					resolve(this.parseResponse(response));
 				});
 				httpRequest.on("error", reject);
 				httpRequest.end();
 			});
 
 		const httpRequest = request(opts, (response) => {
-			parseResponse(response).then((d) => cb(null, d), cb);
+			this.parseResponse(response).then((d) => cb(null, d), cb);
 		});
 		httpRequest.on("error", cb);
 		httpRequest.end();
@@ -394,48 +437,4 @@ export class Imperial {
 		// @ts-expect-error eqeqeq
 		return this.createDocument(text, optionsOrCallback, cb);
 	}
-}
-
-function parseResponse(response: IncomingMessage): Promise<never> {
-	return new Promise((resolve, reject) => {
-		const data: string[] = [];
-		// Collect all data chunks
-		response.on("data", (chunk: string) => {
-			data.push(chunk);
-		});
-
-		response.on("end", () => {
-			try {
-				const responseData = data.join(String());
-				let json;
-
-				try {
-					json = JSON.parse(responseData);
-				} catch (e) {
-					/* Ignore parse error */
-				}
-
-				if (response.statusCode === 200 && json) {
-					return resolve(json);
-				}
-
-				if (response.statusCode === 302) {
-					/* When we encouter a 302 the request was not correct and the server decied to redirect us */
-					response.statusCode = 400;
-				}
-
-				reject(
-					new Error(
-						json?.message
-							? json.message
-							: humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`
-					)
-				);
-			} catch (err) {
-				reject(err);
-			}
-		});
-
-		response.on("error", reject);
-	});
 }
