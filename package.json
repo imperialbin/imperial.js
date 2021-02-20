@@ -2,10 +2,10 @@
 	"name": "imperial-node",
 	"version": "1.2.4",
 	"description": "Imperial API wrapper in Node.js",
-	"main": "./dist/lib/index.js",
-	"types": "./dist/lib/index.d.ts",
+	"main": "./lib/index.js",
+	"types": "./lib/index.d.ts",
 	"scripts": {
-		"build": "rimraf dist && tsc",
+		"build": "rimraf lib && tsc",
 		"lint": "eslint src/**/*.ts --fix",
 		"test": "jest",
 		"ci": "rm -rf node_modules && yarn install --frozen-lockfile"

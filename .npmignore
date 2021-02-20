@@ -7,5 +7,7 @@ tsconfig.json
 yarn.lock
 .eslintignore
 .eslintrc
-test.js
 yarn-error.log
+.env
+jest.config.js
+.gitignore
