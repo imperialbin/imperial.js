@@ -30,10 +30,8 @@ jobs:
               run: |
                   touch .env
                   echo "IMPERIAL_TOKEN = $IMPERIAL_TOKEN" > .env
-                  echo "IMPERIAL_VALID_DOCUMENT_URL = $VALID_DOCUMENT_URL" >> .env
               env:
                   IMPERIAL_TOKEN: ${{ secrets.IMPERIAL_TOKEN}}
-                  VALID_DOCUMENT_URL: ${{ secrets.VALID_DOCUMENT_URL }}
 
             - name: Test
               run: yarn test
