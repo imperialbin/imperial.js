@@ -4,8 +4,21 @@ import { Imperial } from "../lib";
 
 const { IMPERIAL_TOKEN } = process.env;
 
+const createdDocuments: string[] = [];
+
 describe("createDocument", () => {
 	if (!IMPERIAL_TOKEN) throw new Error("Env was not preparerd");
+
+	afterAll(async () => {
+		const api = new Imperial(IMPERIAL_TOKEN);
+
+		for (const document of createdDocuments)
+			try {
+				await api.deleteDocument(document);
+			} catch (_) {
+				throw new Error("Failed to delete tested files.");
+			}
+	});
 
 	it("valid with token", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
@@ -14,9 +27,13 @@ describe("createDocument", () => {
 
 		expect(res.success).toBeTruthy();
 		expect(res.instantDelete).toBeTruthy();
+
+		if (res.success) createdDocuments.push(res.formattedLink);
 	}, 10000); // timeout 10s
 
-	it("valid without token", async () => {
+	// No need to test without token because it would have done
+	// the exact same thing but settings would not be set
+	it.skip("valid without token", async () => {
 		const api = new Imperial();
 
 		const res = await api.createDocument("test jest bro", { instantDelete: true });
@@ -30,8 +47,6 @@ describe("createDocument", () => {
 		await expect(
 			(async () => {
 				// @ts-ignore
-				await api.createDocument({});
-				// @ts-ignore
 				await api.createDocument([]);
 				// @ts-ignore
 				await api.createDocument(12345);
@@ -42,7 +57,7 @@ describe("createDocument", () => {
 	});
 
 	it("invalid - no data", async () => {
-		const api = new Imperial();
+		const api = new Imperial(IMPERIAL_TOKEN);
 
 		await expect(
 			(async () => {
