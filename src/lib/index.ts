@@ -1,104 +1,45 @@
-import { IncomingMessage, OutgoingHttpHeaders } from "http";
-import { request, RequestOptions } from "https";
-import { URL } from "url";
-import {
+import type { URL } from "url";
+import type {
 	createOptions,
 	ImperialResponseCommon,
 	ImperialResponseGetDocument,
 	ImperialResponseCreateDocument,
 } from "./helpers/interfaces";
-import { validateToken } from "./helpers/isValidToken";
-import { codes as humanReadable } from "./helpers/httpCodes";
+
+import getDocument from "./methods/getDocument";
+import createDocument from "./methods/createDocument";
+import deleteDocument from "./methods/deleteDocument";
+import verify from "./methods/verify";
 
 export * as Interfaces from "./helpers/interfaces";
-
-/* Internal inetfaces that should not be exported */
-interface prepareParams {
-	method: string;
-	headers?: OutgoingHttpHeaders;
-	path: string;
-}
-
-interface internalPostOptions extends createOptions {
-	code: string;
-	[key: string]: unknown;
-}
 
 /**
  *  The API wrapper class
  *  @author https://github.com/pxseu
  */
 export class Imperial {
+	private _token: string | undefined;
+
 	/**
 	 *  `Imperial` constructor
-	 *  @param token Your API token
+	 *  @param {String} token Your API token
 	 */
-	constructor(private token?: string) {}
-
-	private HOSTNAME = "imperialb.in"; // Domain to do request with
-	private HOSTNAMEREGEX = /^(www\.)?imperialb(\.in|in.com)$/i; // Simple regex to check if a domain is valid
-
-	private prepareRequest({ method, headers = {}, path }: prepareParams): RequestOptions {
-		const defaultHeaders = {
-			"Content-Type": "application/json", // best thing to happen
-			"User-Agent": "imperial-node; (+https://github.com/imperialbin/imperial-node)",
-			Authorization: this.token ?? "",
-		};
-
-		headers = Object.assign(headers, defaultHeaders);
-
-		return {
-			hostname: this.HOSTNAME,
-			port: 443,
-			path: `/api${path}`,
-			method,
-			headers,
-		};
+	constructor(token?: string) {
+		if (token) this._token = token;
 	}
 
-	private parseResponse = (response: IncomingMessage): Promise<never> => {
-		return new Promise((resolve, reject) => {
-			const data: string[] = [];
-			// Collect all data chunks
-			response.on("data", (chunk: string) => {
-				data.push(chunk);
-			});
+	public get token(): string {
+		if (!this._token) return "";
+		return this._token;
+	}
 
-			response.on("end", () => {
-				try {
-					const responseData = data.join(String());
-					let json;
+	public get HOSTNAME(): string {
+		return "imperialb.in";
+	} // Domain to do request with
 
-					try {
-						json = JSON.parse(responseData);
-					} catch (e) {
-						/* Ignore parse error */
-					}
-
-					if (response.statusCode === 200 && json) {
-						return resolve(json);
-					}
-
-					if (response.statusCode === 302) {
-						/* When we encouter a 302 the request was not correct and the server decied to redirect us */
-						response.statusCode = 400;
-					}
-
-					reject(
-						new Error(
-							json?.message
-								? json.message
-								: humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`
-						)
-					);
-				} catch (err) {
-					reject(err);
-				}
-			});
-
-			response.on("error", reject);
-		});
-	};
+	public get HOSTNAMEREGEX(): RegExp {
+		return /^(www\.)?imperialb(\.in|in.com)$/i;
+	} // Simple regex to check if a domain is valid
 
 	/**
 	 *  Create a document
@@ -153,60 +94,7 @@ export class Imperial {
 		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | createOptions,
 		cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): Promise<ImperialResponseCreateDocument> | void {
-		const callback = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
-
-		if (!text || text === String()) {
-			const err = new Error("No `text` was provided!");
-			if (!callback) return Promise.reject(err);
-			return callback(err);
-		}
-
-		if (typeof text !== "string") {
-			// Throw an error if the data is not a string
-			const err = new TypeError("Parameter `text` must be a string!");
-			if (!cb) return Promise.reject(err);
-			return cb(err);
-		}
-
-		let data: internalPostOptions = {
-			longerUrls: false,
-			instantDelete: false,
-			imageEmbed: false,
-			expiration: 5,
-			code: text,
-		};
-
-		if (optionsOrCallback && typeof optionsOrCallback !== "function") {
-			data = Object.assign(data, optionsOrCallback);
-			data.code = text; // a little backup if someone were to pass code so it doesn't break
-		}
-
-		const dataString = JSON.stringify(data);
-
-		const opts = this.prepareRequest({
-			method: "POST",
-			path: "/document",
-			headers: {
-				"Content-Length": Buffer.byteLength(dataString),
-			},
-		});
-
-		if (!callback)
-			return new Promise((resolve, reject) => {
-				const httpRequest = request(opts, (response) => {
-					resolve(this.parseResponse(response));
-				});
-				httpRequest.on("error", reject);
-				httpRequest.write(dataString);
-				httpRequest.end();
-			});
-
-		const httpRequest = request(opts, (response) => {
-			this.parseResponse(response).then((data) => callback(null, data), cb);
-		});
-		httpRequest.on("error", callback);
-		httpRequest.write(dataString);
-		httpRequest.end();
+		return createDocument.call(this, text, optionsOrCallback, cb);
 	}
 
 	/**
@@ -216,7 +104,7 @@ export class Imperial {
 	 *  // Logs the response to the console
 	 *  @returns `Promise<ImperialResponseGetDocument>`
 	 */
-	public getDocument(id: string): Promise<ImperialResponseGetDocument>;
+	public getDocument(id: string | URL): Promise<ImperialResponseGetDocument>;
 
 	/**
 	 *  Get a document from the API
@@ -226,62 +114,45 @@ export class Imperial {
 	 *  // Logs the response to the console
 	 *  @returns `void`
 	 */
-	public getDocument(id: string, cb: (error: unknown, data?: ImperialResponseGetDocument) => void): void;
+	public getDocument(id: string | URL, cb: (error: unknown, data?: ImperialResponseGetDocument) => void): void;
 
 	/**
 	 *  Get a document from the API
 	 */
 	public getDocument(
-		id: string,
+		id: string | URL,
 		cb?: (error: unknown, data?: ImperialResponseGetDocument) => void
 	): Promise<ImperialResponseGetDocument> | void {
-		if (!id || id === String()) {
-			// Throw an error if the data was empty to not stress the servers
-			const err = new Error("No `id` was provided!");
-			if (!cb) return Promise.reject(err);
-			return cb(err);
-		}
+		return getDocument.call(this, id, cb);
+	}
 
-		if (typeof id !== "string") {
-			// Throw an error if the data is not a string
-			const err = new TypeError("Parameter `id` must be a string!");
-			if (!cb) return Promise.reject(err);
-			return cb(err);
-		}
+	/**
+	 *  Delete a document from the API | **Requires an API Token**
+	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @example deleteDocument("someid").then(console.log);
+	 *  // Logs the response to the console
+	 *  @returns {Promise<ImperialResponseCommon>} `Promise<ImperialResponseCommon>`
+	 */
+	public deleteDocument(id: string | URL): Promise<ImperialResponseCommon>;
 
-		let documentId = encodeURIComponent(id); // Make the user inputed data encoded so it doesn't break stuff
+	/**
+	 *  Delete a document from the API | **Requires an API Token**
+	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param cb Function called after the data is fetched or if there was an error
+	 *  @example deleteDocument("someid"), (e, d) => { if (!e) console.log(d) };
+	 *  // Logs the response to the console
+	 *  @returns {void} `void`
+	 */
+	public deleteDocument(id: string | URL, cb: (error: unknown, data?: ImperialResponseCommon) => void): void;
 
-		try {
-			// Try to parse a url
-			const url = new URL(id);
-			if (this.HOSTNAMEREGEX.test(url.hostname)) {
-				// If the domain matches imperial extract data after last slash
-				const splitPath = url.pathname.split("/");
-				documentId = splitPath.length > 0 ? splitPath[splitPath.length - 1] : String();
-			}
-		} catch (e) {
-			/* Don't do anything with the URL prase error */
-		}
-
-		const opts = this.prepareRequest({
-			method: "GET",
-			path: `/document/${documentId}`,
-		});
-
-		if (!cb)
-			return new Promise((resolve, reject) => {
-				const httpRequest = request(opts, (response) => {
-					resolve(this.parseResponse(response));
-				});
-				httpRequest.on("error", reject);
-				httpRequest.end();
-			});
-
-		const httpRequest = request(opts, (response) => {
-			this.parseResponse(response).then((data) => cb(null, data), cb);
-		});
-		httpRequest.on("error", cb);
-		httpRequest.end();
+	/**
+	 *  Delete a document from the API | **Requires an API Token**
+	 */
+	public deleteDocument(
+		id: string | URL,
+		cb?: (error: unknown, data?: ImperialResponseCommon) => void
+	): Promise<ImperialResponseCommon> | void {
+		return deleteDocument.call(this, id, cb);
 	}
 
 	/**
@@ -293,7 +164,7 @@ export class Imperial {
 	public verify(): Promise<ImperialResponseCommon>;
 
 	/**
-	 *  Check if your token is valid **Only use when provided the token in the constructor**
+	 *  Check if your token is valid | **Requires an API Token**
 	 *  @param cb Function called after the data is fetched or if there was an error
 	 *  @example verify((e, d) => {if (!e) console.log(d)})
 	 *  // shows if the token is valid
@@ -302,36 +173,12 @@ export class Imperial {
 	public verify(cb?: (error: unknown, data?: ImperialResponseCommon) => void): void;
 
 	/**
-	 *  Check if your token is valid **Only use when provided the token in the constructor**
+	 *  Check if your token is valid | **Requires an API Token**
 	 */
 	public verify(
 		cb?: (error: unknown, data?: ImperialResponseCommon) => void
 	): Promise<ImperialResponseCommon> | void {
-		if (!this.token || !validateToken(this.token)) {
-			const err = new Error("No or invalid token was provided in the constructor!");
-			if (!cb) return Promise.reject(err);
-			return cb(err);
-		}
-
-		const opts = this.prepareRequest({
-			method: "GET",
-			path: `/checkApiToken/${encodeURIComponent(this.token)}`,
-		});
-
-		if (!cb)
-			return new Promise((resolve, reject) => {
-				const httpRequest = request(opts, (response) => {
-					resolve(this.parseResponse(response));
-				});
-				httpRequest.on("error", reject);
-				httpRequest.end();
-			});
-
-		const httpRequest = request(opts, (response) => {
-			this.parseResponse(response).then((d) => cb(null, d), cb);
-		});
-		httpRequest.on("error", cb);
-		httpRequest.end();
+		return verify.call(this, cb);
 	}
 
 	/* Deprecated stuff */
@@ -370,8 +217,7 @@ export class Imperial {
 			"DeprecationWarning"
 		);
 
-		// @ts-expect-error eqeqeq
-		return this.getDocument(id, cb);
+		return getDocument.call(this, id, cb);
 	}
 
 	/**
@@ -434,7 +280,6 @@ export class Imperial {
 			"DeprecationWarning"
 		);
 
-		// @ts-expect-error eqeqeq
-		return this.createDocument(text, optionsOrCallback, cb);
+		return createDocument.call(this, text, optionsOrCallback, cb);
 	}
 }
