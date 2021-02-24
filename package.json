@@ -7,7 +7,9 @@
 	"scripts": {
 		"build": "rimraf lib && tsc",
 		"lint": "eslint src/**/*.ts --fix",
+		"format": "prettier --write 'src/**/*.ts'",
 		"test": "jest",
+		"lazy": "yarn format && yarn lint && yarn build && yarn test",
 		"ci": "rm -rf node_modules && yarn install --frozen-lockfile"
 	},
 	"repository": {
@@ -34,6 +36,7 @@
 		"eslint": "^7.17.0",
 		"eslint-config-prettier": "^7.1.0",
 		"jest": "^26.6.3",
+		"prettier": "^2.2.1",
 		"rimraf": "^3.0.2",
 		"ts-jest": "^26.5.1",
 		"typescript": "^4.1.5"
