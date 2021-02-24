@@ -6,10 +6,11 @@ import type {
 	ImperialResponseCreateDocument,
 } from "./helpers/interfaces";
 
-import getDocument from "./methods/getDocument";
-import createDocument from "./methods/createDocument";
-import deleteDocument from "./methods/deleteDocument";
-import verify from "./methods/verify";
+import { getDocument } from "./methods/getDocument";
+import { createDocument } from "./methods/createDocument";
+import { deleteDocument } from "./methods/deleteDocument";
+import { verify } from "./methods/verify";
+import { validateToken } from "./helpers/isValidToken";
 
 export * as Interfaces from "./helpers/interfaces";
 
@@ -25,7 +26,7 @@ export class Imperial {
 	 *  @param {String} token Your API token
 	 */
 	constructor(token?: string) {
-		if (token) this._token = token;
+		if (token && validateToken(token)) this._token = token;
 	}
 
 	public get token(): string {

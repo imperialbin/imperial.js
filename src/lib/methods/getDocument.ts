@@ -5,7 +5,7 @@ import parseId from "../utils/parseId";
 import parseResponse from "../utils/parseResponse";
 import prepareRequest from "../utils/prepareRequest";
 
-const getDocument = function (
+export const getDocument = function (
 	this: Imperial,
 	id: string | URL,
 	cb?: (error: unknown, data?: ImperialResponseGetDocument) => void
@@ -48,5 +48,3 @@ const getDocument = function (
 	httpRequest.on("error", cb);
 	httpRequest.end();
 };
-
-export default getDocument;

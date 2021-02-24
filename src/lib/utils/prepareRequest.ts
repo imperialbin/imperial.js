@@ -1,6 +1,9 @@
 import type { OutgoingHttpHeaders } from "http";
 import type { RequestOptions } from "https";
 
+/**
+ *  @internal
+ */
 interface prepareParams {
 	method: string;
 	headers?: OutgoingHttpHeaders;
@@ -10,11 +13,12 @@ interface prepareParams {
 }
 
 const prepareRequest = function ({ method, headers = {}, path, hostname, token }: prepareParams): RequestOptions {
-	const defaultHeaders = {
+	const defaultHeaders: OutgoingHttpHeaders = {
 		"Content-Type": "application/json", // best thing to happen
 		"User-Agent": "imperial-node; (+https://github.com/imperialbin/imperial-node)",
-		Authorization: token ?? "",
 	};
+
+	if (token) defaultHeaders.Authorization = token;
 
 	headers = Object.assign(headers, defaultHeaders);
 

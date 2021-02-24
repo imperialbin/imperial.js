@@ -9,7 +9,7 @@ interface internalPostOptions extends createOptions {
 	[key: string]: unknown;
 }
 
-const createDocument = function (
+export const createDocument = function (
 	this: Imperial,
 	text: string,
 	optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | createOptions,
@@ -74,5 +74,3 @@ const createDocument = function (
 	httpRequest.write(dataString);
 	httpRequest.end();
 };
-
-export default createDocument;

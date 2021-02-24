@@ -5,7 +5,7 @@ import parseId from "../utils/parseId";
 import parseResponse from "../utils/parseResponse";
 import prepareRequest from "../utils/prepareRequest";
 
-const deleteDocument = function (
+export const deleteDocument = function (
 	this: Imperial,
 	id: string | URL,
 	cb?: (error: unknown, data?: ImperialResponseCommon) => void
@@ -55,5 +55,3 @@ const deleteDocument = function (
 	httpRequest.on("error", cb);
 	httpRequest.end();
 };
-
-export default deleteDocument;
