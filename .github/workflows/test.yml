@@ -1,4 +1,4 @@
-name: Build and test
+name: Format, lint, build and test
 
 on:
     push:
@@ -23,8 +23,14 @@ jobs:
             - name: Install dependencies
               run: yarn ci
 
+            - name: Format
+              run: yarn format
+
             - name: Lint
               run: yarn lint
+
+            - name: Build
+              run: yarn build
 
             - name: Prepare Test
               run: |
