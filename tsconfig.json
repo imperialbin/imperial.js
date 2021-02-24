@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "moduleResolution": "node",
-        "target": "ES6",
+        "target": "ES5",
         "module": "CommonJS",
         "outDir": "./lib/",
         "strict": true,
@@ -10,6 +10,8 @@
         "alwaysStrict": true,
         "skipLibCheck": true,
         "noImplicitAny": true,
+        "noEmitOnError": true,
+        "stripInternal": true,
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "isolatedModules": true,
@@ -17,6 +19,7 @@
         "strictNullChecks": true,
         "resolveJsonModule": true,
         "noImplicitReturns": true,
+        "downlevelIteration": true,
         "noUnusedParameters": true,
         "strictBindCallApply": true,
         "strictFunctionTypes": true,
