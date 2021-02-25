@@ -10,7 +10,7 @@ export const deleteDocument = function (
 	id: string | URL,
 	callback?: (error: unknown, data?: ImperialResponseCommon) => void
 ): Promise<ImperialResponseCommon> | void {
-	if (callback && typeof callback !== "function") {
+	if (callback !== undefined && typeof callback !== "function") {
 		// Throw an error if the data is not a string
 		const err = new TypeError("Parameter `callback` must be callable!");
 		if (!callback) return Promise.reject(err);

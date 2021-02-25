@@ -15,7 +15,9 @@ export const getDocument = function (
 	const [callback, password] =
 		typeof passwordOrCallback === "function" ? [passwordOrCallback] : [cb, passwordOrCallback];
 
-	if (callback && typeof callback !== "function") {
+	console.log();
+
+	if (callback !== undefined && typeof callback !== "function") {
 		// Throw an error if the data is not a string
 		const err = new TypeError("Parameter `callback` must be callable!");
 		if (!callback) return Promise.reject(err);

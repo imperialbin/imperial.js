@@ -17,7 +17,7 @@ export const createDocument = function (
 ): Promise<ImperialResponseCreateDocument> | void {
 	const [callback, options] = typeof optionsOrCallback === "function" ? [optionsOrCallback] : [cb, optionsOrCallback];
 
-	if (callback && typeof callback !== "function") {
+	if (callback !== undefined && typeof callback !== "function") {
 		// Throw an error if the data is not a callable functionex
 		const err = new TypeError("Parameter `callback` must be callable!");
 		if (!callback) return Promise.reject(err);
