@@ -19,14 +19,28 @@ export const editDocument = function (
 	}
 
 	if (!this.token) {
-		// Throw an error if the data was empty to not stress the servers
+		// Throw an error if the token was not set
 		const err = new Error("This method requires a token to be set in the constructor!");
 		if (!callback) return Promise.reject(err);
 		return callback(err);
 	}
 
+	if (!id) {
+		// Throw an error if the id was empty to not stress the servers
+		const err = new Error("No `id` was provided!");
+		if (!callback) return Promise.reject(err);
+		return callback(err);
+	}
+
+	if (!newText) {
+		// Throw an error if the id was empty to not stress the servers
+		const err = new Error("No `newText` was provided!");
+		if (!callback) return Promise.reject(err);
+		return callback(err);
+	}
+
 	if (typeof id !== "string" && !(id instanceof URL)) {
-		// Throw an error if the data is not a string nor URL
+		// Throw an error if the id is not in the correct type
 		const err = new TypeError("Parameter `id` must be a string or an URL!");
 		if (!callback) return Promise.reject(err);
 		return callback(err);

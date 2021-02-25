@@ -43,7 +43,7 @@ describe("editDocument", () => {
 
 		await expect(
 			(async () => {
-				await api.deleteDocument("test jest bro");
+				await api.editDocument("test jest bro", "test jest bro");
 			})()
 		).rejects.toThrow(new Error("This method requires a token to be set in the constructor!"));
 	}, 10000); // timeout 10s
@@ -53,13 +53,13 @@ describe("editDocument", () => {
 		await expect(
 			(async () => {
 				// @ts-ignore
-				await api.deleteDocument({}, "");
+				await api.editDocument({}, "bbbbbb");
 				// @ts-ignore
-				await api.deleteDocument([], "");
+				await api.editDocument([], "bbbbbb");
 				// @ts-ignore
-				await api.deleteDocument(12345, "");
+				await api.editDocument(12345, "bbbbbb");
 				// @ts-ignore
-				await api.deleteDocument(() => {}, ""); // eslint-disable-line @typescript-eslint/no-empty-function
+				await api.editDocument(() => {}, "bbbbbb"); // eslint-disable-line @typescript-eslint/no-empty-function
 			})()
 		).rejects.toThrow(new TypeError("Parameter `id` must be a string or an URL!"));
 	});
@@ -70,7 +70,7 @@ describe("editDocument", () => {
 		await expect(
 			(async () => {
 				//@ts-ignore
-				await api.deleteDocument();
+				await api.editDocument();
 			})()
 		).rejects.toThrow(new Error("No `id` was provided!"));
 	});

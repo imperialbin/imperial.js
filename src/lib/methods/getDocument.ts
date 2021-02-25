@@ -15,14 +15,20 @@ export const getDocument = function (
 	const [callback, password] =
 		typeof passwordOrCallback === "function" ? [passwordOrCallback] : [cb, passwordOrCallback];
 
-	console.log();
-
 	if (callback !== undefined && typeof callback !== "function") {
-		// Throw an error if the data is not a string
+		// Throw an error if the callback is not a function
 		const err = new TypeError("Parameter `callback` must be callable!");
 		if (!callback) return Promise.reject(err);
 		throw err;
 	}
+
+	if (!id) {
+		// Throw an error if the id was empty to not stress the servers
+		const err = new Error("No `id` was provided!");
+		if (!callback) return Promise.reject(err);
+		return callback(err);
+	}
+
 	if (typeof id !== "string" && !(id instanceof URL)) {
 		// Throw an error if the data is not a string nor an URL
 		const err = new TypeError("Parameter `id` must be a string or an URL!");
@@ -31,7 +37,7 @@ export const getDocument = function (
 	}
 
 	if (password && typeof password !== "string") {
-		// Throw an error if the data is not a string
+		// Throw an error if the password is not a string
 		const err = new TypeError("Parameter `password` must be a string!");
 		if (!callback) return Promise.reject(err);
 		return callback(err);
