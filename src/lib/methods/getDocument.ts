@@ -21,14 +21,6 @@ export const getDocument = function (
 		if (!callback) return Promise.reject(err);
 		throw err;
 	}
-
-	if (!id) {
-		// Throw an error if the data was empty to not stress the servers
-		const err = new Error("No `id` was provided!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
-
 	if (typeof id !== "string" && !(id instanceof URL)) {
 		// Throw an error if the data is not a string nor an URL
 		const err = new TypeError("Parameter `id` must be a string or an URL!");
@@ -44,6 +36,14 @@ export const getDocument = function (
 	}
 
 	const documentId = encodeURIComponent(parseId(id, this.HOSTNAMEREGEX)); // Make the user inputed data encoded so it doesn't break stuff
+
+	if (!documentId) {
+		// Throw an error if the data was empty to not stress the servers
+		const err = new Error("No `id` was provided!");
+		if (!callback) return Promise.reject(err);
+		return callback(err);
+	}
+
 	const documentPassword = password ?? parsePassword(id);
 
 	const opts = prepareRequest({
