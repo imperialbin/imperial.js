@@ -29,8 +29,6 @@ describe("deleteDocument", () => {
 		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
 	}, 10000); // timeout 10s
 
-	// No need to test without token because it would have done
-	// the exact same thing but settings would not be set
 	it("valid without token", async () => {
 		const api = new Imperial();
 

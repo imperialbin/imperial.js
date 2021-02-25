@@ -22,6 +22,10 @@ export interface ImperialResponseGetDocument {
 	document: string;
 }
 
+export interface ImperialResponseEditDocument extends ImperialResponseCreateDocument {
+	message: string;
+}
+
 /**
  *  Common responses that get returned from the server
  */

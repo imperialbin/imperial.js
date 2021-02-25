@@ -4,11 +4,13 @@ import type {
 	ImperialResponseCommon,
 	ImperialResponseGetDocument,
 	ImperialResponseCreateDocument,
+	ImperialResponseEditDocument,
 } from "./helpers/interfaces";
 
 import { getDocument } from "./methods/getDocument";
 import { createDocument } from "./methods/createDocument";
 import { deleteDocument } from "./methods/deleteDocument";
+import { editDocument } from "./methods/editDocument";
 import { verify } from "./methods/verify";
 import { validateToken } from "./helpers/isValidToken";
 
@@ -179,6 +181,41 @@ export class Imperial {
 		cb?: (error: unknown, data?: ImperialResponseCommon) => void
 	): Promise<ImperialResponseCommon> | void {
 		return deleteDocument.call(this, id, cb);
+	}
+
+	/**
+	 *  Edit a document from the API | **Requires an API Token**
+	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param newText Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @example editDocument("someid", "i am the new text!").then(console.log);
+	 *  // Logs the response to the console
+	 *  @returns {Promise<ImperialResponseEditDocument>} `Promise<ImperialResponseEditDocument>`
+	 */
+	public editDocument(id: string | URL, newText: string): Promise<ImperialResponseEditDocument>;
+
+	/**
+	 *  Edit a document from the API | **Requires an API Token**
+	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param newText Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @example editDocument("someid", "i am the new text!", (e, d) => { if (!e) console.log(d);});
+	 *  // Logs the response to the console
+	 *  @returns {void} `void`
+	 */
+	public editDocument(
+		id: string | URL,
+		newText: string,
+		cb: (error: unknown, data?: ImperialResponseEditDocument) => void
+	): void;
+
+	/**
+	 *  Edit a document from the API | **Requires an API Token**
+	 */
+	public editDocument(
+		id: string | URL,
+		newText: string,
+		cb?: (error: unknown, data?: ImperialResponseEditDocument) => void
+	): Promise<ImperialResponseEditDocument> | void {
+		return editDocument.call(this, id, newText, cb);
 	}
 
 	/**
