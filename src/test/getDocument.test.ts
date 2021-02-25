@@ -37,7 +37,7 @@ describe("getDocument", () => {
 		const res = await api.getDocument(documentToRead);
 
 		expect(res.success).toBeTruthy();
-		expect(typeof res.document).toBe(typeof String());
+		expect(typeof res.document).toBe("string");
 	}, 10000); // timout 10s
 
 	it.skip("valid without token", async () => {
@@ -46,7 +46,7 @@ describe("getDocument", () => {
 		const res = await api.getDocument(documentToRead);
 
 		expect(res.success).toBeTruthy();
-		expect(typeof res.document).toBe(typeof String());
+		expect(typeof res.document).toBe("string");
 	}, 10000); // timout 10s
 
 	it("invalid - data with wrong type", async () => {

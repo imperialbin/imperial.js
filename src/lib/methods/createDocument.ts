@@ -15,7 +15,14 @@ export const createDocument = function (
 	optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | createOptions,
 	cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
 ): Promise<ImperialResponseCreateDocument> | void {
-	const callback = typeof optionsOrCallback === "function" ? optionsOrCallback : cb;
+	const [callback, options] = typeof optionsOrCallback === "function" ? [optionsOrCallback] : [cb, optionsOrCallback];
+
+	if (callback && typeof callback !== "function") {
+		// Throw an error if the data is not a callable functionex
+		const err = new TypeError("Parameter `callback` must be callable!");
+		if (!callback) return Promise.reject(err);
+		throw err;
+	}
 
 	if (!text || text === String()) {
 		const err = new Error("No `text` was provided!");
@@ -26,24 +33,26 @@ export const createDocument = function (
 	if (typeof text !== "string") {
 		// Throw an error if the data is not a string
 		const err = new TypeError("Parameter `text` must be a string!");
-		if (!cb) return Promise.reject(err);
-		return cb(err);
+		if (!callback) return Promise.reject(err);
+		return callback(err);
 	}
 
-	let data: internalPostOptions = {
-		encrypted: false,
+	if (options && typeof options !== "object") {
+		// Throw an error if the data is not an object
+		const err = new TypeError("Parameter `options` must be an Object!");
+		if (!callback) return Promise.reject(err);
+		return callback(err);
+	}
 
-		longerUrls: false,
-		instantDelete: false,
-		imageEmbed: false,
-		expiration: 5,
+	const data: internalPostOptions = {
+		password: options?.password ?? "",
+		encrypted: options?.encrypted ?? false,
+		longerUrls: options?.longerUrls ?? false,
+		instantDelete: options?.instantDelete ?? false,
+		imageEmbed: options?.imageEmbed ?? false,
+		expiration: options?.expiration ?? 5,
 		code: text,
 	};
-
-	if (optionsOrCallback && typeof optionsOrCallback !== "function") {
-		data = Object.assign(data, optionsOrCallback);
-		data.code = text; // a little backup if someone were to pass code so it doesn't break
-	}
 
 	const dataString = JSON.stringify(data);
 

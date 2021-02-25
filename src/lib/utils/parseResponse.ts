@@ -1,4 +1,5 @@
 import { codes as humanReadable } from "../helpers/httpCodes";
+import { responses } from "../helpers/imperialResponses";
 import type { IncomingMessage } from "http";
 
 const parseResponse = function (response: IncomingMessage): Promise<never> {
@@ -20,22 +21,18 @@ const parseResponse = function (response: IncomingMessage): Promise<never> {
 					/* Ignore parse error */
 				}
 
-				if (response.statusCode === 200 && json) {
+				if (json.message && responses.get(json.message)) {
+					json.message = responses.get(json.message);
+				}
+
+				if (response.statusCode === 200 && json && json.success) {
 					return resolve(json);
 				}
 
-				if (response.statusCode === 302) {
-					/* When we encouter a 302 the request was not correct and the server decied to redirect us */
-					response.statusCode = 400;
-				}
+				const errorMsg =
+					json?.message ?? humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`;
 
-				reject(
-					new Error(
-						json?.message
-							? json.message
-							: humanReadable.get(response.statusCode) ?? `Response code ${response.statusCode}`
-					)
-				);
+				reject(new Error(errorMsg));
 			} catch (err) {
 				reject(err);
 			}

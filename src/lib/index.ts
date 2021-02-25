@@ -29,8 +29,7 @@ export class Imperial {
 		if (token && validateToken(token)) this._token = token;
 	}
 
-	public get token(): string {
-		if (!this._token) return "";
+	public get token(): string | undefined {
 		return this._token;
 	}
 
@@ -77,7 +76,7 @@ export class Imperial {
 	 *  @param text The text to be sent
 	 *  @param opts Additional options for the request **Api key is required**
 	 *  @param cb Function called after the data is sent or if there was an error
-	 *  @example createDocument("hi!", (e, d) => {if (!e) console.log(d);})
+	 *  @example createDocument("hi!", { longerUrls: true }, (e, d) => {if (!e) console.log(d);})
 	 *  // Prints the response to console
 	 *  @returns `void`
 	 */
@@ -110,8 +109,18 @@ export class Imperial {
 	/**
 	 *  Get a document from the API
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param password Password to an encrypted document.
+	 *  @example getDocument("someid", "you shall not pass"), (e, d) => { if (!e) console.log(d) };
+	 *  // Logs the response to the console
+	 *  @returns `void`
+	 */
+	public getDocument(id: string | URL, password: string): Promise<ImperialResponseGetDocument>;
+
+	/**
+	 *  Get a document from the API
+	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example getDocument("someid"), (e, d) => { if (!e) console.log(d) };
+	 *  @example getDocument("someid", (e, d) => { if (!e) console.log(d) });
 	 *  // Logs the response to the console
 	 *  @returns `void`
 	 */
@@ -119,12 +128,28 @@ export class Imperial {
 
 	/**
 	 *  Get a document from the API
+	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param password Password to an encrypted document.
+	 *  @param cb Function called after the data is fetched or if there was an error
+	 *  @example getDocument("someid", "you shall not pass", (e, d) => { if (!e) console.log(d) });
+	 *  // Logs the response to the console
+	 *  @returns `void`
 	 */
 	public getDocument(
 		id: string | URL,
+		password: string,
+		cb: (error: unknown, data?: ImperialResponseGetDocument) => void
+	): void;
+
+	/**
+	 *  Get a document from the API
+	 */
+	public getDocument(
+		id: string | URL,
+		passwordOrCallback?: string | ((error: unknown, data?: ImperialResponseGetDocument) => void),
 		cb?: (error: unknown, data?: ImperialResponseGetDocument) => void
 	): Promise<ImperialResponseGetDocument> | void {
-		return getDocument.call(this, id, cb);
+		return getDocument.call(this, id, passwordOrCallback, cb);
 	}
 
 	/**
@@ -140,7 +165,7 @@ export class Imperial {
 	 *  Delete a document from the API | **Requires an API Token**
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example deleteDocument("someid"), (e, d) => { if (!e) console.log(d) };
+	 *  @example deleteDocument("someid", (e, d) => { if (!e) console.log(d) });
 	 *  // Logs the response to the console
 	 *  @returns {void} `void`
 	 */
@@ -198,7 +223,7 @@ export class Imperial {
 	 *  Get a document from the API
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example getDocument("someid"), (e, d) => { if (!e) console.log(d) };
+	 *  @example getDocument("someid", (e, d) => { if (!e) console.log(d) });
 	 *  // Logs the response to the console
 	 *  @returns `void`
 	 *  @deprecated Since 1.2.3, use `getDocument` instead
@@ -218,7 +243,7 @@ export class Imperial {
 			"DeprecationWarning"
 		);
 
-		return getDocument.call(this, id, cb);
+		return getDocument.call(this, id, undefined, cb);
 	}
 
 	/**

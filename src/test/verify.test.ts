@@ -13,7 +13,7 @@ describe("verify", () => {
 		const res = await api.verify();
 
 		expect(res.success).toBeTruthy();
-		expect(typeof res.message).toBe(typeof String());
+		expect(typeof res.message).toBe("string");
 	}, 10000);
 
 	it("invalid", async () => {
