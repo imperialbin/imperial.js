@@ -197,6 +197,7 @@ export class Imperial {
 	 *  Edit a document from the API | **Requires an API Token**
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param newText Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param cb Function called after the data is fetched or if there was an error
 	 *  @example editDocument("someid", "i am the new text!", (e, d) => { if (!e) console.log(d);});
 	 *  // Logs the response to the console
 	 *  @returns {void} `void`

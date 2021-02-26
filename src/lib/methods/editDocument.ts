@@ -47,8 +47,8 @@ export const editDocument = function (
 	}
 
 	if (typeof newText !== "string") {
-		// Throw an error if the data is not a string nor URL
-		const err = new TypeError("Parameter `newText` must be a string or an URL!");
+		// Throw an error if the data is not a string
+		const err = new TypeError("Parameter `newText` must be a string!");
 		if (!callback) return Promise.reject(err);
 		return callback(err);
 	}
