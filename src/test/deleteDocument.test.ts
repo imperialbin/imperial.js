@@ -14,7 +14,7 @@ describe("deleteDocument", () => {
 
 		try {
 			const res = await api.createDocument("test jest bro");
-			if (!res.success) throw new Error("Failed to prepare tests.");
+			if (!res.success) throw "";
 			documentToDelete = res.formattedLink;
 		} catch (e) {
 			throw new Error("Failed to prepare tests.");
@@ -39,7 +39,7 @@ describe("deleteDocument", () => {
 		).rejects.toThrow(new Error("This method requires a token to be set in the constructor!"));
 	}, 10000); // timeout 10s
 
-	it("invalid - data with wrong type", async () => {
+	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 		await expect(
 			(async () => {
@@ -53,6 +53,20 @@ describe("deleteDocument", () => {
 				await api.deleteDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 			})()
 		).rejects.toThrow(new TypeError("Parameter `id` must be a string or an URL!"));
+	});
+
+	it("invalid - second param with wrong type", async () => {
+		const api = new Imperial(IMPERIAL_TOKEN);
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.deleteDocument("jest test bro", "");
+				// @ts-ignore
+				await api.deleteDocument("jest test bro", []);
+				// @ts-ignore
+				await api.deleteDocument("jest test bro", 12345);
+			})()
+		).rejects.toThrow(new TypeError("Parameter `callback` must be callable!"));
 	});
 
 	it("invalid - no data", async () => {

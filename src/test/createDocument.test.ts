@@ -42,10 +42,12 @@ describe("createDocument", () => {
 		expect(res.instantDelete).toBeFalsy();
 	}, 10000); // timeout 10s
 
-	it("invalid - data with wrong type", async () => {
+	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 		await expect(
 			(async () => {
+				// @ts-ignore
+				await api.createDocument({});
 				// @ts-ignore
 				await api.createDocument([]);
 				// @ts-ignore
@@ -54,6 +56,34 @@ describe("createDocument", () => {
 				await api.createDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 			})()
 		).rejects.toThrow(new TypeError("Parameter `text` must be a string!"));
+	});
+
+	it("invalid - second param with wrong type", async () => {
+		const api = new Imperial(IMPERIAL_TOKEN);
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.createDocument("jest test bro", "");
+				// @ts-ignore
+				await api.createDocument("jest test bro", []);
+				// @ts-ignore
+				await api.createDocument("jest test bro", 12345);
+			})()
+		).rejects.toThrow(new TypeError("Parameter `options` must be an Object!"));
+	});
+
+	it("invalid - third param with wrong type", async () => {
+		const api = new Imperial(IMPERIAL_TOKEN);
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.createDocument("jest test bro", {}, 12345);
+				// @ts-ignore
+				await api.createDocument("jest test bro", {}, {});
+				// @ts-ignore
+				await api.createDocument("jest test bro", {}, []);
+			})()
+		).rejects.toThrow(new TypeError("Parameter `callback` must be callable!"));
 	});
 
 	it("invalid - no data", async () => {

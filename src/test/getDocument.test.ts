@@ -49,7 +49,7 @@ describe("getDocument", () => {
 		expect(typeof res.document).toBe("string");
 	}, 10000); // timout 10s
 
-	it("invalid - data with wrong type", async () => {
+	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 		await expect(
 			(async () => {
@@ -63,6 +63,36 @@ describe("getDocument", () => {
 				await api.getDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 			})()
 		).rejects.toThrowError(new TypeError("Parameter `id` must be a string or an URL!"));
+	});
+
+	it("invalid - second param with wrong type", async () => {
+		const api = new Imperial(IMPERIAL_TOKEN);
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.getDocument("bbbbbb", {});
+				// @ts-ignore
+				await api.getDocument("bbbbbb", []);
+				// @ts-ignore
+				await api.getDocument("bbbbbb", 12345);
+			})()
+		).rejects.toThrowError(new TypeError("Parameter `password` must be a string!"));
+	});
+
+	it("invalid - third param with wrong type", async () => {
+		const api = new Imperial(IMPERIAL_TOKEN);
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.getDocument("bbbbbb", "bbbbbb", "");
+				// @ts-ignore
+				await api.getDocument("bbbbbb", "bbbbbb", {});
+				// @ts-ignore
+				await api.getDocument("bbbbbb", "bbbbbb", []);
+				// @ts-ignore
+				await api.getDocument("bbbbbb", "bbbbbb", 12345);
+			})()
+		).rejects.toThrowError(new TypeError("Parameter `callback` must be callable!"));
 	});
 
 	it("invalid - no data", async () => {

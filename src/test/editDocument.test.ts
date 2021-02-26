@@ -48,7 +48,7 @@ describe("editDocument", () => {
 		).rejects.toThrow(new Error("This method requires a token to be set in the constructor!"));
 	}, 10000); // timeout 10s
 
-	it("invalid - data with wrong type", async () => {
+	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 		await expect(
 			(async () => {
@@ -62,6 +62,36 @@ describe("editDocument", () => {
 				await api.editDocument(() => {}, "bbbbbb"); // eslint-disable-line @typescript-eslint/no-empty-function
 			})()
 		).rejects.toThrow(new TypeError("Parameter `id` must be a string or an URL!"));
+	});
+
+	it("invalid - second param with wrong type", async () => {
+		const api = new Imperial(IMPERIAL_TOKEN);
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.editDocument("bbbbbb", {});
+				// @ts-ignore
+				await api.editDocument("bbbbbb", []);
+				// @ts-ignore
+				await api.editDocument("bbbbbb", 12345);
+				// @ts-ignore
+				await api.editDocument("bbbbbb", () => {}); // eslint-disable-line @typescript-eslint/no-empty-function
+			})()
+		).rejects.toThrow(new TypeError("Parameter `newText` must be a string!"));
+	});
+
+	it("invalid - third param with wrong type", async () => {
+		const api = new Imperial(IMPERIAL_TOKEN);
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.editDocument("bbbbbb", "bbbbbb", {});
+				// @ts-ignore
+				await api.editDocument("bbbbbb", "bbbbbb", []);
+				// @ts-ignore
+				await api.editDocument("bbbbbb", "bbbbbb", 12345);
+			})()
+		).rejects.toThrow(new TypeError("Parameter `callback` must be callable!"));
 	});
 
 	it("invalid - no data", async () => {
