@@ -2,11 +2,23 @@
  *  Global interfaces that the user can import
  */
 
+// Imperial resonse interfaces
+
+interface ResponseBase {
+	success: boolean;
+}
+
+/**
+ *  Common responses that get returned from the server
+ */
+export interface ImperialResponseCommon extends ResponseBase {
+	message: string;
+}
+
 /**
  *  `createDocument` response
  */
-export interface ImperialResponseCreateDocument {
-	success: boolean;
+export interface ImperialResponseCreateDocument extends ResponseBase {
 	documentId: string;
 	rawLink: string;
 	formattedLink: string;
@@ -17,22 +29,16 @@ export interface ImperialResponseCreateDocument {
 /**
  *  `getDocument` response
  */
-export interface ImperialResponseGetDocument {
-	success: boolean;
+export interface ImperialResponseGetDocument extends ResponseBase {
 	document: string;
 }
 
-export interface ImperialResponseEditDocument extends ImperialResponseCreateDocument {
-	message: string;
-}
-
 /**
- *  Common responses that get returned from the server
+ *  `editDocument` response
  */
-export interface ImperialResponseCommon {
-	success: boolean;
-	message: string;
-}
+export interface ImperialResponseEditDocument extends ImperialResponseCreateDocument, ImperialResponseCommon {}
+
+// Misc interfaces
 
 /**
  *  Options for creating the document

@@ -39,10 +39,10 @@ const api = new Imperial(/* Required for Document settings */);
 // for ts folks
 
 const createDocumentSettings/* :Interfaces.createOptions */ = {
-    longerUrls?: boolean;
-	instantDelete?: boolean;
-	imageEmbed?: boolean;
-	expiration?: number;
+    longerUrls: true;
+	instantDelete: true;
+	imageEmbed: true;
+	expiration: 2;
 };
 
 api.createDocument("hello world!", createDocumentSettings /* this is optional */).then(console.log, console.error);
