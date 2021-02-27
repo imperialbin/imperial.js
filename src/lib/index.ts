@@ -31,17 +31,26 @@ export class Imperial {
 		if (token && validateToken(token)) this._token = token;
 	}
 
+	/**
+	 *  The token you provided in the constructor
+	 */
 	public get token(): string | undefined {
 		return this._token;
 	}
 
+	/**
+	 *  Imperial's domain name
+	 */
 	public get HOSTNAME(): string {
 		return "imperialb.in";
-	} // Domain to do request with
+	}
 
+	/**
+	 *  Regex to check if the domain provided is part of imperial
+	 */
 	public get HOSTNAMEREGEX(): RegExp {
 		return /^(www\.)?imperialb(\.in|in.com)$/i;
-	} // Simple regex to check if a domain is valid
+	}
 
 	/**
 	 *  Create a document
