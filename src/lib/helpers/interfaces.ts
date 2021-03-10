@@ -24,6 +24,8 @@ export interface ImperialResponseCreateDocument extends ResponseBase {
 	formattedLink: string;
 	expiresIn: string;
 	instantDelete: boolean;
+	encrypted?: boolean;
+	password: string | false;
 }
 
 /**
