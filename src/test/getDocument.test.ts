@@ -13,7 +13,7 @@ describe("getDocument", () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
 		try {
-			const res = await api.createDocument("test jest bro");
+			const res = await api.createDocument("Tests: getDocument");
 			if (!res.success) throw new Error("Failed to prepare tests.");
 			documentToRead = res.formattedLink;
 		} catch (e) {
@@ -51,48 +51,97 @@ describe("getDocument", () => {
 
 	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		const err = new TypeError("Parameter `id` must be a string or an URL!");
+
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument({});
+			})()
+		).rejects.toThrowError(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.getDocument([]);
+			})()
+		).rejects.toThrowError(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.getDocument(12345);
+			})()
+		).rejects.toThrowError(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.getDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 			})()
-		).rejects.toThrowError(new TypeError("Parameter `id` must be a string or an URL!"));
+		).rejects.toThrowError(err);
 	});
 
 	it("invalid - second param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		const err = new TypeError("Parameter `password` must be a string!");
+
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", {});
+			})()
+		).rejects.toThrowError(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", []);
+			})()
+		).rejects.toThrowError(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", 12345);
 			})()
-		).rejects.toThrowError(new TypeError("Parameter `password` must be a string!"));
+		).rejects.toThrowError(err);
 	});
 
 	it("invalid - third param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		const err = new TypeError("Parameter `callback` must be callable!");
+
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", "bbbbbb", "");
+			})()
+		).rejects.toThrowError(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", "bbbbbb", {});
+			})()
+		).rejects.toThrowError(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", "bbbbbb", []);
+			})()
+		).rejects.toThrowError(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", "bbbbbb", 12345);
 			})()
-		).rejects.toThrowError(new TypeError("Parameter `callback` must be callable!"));
+		).rejects.toThrowError(err);
 	});
 
 	it("invalid - no data", async () => {

@@ -13,7 +13,7 @@ describe("deleteDocument", () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
 		try {
-			const res = await api.createDocument("test jest bro");
+			const res = await api.createDocument("Tests: deleteDocument");
 			if (!res.success) throw "";
 			documentToDelete = res.formattedLink;
 		} catch (e) {
@@ -21,7 +21,7 @@ describe("deleteDocument", () => {
 		}
 	});
 
-	it("valid with token", async () => {
+	it("valid - with token", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
 		const res = await api.deleteDocument(documentToDelete);
@@ -29,44 +29,75 @@ describe("deleteDocument", () => {
 		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
 	}, 10000); // timeout 10s
 
-	it("valid without token", async () => {
+	it("valid - without token", async () => {
 		const api = new Imperial();
 
 		await expect(
 			(async () => {
-				await api.deleteDocument("test jest bro");
+				await api.deleteDocument("bbbbbb");
 			})()
 		).rejects.toThrow(new Error("This method requires a token to be set in the constructor!"));
 	}, 10000); // timeout 10s
 
 	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		const err = new TypeError("Parameter `id` must be a string or an URL!");
+
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.deleteDocument({});
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.deleteDocument([]);
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.deleteDocument(12345);
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.deleteDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 			})()
-		).rejects.toThrow(new TypeError("Parameter `id` must be a string or an URL!"));
+		).rejects.toThrow(err);
 	});
 
 	it("invalid - second param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		const err = new TypeError("Parameter `callback` must be callable!");
+
 		await expect(
 			(async () => {
 				// @ts-ignore
-				await api.deleteDocument("jest test bro", "");
-				// @ts-ignore
-				await api.deleteDocument("jest test bro", []);
-				// @ts-ignore
-				await api.deleteDocument("jest test bro", 12345);
+				await api.deleteDocument("bbbbbb", "");
 			})()
-		).rejects.toThrow(new TypeError("Parameter `callback` must be callable!"));
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.deleteDocument("bbbbbb", []);
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.deleteDocument("bbbbbb", 12345);
+			})()
+		).rejects.toThrow(err);
 	});
 
 	it("invalid - no data", async () => {

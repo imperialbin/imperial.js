@@ -20,10 +20,10 @@ describe("createDocument", () => {
 			}
 	});
 
-	it("valid with token", async () => {
+	it("valid - with token", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const res = await api.createDocument("test jest bro", { instantDelete: true });
+		const res = await api.createDocument("Test: createDocument > valid - with token", { instantDelete: true });
 
 		expect(res.success).toBeTruthy();
 		expect(res.instantDelete).toBeTruthy();
@@ -33,10 +33,10 @@ describe("createDocument", () => {
 
 	// No need to test without token because it would have done
 	// the exact same thing but settings would not be set
-	it.skip("valid without token", async () => {
+	it.skip("valid - without token", async () => {
 		const api = new Imperial();
 
-		const res = await api.createDocument("test jest bro", { instantDelete: true });
+		const res = await api.createDocument("Test: createDocument > valid - without token", { instantDelete: true });
 
 		expect(res.success).toBeTruthy();
 		expect(res.instantDelete).toBeFalsy();
@@ -44,46 +44,90 @@ describe("createDocument", () => {
 
 	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		const err = new TypeError("Parameter `text` must be a string!");
+
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.createDocument({});
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.createDocument([]);
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.createDocument(12345);
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
 				// @ts-ignore
 				await api.createDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 			})()
-		).rejects.toThrow(new TypeError("Parameter `text` must be a string!"));
+		).rejects.toThrow(err);
 	});
 
 	it("invalid - second param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		const err = new TypeError("Parameter `options` must be an Object!");
+
 		await expect(
 			(async () => {
 				// @ts-ignore
-				await api.createDocument("jest test bro", "");
-				// @ts-ignore
-				await api.createDocument("jest test bro", []);
-				// @ts-ignore
-				await api.createDocument("jest test bro", 12345);
+				await api.createDocument("Test: createDocument > invalid - second param with wrong type #1", "");
 			})()
-		).rejects.toThrow(new TypeError("Parameter `options` must be an Object!"));
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.createDocument("Test: createDocument > invalid - second param with wrong type #2", []);
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.createDocument("Test: createDocument > invalid - second param with wrong type #3", 12345);
+			})()
+		).rejects.toThrow(err);
 	});
 
 	it("invalid - third param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		const err = new TypeError("Parameter `callback` must be callable!");
+
 		await expect(
 			(async () => {
 				// @ts-ignore
-				await api.createDocument("jest test bro", {}, 12345);
-				// @ts-ignore
-				await api.createDocument("jest test bro", {}, {});
-				// @ts-ignore
-				await api.createDocument("jest test bro", {}, []);
+				await api.createDocument("Test: createDocument > invalid - third param with wrong type #1", {}, 12345);
 			})()
-		).rejects.toThrow(new TypeError("Parameter `callback` must be callable!"));
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.createDocument("Test: createDocument > invalid - third param with wrong type #2", {}, {});
+			})()
+		).rejects.toThrow(err);
+
+		await expect(
+			(async () => {
+				// @ts-ignore
+				await api.createDocument("Test: createDocument > invalid - third param with wrong type #3", {}, []);
+			})()
+		).rejects.toThrow(err);
 	});
 
 	it("invalid - no data", async () => {
