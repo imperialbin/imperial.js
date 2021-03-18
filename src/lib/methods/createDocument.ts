@@ -40,7 +40,7 @@ export const createDocument = function (
 		return callback(err);
 	}
 
-	if (options && typeof options !== "object") {
+	if ((options !== undefined && typeof options !== "object") || options instanceof Array) {
 		// Throw an error if the data is not an object
 		const err = new TypeError("Parameter `options` must be an Object!");
 		if (!callback) return Promise.reject(err);
