@@ -1,9 +1,12 @@
 import { request } from "https";
 import type { Imperial } from "..";
 import type { createOptions, ImperialResponseCreateDocument } from "../helpers/interfaces";
-import parseResponse from "../utils/parseResponse";
-import prepareRequest from "../utils/prepareRequest";
+import { parseResponse } from "../utils/parseResponse";
+import { prepareRequest } from "../utils/prepareRequest";
 
+/**
+ *  @internal
+ */
 interface internalPostOptions extends createOptions {
 	code: string;
 	[key: string]: unknown;
@@ -24,7 +27,7 @@ export const createDocument = function (
 		throw err;
 	}
 
-	if (!text || text === String()) {
+	if (!text || text === "") {
 		const err = new Error("No `text` was provided!");
 		if (!callback) return Promise.reject(err);
 		return callback(err);
@@ -69,7 +72,7 @@ export const createDocument = function (
 	if (!callback)
 		return new Promise((resolve, reject) => {
 			const httpRequest = request(opts, (response) => {
-				resolve(parseResponse(response));
+				resolve(parseResponse(response, httpRequest));
 			});
 			httpRequest.on("error", reject);
 			httpRequest.write(dataString);
@@ -77,7 +80,7 @@ export const createDocument = function (
 		});
 
 	const httpRequest = request(opts, (response) => {
-		parseResponse(response).then((data) => callback(null, data), cb);
+		parseResponse(response, httpRequest).then((data) => callback(null, data), cb);
 	});
 	httpRequest.on("error", callback);
 	httpRequest.write(dataString);

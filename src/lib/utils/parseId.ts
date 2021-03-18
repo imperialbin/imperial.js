@@ -1,5 +1,4 @@
-const parseUrl = (url: URL, hostnameRegex: RegExp): string => {
-	if (!url.pathname) return String();
+const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {
 	const splitPath = url.pathname.split("/");
 
 	if (hostnameRegex.test(url.hostname) && splitPath.length > 0) {
@@ -7,25 +6,21 @@ const parseUrl = (url: URL, hostnameRegex: RegExp): string => {
 		return splitPath[splitPath.length - 1];
 	}
 
-	return url.toString ? url.toString() : String();
+	return url.toString();
 };
 
-const parseId = function (id: string | URL, hostnameRegex: RegExp): string {
-	if (!(id instanceof URL)) {
-		let _id: string = id as string;
+export const parseId = function (id: string | URL, hostnameRegex: RegExp): string {
+	if (id instanceof URL) return getIdFromUrl(id as URL, hostnameRegex);
 
-		try {
-			// Try to parse a url
-			const url = new URL(id as string);
-			_id = parseUrl(url, hostnameRegex);
-		} catch (e) {
-			/* Don't do anything with the URL prase error */
-		}
+	let _id = id;
+
+	try {
 		// Try to parse a url
-		return _id;
+		_id = getIdFromUrl(new URL(id as string), hostnameRegex);
+	} catch (e) {
+		// Don't do anything with the URL prase error
 	}
 
-	return parseUrl(id as URL, hostnameRegex);
+	// Try to parse a url
+	return _id;
 };
-
-export default parseId;

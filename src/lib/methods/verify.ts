@@ -1,8 +1,8 @@
 import { request } from "https";
 import type { Imperial } from "..";
 import type { ImperialResponseCommon } from "../helpers/interfaces";
-import parseResponse from "../utils/parseResponse";
-import prepareRequest from "../utils/prepareRequest";
+import { parseResponse } from "../utils/parseResponse";
+import { prepareRequest } from "../utils/prepareRequest";
 
 export const verify = function (
 	this: Imperial,
@@ -31,14 +31,14 @@ export const verify = function (
 	if (!callback)
 		return new Promise((resolve, reject) => {
 			const httpRequest = request(opts, (response) => {
-				resolve(parseResponse(response));
+				resolve(parseResponse(response, httpRequest));
 			});
 			httpRequest.on("error", reject);
 			httpRequest.end();
 		});
 
 	const httpRequest = request(opts, (response) => {
-		parseResponse(response).then((data) => callback(null, data), callback);
+		parseResponse(response, httpRequest).then((data) => callback(null, data), callback);
 	});
 	httpRequest.on("error", callback);
 	httpRequest.end();

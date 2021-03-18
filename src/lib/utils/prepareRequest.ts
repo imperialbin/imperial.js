@@ -12,9 +12,16 @@ interface prepareParams {
 	token: string | undefined;
 }
 
-const prepareRequest = function ({ method, headers = {}, path, hostname, token }: prepareParams): RequestOptions {
+export const prepareRequest = function ({
+	method,
+	headers = {},
+	path,
+	hostname,
+	token,
+}: prepareParams): RequestOptions {
 	const defaultHeaders: OutgoingHttpHeaders = {
-		"Content-Type": "application/json", // best thing to happen
+		// best thing to happen
+		"Content-Type": "application/json",
 		"User-Agent": "imperial-node; (+https://github.com/imperialbin/imperial-node)",
 	};
 
@@ -30,5 +37,3 @@ const prepareRequest = function ({ method, headers = {}, path, hostname, token }
 		headers,
 	};
 };
-
-export default prepareRequest;

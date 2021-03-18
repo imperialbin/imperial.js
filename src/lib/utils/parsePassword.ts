@@ -1,23 +1,20 @@
-const parseUrl = (url: URL): string | undefined => {
+const getPasswordFromUrl = (url: URL): string | undefined => {
 	const password = url.searchParams.get("password");
 
-	if (!password) return undefined;
+	if (!password) return;
 	return password;
 };
 
-const parsePassword = function (id: string | URL): string | undefined {
+export const parsePassword = function (id: string | URL): string | undefined {
 	if (id instanceof URL) {
-		return parseUrl(id as URL);
+		return getPasswordFromUrl(id as URL);
 	}
 
 	try {
 		// Try to parse a url
-		const url = new URL(id as string);
-		return parseUrl(url);
+		return getPasswordFromUrl(new URL(id as string));
 	} catch (e) {
-		/* Don't do anything with the URL prase error */
-		return undefined;
+		// Return undefined if the parsing failed
+		return;
 	}
 };
-
-export default parsePassword;

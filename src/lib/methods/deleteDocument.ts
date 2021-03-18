@@ -1,9 +1,9 @@
 import { request } from "https";
 import type { Imperial } from "..";
 import type { ImperialResponseCommon } from "../helpers/interfaces";
-import parseId from "../utils/parseId";
-import parseResponse from "../utils/parseResponse";
-import prepareRequest from "../utils/prepareRequest";
+import { parseId } from "../utils/parseId";
+import { parseResponse } from "../utils/parseResponse";
+import { prepareRequest } from "../utils/prepareRequest";
 
 export const deleteDocument = function (
 	this: Imperial,
@@ -57,14 +57,14 @@ export const deleteDocument = function (
 	if (!callback)
 		return new Promise((resolve, reject) => {
 			const httpRequest = request(opts, (response) => {
-				resolve(parseResponse(response));
+				resolve(parseResponse(response, httpRequest));
 			});
 			httpRequest.on("error", reject);
 			httpRequest.end();
 		});
 
 	const httpRequest = request(opts, (response) => {
-		parseResponse(response).then((data) => callback(null, data), callback);
+		parseResponse(response, httpRequest).then((data) => callback(null, data), callback);
 	});
 	httpRequest.on("error", callback);
 	httpRequest.end();
