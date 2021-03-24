@@ -12,3 +12,4 @@ yarn-error.log
 jest.config.js
 .gitignore
 .prettierrc.json
+examples/

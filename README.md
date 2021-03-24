@@ -28,62 +28,19 @@ $ yarn add imperial-node
 
 # Example Usage
 
-```js
-const { Imperial } = require("imperial-node");
-// or for ts users
-import { Imperial } from "imperial-node";
+Examples can be found in the repository [here](./examples).
 
-const api = new Imperial(/* Required for Document settings */);
-
-// import type { Interfaces } from "imperial-node"
-// for ts folks
-
-const createDocumentSettings/* :Interfaces.createOptions */ = {
-    longerUrls: true;
-	instantDelete: true;
-	imageEmbed: true;
-	expiration: 2;
-};
-
-api.createDocument("hello world!", createDocumentSettings /* this is optional */).then(console.log, console.error);
-// or using callbacks
-api.createDocument("hello world!", createDocumentSettings /* this is optional */, (e, d) => {
-	if (e) return console.error(e);
-	console.log(d);
-});
-
-api.getDocument("https://imperialb.in/pxseuwu/g0gmj4p3fbt")
-	// or just "g0gmj4p3fbt"
-	.then(console.log, console.error);
-// or using callbacks
-api.getDocument("https://imperialb.in/pxseuwu/g0gmj4p3fbt", (e, d) => {
-	if (e) return console.error(e);
-	console.log(d);
-});
-
-api.verify().then(console.log, console.error);
-// or using callbacks
-api.verify((e, d) => {
-	if (e) return console.error(e);
-	console.log(d);
-});
-```
+They should get help you wrap yourself around this implementation.
 
 # Running Locally
 
-Before you start create a new text file in the root of the package named: `test_data.txt`. \
-In that file provide the data like so:
+Before you run the tests make sure to set the enviromental variable `IMPERIAL_TOKEN` to be your Imperial Api token.
+If you do not have an Api token you can get one [here](https://imperialb.in/account).
 
-```
-<Your Imperial token here>
-<Valid document url>
-```
-
-Then do:
+If you're all set you can use these to run the tests:
 
 ```sh
 $ npm ci
-$ npm run build
 $ npm test
 ```
 
@@ -92,7 +49,6 @@ or with yarn
 ```sh
 # if you already installed once make sure to remove node_modules
 $ yarn install --frozen-lockfile
-$ yarn build
 $ yarn test
 ```
 
@@ -101,7 +57,7 @@ $ yarn test
 1. Fork the repo on GitHub
 2. Clone the project to your own machine
 3. Commit changes to your own branch
-4. Push your work back up to your fork
+4. Push your work to your fork
 5. Submit a Pull request so that I can review your changes
 
 NOTE: Be sure to merge the latest from "upstream" before making a pull request!
