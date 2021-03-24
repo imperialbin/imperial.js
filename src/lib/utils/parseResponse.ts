@@ -1,34 +1,14 @@
+import type { ClientRequest, IncomingMessage } from "http";
 import { codes as humanReadable } from "../helpers/httpCodes";
 import { responses } from "../helpers/imperialResponses";
-import type { IncomingMessage, ClientRequest } from "http";
 import type { ImperialResponseCommon } from "../helpers/interfaces";
+import { ImperialError } from "./ImperialError";
 
 /**
  *  @internal
  */
 interface InternalImperial extends ImperialResponseCommon {
 	[key: string]: unknown;
-}
-
-/**
- *  @internal
- */
-interface ImperialErrorInterface {
-	message?: string;
-	status?: number;
-	path?: string;
-}
-
-class ImperialError extends Error {
-	public status?: number;
-	public path?: string;
-
-	constructor({ message, status, path }: ImperialErrorInterface) {
-		super(message);
-		this.name = "ImperialError";
-		this.status = status;
-		this.path = path;
-	}
 }
 
 export const parseResponse = function (response: IncomingMessage, request: ClientRequest): Promise<never> {

@@ -2,17 +2,18 @@ import type { URL } from "url";
 import type {
 	createOptions,
 	ImperialResponseCommon,
-	ImperialResponseGetDocument,
 	ImperialResponseCreateDocument,
 	ImperialResponseEditDocument,
+	ImperialResponseGetDocument,
 } from "./helpers/interfaces";
 
-import { getDocument } from "./methods/getDocument";
+// Import methods
+import { validateToken } from "./helpers/isValidToken";
 import { createDocument } from "./methods/createDocument";
 import { deleteDocument } from "./methods/deleteDocument";
 import { editDocument } from "./methods/editDocument";
+import { getDocument } from "./methods/getDocument";
 import { verify } from "./methods/verify";
-import { validateToken } from "./helpers/isValidToken";
 
 export * as Interfaces from "./helpers/interfaces";
 
