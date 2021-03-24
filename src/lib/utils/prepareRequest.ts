@@ -1,16 +1,6 @@
 import type { OutgoingHttpHeaders } from "http";
 import type { RequestOptions } from "https";
-
-/**
- *  @internal
- */
-interface prepareParams {
-	method: string;
-	headers?: OutgoingHttpHeaders;
-	path: string;
-	hostname: string;
-	token: string | undefined;
-}
+import type { PrepareRequestParams } from "../helpers/interfaces";
 
 export const prepareRequest = function ({
 	method,
@@ -18,7 +8,7 @@ export const prepareRequest = function ({
 	path,
 	hostname,
 	token,
-}: prepareParams): RequestOptions {
+}: PrepareRequestParams): RequestOptions {
 	const defaultHeaders: OutgoingHttpHeaders = {
 		// best thing to happen
 		"Content-Type": "application/json",

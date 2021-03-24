@@ -1,16 +1,8 @@
 import { request } from "https";
 import type { Imperial } from "..";
-import type { createOptions, ImperialResponseCreateDocument } from "../helpers/interfaces";
+import type { createOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../helpers/interfaces";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
-
-/**
- *  @internal
- */
-interface internalPostOptions extends createOptions {
-	code: string;
-	[key: string]: unknown;
-}
 
 export const createDocument = function (
 	this: Imperial,
@@ -47,7 +39,7 @@ export const createDocument = function (
 		return callback(err);
 	}
 
-	const data: internalPostOptions = {
+	const data: InternalPostOptions = {
 		password: options?.password ?? "",
 		encrypted: options?.encrypted ?? false,
 		longerUrls: options?.longerUrls ?? false,

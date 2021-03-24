@@ -1,15 +1,8 @@
 import type { ClientRequest, IncomingMessage } from "http";
 import { codes as humanReadable } from "../helpers/httpCodes";
 import { responses } from "../helpers/imperialResponses";
-import type { ImperialResponseCommon } from "../helpers/interfaces";
+import type { InternalImperialResponse } from "../helpers/interfaces";
 import { ImperialError } from "./ImperialError";
-
-/**
- *  @internal
- */
-interface InternalImperial extends ImperialResponseCommon {
-	[key: string]: unknown;
-}
 
 export const parseResponse = function (response: IncomingMessage, request: ClientRequest): Promise<never> {
 	return new Promise((resolve, reject) => {
@@ -22,7 +15,7 @@ export const parseResponse = function (response: IncomingMessage, request: Clien
 
 		response.on("end", () => {
 			const responseData = data.join("");
-			let json: InternalImperial | undefined;
+			let json: InternalImperialResponse | undefined;
 
 			try {
 				json = JSON.parse(responseData);
