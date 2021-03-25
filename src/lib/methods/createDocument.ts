@@ -1,13 +1,13 @@
 import { request } from "https";
 import type { Imperial } from "..";
-import type { createOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../helpers/interfaces";
+import type { CreateOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../helpers/interfaces";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
 
 export const createDocument = function (
 	this: Imperial,
 	text: string,
-	optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | createOptions,
+	optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | CreateOptions,
 	cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
 ): Promise<ImperialResponseCreateDocument> | void {
 	const [callback, options] = typeof optionsOrCallback === "function" ? [optionsOrCallback] : [cb, optionsOrCallback];

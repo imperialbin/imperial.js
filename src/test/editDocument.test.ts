@@ -32,7 +32,12 @@ describe("editDocument", () => {
 	it("valid with token", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const res = await api.editDocument(documentToEdit, "test jest bro!!!");
+		let res = await api.editDocument(documentToEdit, "Tests: editDocument #2");
+
+		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
+
+		res = await api.editDocument(new URL(documentToEdit), "Tests: editDocument #3");
+
 		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
 	}, 10000); // timeout 10s
 

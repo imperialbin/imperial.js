@@ -39,7 +39,7 @@ export interface ImperialResponseEditDocument extends ImperialResponseCreateDocu
 /**
  *  Options for creating the document
  */
-export interface createOptions {
+export interface CreateOptions {
 	longerUrls?: boolean;
 	instantDelete?: boolean;
 	imageEmbed?: boolean;
@@ -51,7 +51,7 @@ export interface createOptions {
 /**
  *  @internal
  */
-export interface InternalPostOptions extends createOptions {
+export interface InternalPostOptions extends CreateOptions {
 	code: string;
 	[key: string]: unknown;
 }

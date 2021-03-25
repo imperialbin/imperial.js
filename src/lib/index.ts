@@ -1,6 +1,5 @@
-import type { URL } from "url";
 import type {
-	createOptions,
+	CreateOptions,
 	ImperialResponseCommon,
 	ImperialResponseCreateDocument,
 	ImperialResponseEditDocument,
@@ -71,7 +70,7 @@ export class Imperial {
 	 *  @example createDocument("hi!", { longerUrls: true }).then(console.log); // Prints the response to console
 	 *  @returns `Promise<ImperialResponseCreateDocument>`
 	 */
-	public createDocument(text: string, opts: createOptions): Promise<ImperialResponseCreateDocument>;
+	public createDocument(text: string, opts: CreateOptions): Promise<ImperialResponseCreateDocument>;
 
 	/**
 	 *  Create a document
@@ -94,7 +93,7 @@ export class Imperial {
 	 */
 	public createDocument(
 		text: string,
-		opts: createOptions,
+		opts: CreateOptions,
 		cb: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): void;
 
@@ -103,7 +102,7 @@ export class Imperial {
 	 */
 	public createDocument(
 		text: string,
-		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | createOptions,
+		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | CreateOptions,
 		cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): Promise<ImperialResponseCreateDocument> | void {
 		return createDocument.call(this, text, optionsOrCallback, cb);
@@ -313,7 +312,7 @@ export class Imperial {
 	 *  // Prints the response to console
 	 *  @deprecated Since 1.2.3, use `createDocument` instead
 	 */
-	public postCode(text: string, opts: createOptions): Promise<ImperialResponseCreateDocument>;
+	public postCode(text: string, opts: CreateOptions): Promise<ImperialResponseCreateDocument>;
 
 	/**
 	 *  Create a document
@@ -336,7 +335,7 @@ export class Imperial {
 	 */
 	public postCode(
 		text: string,
-		opts: createOptions,
+		opts: CreateOptions,
 		cb: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): void;
 
@@ -346,7 +345,7 @@ export class Imperial {
 	 */
 	public postCode(
 		text: string,
-		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | createOptions,
+		optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | CreateOptions,
 		cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
 	): Promise<ImperialResponseCreateDocument> | void {
 		process.emitWarning(

@@ -33,7 +33,11 @@ describe("getDocument", () => {
 	it("valid with token", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const res = await api.getDocument(documentToRead);
+		let res = await api.getDocument(documentToRead);
+
+		expect(typeof res.document).toBe("string");
+
+		res = await api.getDocument(new URL(documentToRead));
 
 		expect(typeof res.document).toBe("string");
 	}, 10000); // timout 10s
