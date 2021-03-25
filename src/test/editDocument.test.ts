@@ -14,7 +14,6 @@ describe("editDocument", () => {
 
 		try {
 			const res = await api.createDocument("Tests: editDocument", { longerUrls: true });
-			if (!res.success) throw new Error("Failed to prepare tests.");
 			documentToEdit = res.formattedLink;
 		} catch (e) {
 			throw new Error("Failed to prepare tests.");
@@ -34,7 +33,6 @@ describe("editDocument", () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
 		const res = await api.editDocument(documentToEdit, "test jest bro!!!");
-		expect(res.success).toBeTruthy();
 		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
 	}, 10000); // timeout 10s
 

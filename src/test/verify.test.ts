@@ -12,7 +12,6 @@ describe("verify", () => {
 
 		const res = await api.verify();
 
-		expect(res.success).toBeTruthy();
 		expect(typeof res.message).toBe("string");
 	}, 10000);
 

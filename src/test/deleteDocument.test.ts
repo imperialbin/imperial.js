@@ -14,7 +14,6 @@ describe("deleteDocument", () => {
 
 		try {
 			const res = await api.createDocument("Tests: deleteDocument");
-			if (!res.success) throw "";
 			documentToDelete = res.formattedLink;
 		} catch (e) {
 			throw new Error("Failed to prepare tests.");
@@ -25,7 +24,6 @@ describe("deleteDocument", () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
 		const res = await api.deleteDocument(documentToDelete);
-		expect(res.success).toBeTruthy();
 		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
 	}, 10000); // timeout 10s
 

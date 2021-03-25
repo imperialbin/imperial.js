@@ -14,7 +14,6 @@ describe("getDocument", () => {
 
 		try {
 			const res = await api.createDocument("Tests: getDocument");
-			if (!res.success) throw new Error("Failed to prepare tests.");
 			documentToRead = res.formattedLink;
 		} catch (e) {
 			throw new Error("Failed to prepare tests.");
@@ -36,7 +35,6 @@ describe("getDocument", () => {
 
 		const res = await api.getDocument(documentToRead);
 
-		expect(res.success).toBeTruthy();
 		expect(typeof res.document).toBe("string");
 	}, 10000); // timout 10s
 
@@ -45,7 +43,6 @@ describe("getDocument", () => {
 
 		const res = await api.getDocument(documentToRead);
 
-		expect(res.success).toBeTruthy();
 		expect(typeof res.document).toBe("string");
 	}, 10000); // timout 10s
 

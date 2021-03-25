@@ -25,10 +25,10 @@ describe("createDocument", () => {
 
 		const res = await api.createDocument("Test: createDocument > valid - with token", { instantDelete: true });
 
-		expect(res.success).toBeTruthy();
+		expect(typeof res.documentId).toBe("string");
 		expect(res.instantDelete).toBeTruthy();
 
-		if (res.success) createdDocuments.push(res.formattedLink);
+		createdDocuments.push(res.formattedLink);
 	}, 10000); // timeout 10s
 
 	// No need to test without token because it would have done
@@ -38,7 +38,6 @@ describe("createDocument", () => {
 
 		const res = await api.createDocument("Test: createDocument > valid - without token", { instantDelete: true });
 
-		expect(res.success).toBeTruthy();
 		expect(res.instantDelete).toBeFalsy();
 	}, 10000); // timeout 10s
 
