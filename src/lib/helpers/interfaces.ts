@@ -1,39 +1,31 @@
 import type { OutgoingHttpHeaders } from "http";
 
-/**
- *  Global interfaces that the user can import
- */
-
-// Imperial resonse interfaces
-
-interface ResponseBase {
-	success: boolean;
-}
+// interfaces for most of Imperial responses
 
 /**
  *  Common responses that get returned from the server
  */
-export interface ImperialResponseCommon extends ResponseBase {
+export interface ImperialResponseCommon {
 	message: string;
 }
 
 /**
  *  `createDocument` response
  */
-export interface ImperialResponseCreateDocument extends ResponseBase {
+export interface ImperialResponseCreateDocument {
 	documentId: string;
 	rawLink: string;
 	formattedLink: string;
 	expiresIn: string;
 	instantDelete: boolean;
 	encrypted?: boolean;
-	password: string | false;
+	password?: string;
 }
 
 /**
  *  `getDocument` response
  */
-export interface ImperialResponseGetDocument extends ResponseBase {
+export interface ImperialResponseGetDocument {
 	document: string;
 }
 
@@ -77,6 +69,7 @@ export interface ImperialErrorInterface {
  *  @internal
  */
 export interface InternalImperialResponse extends ImperialResponseCommon {
+	success: boolean;
 	[key: string]: unknown;
 }
 

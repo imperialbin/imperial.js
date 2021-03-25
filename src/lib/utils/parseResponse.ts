@@ -27,8 +27,17 @@ export const parseResponse = function (response: IncomingMessage, request: Clien
 				json.message = responses.get(json.message) ?? json.message;
 			}
 
-			if (response.statusCode === 200 && json?.success === true) {
-				return resolve(json as never);
+			/*
+			 *  This basically removes the success from all of
+			 *  the responses because it would not matter anyway
+			 *
+			 *  I also added the emtpy object so it doesn't cry if
+			 *  the json object is undefined
+			 */
+			const { success, ...content } = json ?? {};
+
+			if (response.statusCode === 200 && success === true) {
+				return resolve(content as never);
 			}
 
 			const errorMsg =
