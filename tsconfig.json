@@ -36,6 +36,6 @@
         "**/*.test.ts"
     ],
     "include": [
-        "./src/**/*.ts",
+        "./src/lib/**/*.ts",
     ]
 }

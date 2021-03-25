@@ -34,7 +34,7 @@ They should get help you wrap yourself around this implementation.
 
 # Running Locally
 
-Before you run the tests make sure to set the enviromental variable `IMPERIAL_TOKEN` to be your Imperial Api token.
+Before you run the tests make sure to set the enviromental variable `IMPERIAL_TOKEN` to be your Imperial Api token. (e.g. set it in .env file in the root of the project)
 If you do not have an Api token you can get one [here](https://imperialb.in/account).
 
 If you're all set you can use these to run the tests:
