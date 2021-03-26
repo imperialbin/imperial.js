@@ -1,5 +1,5 @@
 import { Imperial } from "imperial-node";
-import type { Interfaces } from "imperial-node";
+import type { CreateOptions } from "imperial-node/Interfaces";
 
 /*
  *  the token can be undefined, must be a valid imperial token to work
@@ -10,7 +10,7 @@ const IMPERIAL_TOKEN = "IMPERIAL-really-valid-token";
 const api = new Imperial(IMPERIAL_TOKEN);
 
 // to use these options it is required to set an api token in the constructor
-const options: Interfaces.createOptions = {
+const options: CreateOptions = {
 	/*
 	 *  you only need to specify the ones you need
 	 *  not all are required to be presant
