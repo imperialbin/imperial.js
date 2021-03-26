@@ -57,7 +57,7 @@ export const createDocument = function (
 		headers: {
 			"Content-Length": Buffer.byteLength(dataString),
 		},
-		hostname: this.HOSTNAME,
+		hostname: this.Hostname,
 		token: this.token,
 	});
 

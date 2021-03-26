@@ -1,10 +1,12 @@
 const getPasswordFromUrl = (url: URL): string | undefined => {
 	const password = url.searchParams.get("password");
-
 	if (!password) return;
 	return password;
 };
 
+/**
+ *  @internal
+ */
 export const parsePassword = function (id: string | URL): string | undefined {
 	if (id instanceof URL) {
 		return getPasswordFromUrl(id as URL);

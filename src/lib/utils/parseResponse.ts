@@ -1,9 +1,12 @@
 import type { ClientRequest, IncomingMessage } from "http";
-import { codes as humanReadable } from "../helpers/httpCodes";
-import { responses } from "../helpers/imperialResponses";
+import { HTTPCodes as humanReadable } from "../helpers/HTTPCodes";
+import { imperialResponses } from "../helpers/imperialResponses";
 import type { InternalImperialResponse } from "../helpers/interfaces";
 import { ImperialError } from "./ImperialError";
 
+/**
+ *  @internal
+ */
 export const parseResponse = function (response: IncomingMessage, request: ClientRequest): Promise<never> {
 	return new Promise((resolve, reject) => {
 		const data: string[] = [];
@@ -15,6 +18,7 @@ export const parseResponse = function (response: IncomingMessage, request: Clien
 
 		response.on("end", () => {
 			const responseData = data.join("");
+
 			let json: InternalImperialResponse | undefined;
 
 			try {
@@ -24,7 +28,7 @@ export const parseResponse = function (response: IncomingMessage, request: Clien
 			}
 
 			if (typeof json?.message === "string") {
-				json.message = responses.get(json.message) ?? json.message;
+				json.message = imperialResponses.get(json.message) ?? json.message;
 			}
 
 			/*

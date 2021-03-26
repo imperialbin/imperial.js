@@ -3,7 +3,7 @@ import type { OutgoingHttpHeaders } from "http";
 // interfaces for most of Imperial responses
 
 /**
- *  Common responses that get returned from the server
+ *  Common response that get returned from the server
  */
 export interface ImperialResponseCommon {
 	message: string;
@@ -47,6 +47,8 @@ export interface CreateOptions {
 	encrypted?: boolean;
 	password?: string;
 }
+
+// Bellow are internal interfaces that do not get exported to the dist folder
 
 /**
  *  @internal

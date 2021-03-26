@@ -43,7 +43,7 @@ export const getDocument = function (
 		return callback(err);
 	}
 
-	const documentId = encodeURIComponent(parseId(id, this.HOSTNAMEREGEX)); // Make the user inputed data encoded so it doesn't break stuff
+	const documentId = encodeURIComponent(parseId(id, this.HostnameCheckRegExp)); // Make the user inputed data encoded so it doesn't break stuff
 
 	if (!documentId) {
 		// Throw an error if the data was empty to not stress the servers
@@ -57,7 +57,7 @@ export const getDocument = function (
 	const opts = prepareRequest({
 		method: "GET",
 		path: `/document/${documentId}${documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""}`,
-		hostname: this.HOSTNAME,
+		hostname: this.Hostname,
 		token: this.token,
 	});
 

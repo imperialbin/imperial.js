@@ -24,7 +24,7 @@ export const verify = function (
 	const opts = prepareRequest({
 		method: "GET",
 		path: `/checkApiToken/${encodeURIComponent(this.token)}`,
-		hostname: this.HOSTNAME,
+		hostname: this.Hostname,
 		token: this.token,
 	});
 

@@ -53,7 +53,7 @@ export const editDocument = function (
 		return callback(err);
 	}
 
-	const documentId = parseId(id, this.HOSTNAMEREGEX);
+	const documentId = parseId(id, this.HostnameCheckRegExp);
 
 	if (!documentId) {
 		// Throw an error if the data was empty to not stress the servers
@@ -72,7 +72,7 @@ export const editDocument = function (
 	const opts = prepareRequest({
 		method: "PATCH",
 		path: `/document/`,
-		hostname: this.HOSTNAME,
+		hostname: this.Hostname,
 		token: this.token,
 	});
 

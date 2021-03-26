@@ -2,6 +2,9 @@ import type { OutgoingHttpHeaders } from "http";
 import type { RequestOptions } from "https";
 import type { PrepareRequestParams } from "../helpers/interfaces";
 
+/**
+ *  @internal
+ */
 export const prepareRequest = function ({
 	method,
 	headers = {},

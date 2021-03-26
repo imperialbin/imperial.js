@@ -38,7 +38,7 @@ export const deleteDocument = function (
 		return callback(err);
 	}
 
-	const documentId = encodeURIComponent(parseId(id, this.HOSTNAMEREGEX)); // Make the user inputed data encoded so it doesn't break stuff
+	const documentId = encodeURIComponent(parseId(id, this.HostnameCheckRegExp)); // Make the user inputed data encoded so it doesn't break stuff
 
 	if (!documentId) {
 		// Throw an error if the id was empty to not stress the servers
@@ -50,7 +50,7 @@ export const deleteDocument = function (
 	const opts = prepareRequest({
 		method: "DELETE",
 		path: `/document/${documentId}`,
-		hostname: this.HOSTNAME,
+		hostname: this.Hostname,
 		token: this.token,
 	});
 

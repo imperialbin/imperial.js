@@ -9,6 +9,9 @@ const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {
 	return url.toString();
 };
 
+/**
+ *  @internal
+ */
 export const parseId = function (id: string | URL, hostnameRegex: RegExp): string {
 	if (id instanceof URL) return getIdFromUrl(id as URL, hostnameRegex);
 

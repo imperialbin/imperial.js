@@ -1,4 +1,7 @@
-export const codes = new Map<number | undefined, string>([
+/**
+ *  @internal
+ */
+export const HTTPCodes = new Map<number | undefined, string>([
 	[100, "Continue"],
 	[101, "Switching Protocols"],
 	[102, "Processing"],

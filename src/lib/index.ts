@@ -7,14 +7,12 @@ import type {
 } from "./helpers/interfaces";
 
 // Import methods
-import { validateToken } from "./helpers/isValidToken";
+import { validateToken } from "./helpers/validToken";
 import { createDocument } from "./methods/createDocument";
 import { deleteDocument } from "./methods/deleteDocument";
 import { editDocument } from "./methods/editDocument";
 import { getDocument } from "./methods/getDocument";
 import { verify } from "./methods/verify";
-
-export * as Interfaces from "./helpers/interfaces";
 
 /**
  *  The API wrapper class
@@ -28,7 +26,7 @@ export class Imperial {
 	 *  @param {String} token Your API token
 	 */
 	constructor(token?: string) {
-		if (token && validateToken(token)) this._token = token;
+		if (validateToken(token)) this._token = token;
 	}
 
 	/**
@@ -41,14 +39,14 @@ export class Imperial {
 	/**
 	 *  Imperial's domain name
 	 */
-	public get HOSTNAME(): string {
+	public get Hostname(): string {
 		return "imperialb.in";
 	}
 
 	/**
 	 *  Regex to check if the domain provided is part of imperial
 	 */
-	public get HOSTNAMEREGEX(): RegExp {
+	public get HostnameCheckRegExp(): RegExp {
 		return /^(www\.)?imperialb(\.in|in.com)$/i;
 	}
 
