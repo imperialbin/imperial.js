@@ -1,34 +1,29 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
+import { createMock } from "../testServer";
 
-const { IMPERIAL_TOKEN } = process.env;
-
-const createdDocuments: string[] = [];
+const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
 describe("createDocument", () => {
-	if (!IMPERIAL_TOKEN) throw new Error("Env was not preparerd");
-
-	afterAll(async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		for (const document of createdDocuments)
-			try {
-				await api.deleteDocument(document);
-			} catch (_) {
-				throw new Error("Failed to delete tested files.");
-			}
-	});
-
 	it("valid - with token", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
+
+		createMock({
+			method: "post",
+			path: "/api/document",
+			responseBody: {
+				success: true,
+				documentId: "The document!",
+				instantDelete: true,
+			},
+			statusCode: 200,
+		});
 
 		const res = await api.createDocument("Test: createDocument > valid - with token", { instantDelete: true });
 
 		expect(typeof res.documentId).toBe("string");
 		expect(res.instantDelete).toBeTruthy();
-
-		createdDocuments.push(res.formattedLink);
 	}, 10000); // timeout 10s
 
 	// No need to test without token because it would have done

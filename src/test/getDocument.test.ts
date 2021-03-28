@@ -1,51 +1,61 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
+import { createMock } from "../testServer";
 
-const { IMPERIAL_TOKEN } = process.env;
-
-let documentToRead = "";
+const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
 describe("getDocument", () => {
-	if (!IMPERIAL_TOKEN) throw new Error("Env was not preparerd");
-
-	beforeAll(async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		try {
-			const res = await api.createDocument("Tests: getDocument");
-			documentToRead = res.formattedLink;
-		} catch (e) {
-			throw new Error("Failed to prepare tests.");
-		}
-	});
-
-	afterAll(async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		try {
-			await api.deleteDocument(documentToRead);
-		} catch (_) {
-			throw new Error("Failed to delete tested files.");
-		}
-	});
-
 	it("valid with token", async () => {
+		const DOCUMENT_ID = "really-valid-id";
+
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		let res = await api.getDocument(documentToRead);
+		createMock({
+			method: "get",
+			path: `/api/document/${DOCUMENT_ID}`,
+			responseBody: {
+				success: true,
+				document: "The document",
+			},
+			statusCode: 200,
+		});
+
+		let res = await api.getDocument(DOCUMENT_ID);
 
 		expect(typeof res.document).toBe("string");
 
-		res = await api.getDocument(new URL(documentToRead));
+		createMock({
+			method: "get",
+			path: `/api/document/${DOCUMENT_ID}`,
+			responseBody: {
+				success: true,
+				document: "The document",
+			},
+			statusCode: 200,
+		});
+
+		res = await api.getDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`));
 
 		expect(typeof res.document).toBe("string");
 	}, 10000); // timout 10s
 
 	it.skip("valid without token", async () => {
+		const DOCUMENT_ID = "really-valid-id";
+
 		const api = new Imperial();
 
-		const res = await api.getDocument(documentToRead);
+		createMock({
+			method: "get",
+			path: `/api/document/${DOCUMENT_ID}`,
+			responseBody: {
+				success: true,
+				message: "The document was deleted!",
+			},
+			statusCode: 200,
+		});
+
+		const res = await api.getDocument(DOCUMENT_ID);
 
 		expect(typeof res.document).toBe("string");
 	}, 10000); // timout 10s

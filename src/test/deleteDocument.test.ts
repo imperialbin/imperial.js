@@ -1,37 +1,43 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
+import { createMock } from "../testServer";
 
-const { IMPERIAL_TOKEN } = process.env;
-
-const documentToDelete: string[] = [];
+const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
 describe("deleteDocument", () => {
-	if (!IMPERIAL_TOKEN) throw new Error("Env was not preparerd");
-
-	beforeAll(async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		try {
-			for (let i = 0; i < 2; i++) {
-				const res = await api.createDocument("Tests: deleteDocument");
-				documentToDelete.push(res.formattedLink);
-			}
-		} catch (e) {
-			throw new Error("Failed to prepare tests.");
-		}
-	});
-
 	it("valid - with token", async () => {
+		const DOCUMENT_ID = "really-valid-id";
+
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		let res = await api.deleteDocument(documentToDelete[0]);
+		createMock({
+			method: "delete",
+			path: `/api/document/${DOCUMENT_ID}`,
+			responseBody: {
+				success: true,
+				message: "The document was deleted!",
+			},
+			statusCode: 200,
+		});
 
-		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
+		let res = await api.deleteDocument(DOCUMENT_ID);
 
-		res = await api.deleteDocument(new URL(documentToDelete[1]));
+		expect(typeof res.message).toBe("string");
 
-		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
+		createMock({
+			method: "delete",
+			path: `/api/document/${DOCUMENT_ID}`,
+			responseBody: {
+				success: true,
+				message: "The document was deleted!",
+			},
+			statusCode: 200,
+		});
+
+		res = await api.deleteDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`));
+
+		expect(typeof res.message).toBe("string");
 	}, 10000); // timeout 10s
 
 	it("valid - without token", async () => {

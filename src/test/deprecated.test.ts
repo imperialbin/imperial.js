@@ -2,11 +2,7 @@
 
 import { Imperial } from "../lib";
 
-const { IMPERIAL_TOKEN } = process.env;
-
 describe("deprecated tests", () => {
-	if (!IMPERIAL_TOKEN) throw new Error("Env was not preparerd");
-
 	it("postCode", async () => {
 		const handleWarning = (e: Error) => {
 			expect(e.name).toBe("DeprecationWarning");

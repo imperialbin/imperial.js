@@ -5,21 +5,22 @@ import { createMock } from "../testServer";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
-describe("verify", () => {
+describe("purgeDocuments", () => {
 	it("valid", async () => {
 		createMock({
-			method: "get",
-			path: `/api/checkApiToken/${IMPERIAL_TOKEN}`,
+			method: "delete",
+			path: "/api/purgeDocuments",
 			responseBody: {
 				success: true,
-				message: "Token is valid!!!!!",
+				message: "Deleted a total of 420 documents!",
+				numberDeleted: 420,
 			},
 			statusCode: 200,
 		});
 
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const res = await api.verify();
+		const res = await api.purgeDocuments();
 
 		expect(typeof res.message).toBe("string");
 	}, 10000);
@@ -29,8 +30,8 @@ describe("verify", () => {
 
 		await expect(
 			(async () => {
-				await api.verify();
+				await api.purgeDocuments();
 			})()
-		).rejects.toThrowError(new Error("No or invalid token was provided in the constructor!"));
+		).rejects.toThrowError(new Error("This method requires a token to be set in the constructor!"));
 	});
 });

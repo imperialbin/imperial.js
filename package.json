@@ -36,6 +36,7 @@
 		"eslint": "^7.17.0",
 		"eslint-config-prettier": "^7.1.0",
 		"jest": "^26.6.3",
+		"nock": "^13.0.11",
 		"prettier": "^2.2.1",
 		"rimraf": "^3.0.2",
 		"ts-jest": "^26.5.1",
@@ -50,9 +51,6 @@
 		],
 		"transform": {
 			"^.+\\.ts$": "ts-jest"
-		},
-		"setupFiles": [
-			"dotenv/config"
-		]
+		}
 	}
 }
