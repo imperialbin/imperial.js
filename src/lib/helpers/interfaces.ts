@@ -34,6 +34,12 @@ export interface ImperialResponseGetDocument {
  */
 export interface ImperialResponseEditDocument extends ImperialResponseCreateDocument, ImperialResponseCommon {}
 
+/**
+ *  `purgeDocuments` response
+ */
+export interface ImperialResponsePurgeDocuments extends ImperialResponseCommon {
+	numberDeleted: number;
+}
 // Misc interfaces
 
 /**

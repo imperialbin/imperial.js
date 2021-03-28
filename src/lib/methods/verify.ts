@@ -1,5 +1,5 @@
 import { request } from "https";
-import type { Imperial } from "..";
+import type { Imperial } from "../Imperial";
 import type { ImperialResponseCommon } from "../helpers/interfaces";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";

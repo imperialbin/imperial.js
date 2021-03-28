@@ -1,5 +1,5 @@
 import { request } from "https";
-import type { Imperial } from "..";
+import type { Imperial } from "../Imperial";
 import type { ImperialResponseGetDocument } from "../helpers/interfaces";
 import { parseId } from "../utils/parseId";
 import { parsePassword } from "../utils/parsePassword";
@@ -43,7 +43,8 @@ export const getDocument = function (
 		return callback(err);
 	}
 
-	const documentId = encodeURIComponent(parseId(id, this.HostnameCheckRegExp)); // Make the user inputed data encoded so it doesn't break stuff
+	// Make the user inputed data encoded so it doesn't break stuff
+	const documentId = encodeURIComponent(parseId(id, this.HostnameCheckRegExp));
 
 	if (!documentId) {
 		// Throw an error if the data was empty to not stress the servers
