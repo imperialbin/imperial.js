@@ -32,12 +32,5 @@ jobs:
             - name: Build
               run: yarn build
 
-            - name: Prepare Test
-              run: |
-                  touch .env
-                  echo "IMPERIAL_TOKEN = $IMPERIAL_TOKEN" > .env
-              env:
-                  IMPERIAL_TOKEN: ${{ secrets.IMPERIAL_TOKEN}}
-
             - name: Test
               run: yarn test
