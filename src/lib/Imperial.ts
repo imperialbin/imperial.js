@@ -25,7 +25,7 @@ export class Imperial {
 
 	/**
 	 *  `Imperial` constructor
-	 *  @param {String} token Your API token
+	 *  @param token Your API token
 	 */
 	constructor(token?: string) {
 		if (validateToken(token)) this._token = token;
@@ -178,7 +178,7 @@ export class Imperial {
 	 *  @param cb Function called after the data is fetched or if there was an error
 	 *  @example deleteDocument("someid", (e, d) => { if (!e) console.log(d) });
 	 *  // Logs the response to the console
-	 *  @returns {void} `void`
+	 *  @returns `void`
 	 */
 	public deleteDocument(id: string | URL, cb: (error: unknown, data?: ImperialResponseCommon) => void): void;
 
@@ -209,7 +209,7 @@ export class Imperial {
 	 *  @param cb Function called after the data is fetched or if there was an error
 	 *  @example editDocument("someid", "i am the new text!", (e, d) => { if (!e) console.log(d);});
 	 *  // Logs the response to the console
-	 *  @returns {void} `void`
+	 *  @returns `void`
 	 */
 	public editDocument(
 		id: string | URL,

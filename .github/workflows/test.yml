@@ -1,7 +1,7 @@
 name: Format, lint, build and test
 
 on:
-    push:
+    pull_request:
         branches:
             - senpai
 
@@ -15,7 +15,7 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v1
               with:
-                  node-version: 14.0.0
+                  node-version: 14.16.0
 
             - name: Install yarn
               run: npm i yarn@1.22.10 -g
