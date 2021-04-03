@@ -16,28 +16,24 @@ describe("deleteDocument", () => {
 			path: `/api/document/${DOCUMENT_ID}`,
 			responseBody: {
 				success: true,
-				message: "The document was deleted!",
+				message: "Successfully deleted the document!",
 			},
 			statusCode: 200,
 		});
 
-		let res = await api.deleteDocument(DOCUMENT_ID);
-
-		expect(typeof res.message).toBe("string");
+		await api.deleteDocument(DOCUMENT_ID);
 
 		createMock({
 			method: "delete",
 			path: `/api/document/${DOCUMENT_ID}`,
 			responseBody: {
 				success: true,
-				message: "The document was deleted!",
+				message: "Successfully deleted the document!",
 			},
 			statusCode: 200,
 		});
 
-		res = await api.deleteDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`));
-
-		expect(typeof res.message).toBe("string");
+		await api.deleteDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`));
 	}, 10000); // timeout 10s
 
 	it("valid - without token", async () => {

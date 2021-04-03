@@ -19,9 +19,7 @@ describe("verify", () => {
 
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const res = await api.verify();
-
-		expect(typeof res.message).toBe("string");
+		await api.verify();
 	}, 10000);
 
 	it("invalid", async () => {

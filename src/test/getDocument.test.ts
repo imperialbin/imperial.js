@@ -1,9 +1,25 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
+import { Document } from "../lib/Document";
 import { createMock } from "../testServer";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
+
+const RESPONSE = {
+	success: true,
+	content: "fuck u",
+	documentInfo: {
+		documentId: "bwxUUGyD",
+		language: null,
+		imageEmbed: false,
+		instantDelete: false,
+		dateCreated: 1617463955786,
+		deleteDate: 1617895955786,
+		allowedEditors: [],
+		encrypted: false,
+	},
+};
 
 describe("getDocument", () => {
 	it("valid with token", async () => {
@@ -14,50 +30,24 @@ describe("getDocument", () => {
 		createMock({
 			method: "get",
 			path: `/api/document/${DOCUMENT_ID}`,
-			responseBody: {
-				success: true,
-				document: "The document",
-			},
+			responseBody: RESPONSE,
 			statusCode: 200,
 		});
 
 		let res = await api.getDocument(DOCUMENT_ID);
 
-		expect(typeof res.document).toBe("string");
+		expect(res).toBeInstanceOf(Document);
 
 		createMock({
 			method: "get",
 			path: `/api/document/${DOCUMENT_ID}`,
-			responseBody: {
-				success: true,
-				document: "The document",
-			},
+			responseBody: RESPONSE,
 			statusCode: 200,
 		});
 
 		res = await api.getDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`));
 
-		expect(typeof res.document).toBe("string");
-	}, 10000); // timout 10s
-
-	it.skip("valid without token", async () => {
-		const DOCUMENT_ID = "really-valid-id";
-
-		const api = new Imperial();
-
-		createMock({
-			method: "get",
-			path: `/api/document/${DOCUMENT_ID}`,
-			responseBody: {
-				success: true,
-				message: "The document was deleted!",
-			},
-			statusCode: 200,
-		});
-
-		const res = await api.getDocument(DOCUMENT_ID);
-
-		expect(typeof res.document).toBe("string");
+		expect(res).toBeInstanceOf(Document);
 	}, 10000); // timout 10s
 
 	it("invalid - first param with wrong type", async () => {

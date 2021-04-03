@@ -20,9 +20,7 @@ describe("purgeDocuments", () => {
 
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const res = await api.purgeDocuments();
-
-		expect(typeof res.message).toBe("string");
+		await api.purgeDocuments();
 	}, 10000);
 
 	it("invalid", async () => {

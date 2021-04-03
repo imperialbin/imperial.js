@@ -5,6 +5,23 @@ import { createMock } from "../testServer";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
+const RESPONSE = {
+	success: true,
+	rawLink: "https://imperialb.in/r/bwxUUGyD",
+	formattedLink: "https://imperialb.in/p/bwxUUGyD",
+	documentInfo: {
+		documentId: "bwxUUGyD",
+		language: null,
+		imageEmbed: false,
+		instantDelete: true,
+		dateCreated: 1617463955786,
+		deleteDate: 1617895955786,
+		allowedEditors: [],
+		encrypted: false,
+		password: null,
+	},
+};
+
 describe("createDocument", () => {
 	it("valid - with token", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
@@ -12,28 +29,14 @@ describe("createDocument", () => {
 		createMock({
 			method: "post",
 			path: "/api/document",
-			responseBody: {
-				success: true,
-				documentId: "The document!",
-				instantDelete: true,
-			},
+			responseBody: RESPONSE,
 			statusCode: 200,
 		});
 
 		const res = await api.createDocument("Test: createDocument > valid - with token", { instantDelete: true });
 
-		expect(typeof res.documentId).toBe("string");
+		expect(typeof res.id).toBe("string");
 		expect(res.instantDelete).toBeTruthy();
-	}, 10000); // timeout 10s
-
-	// No need to test without token because it would have done
-	// the exact same thing but settings would not be set
-	it.skip("valid - without token", async () => {
-		const api = new Imperial();
-
-		const res = await api.createDocument("Test: createDocument > valid - without token", { instantDelete: true });
-
-		expect(res.instantDelete).toBeFalsy();
 	}, 10000); // timeout 10s
 
 	it("invalid - first param with wrong type", async () => {

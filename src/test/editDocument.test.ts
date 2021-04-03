@@ -5,39 +5,50 @@ import { createMock } from "../testServer";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
+const DOCUMENT_ID = "really-valid-id";
+
+const RESPONSE = {
+	success: true,
+	message: "Successfully edit the document!",
+	rawLink: "https://imperialb.in/r/bwxUUGyD",
+	formattedLink: "https://imperialb.in/p/bwxUUGyD",
+	documentInfo: {
+		documentId: DOCUMENT_ID,
+		language: null,
+		imageEmbed: false,
+		instantDelete: false,
+		dateCreated: 1617463955786,
+		deleteDate: 1617895955786,
+		allowedEditors: [],
+		encrypted: false,
+	},
+};
+
 describe("editDocument", () => {
 	it("valid with token", async () => {
-		const DOCUMENT_ID = "really-valid-id";
-
 		const api = new Imperial(IMPERIAL_TOKEN);
 
 		createMock({
 			method: "patch",
 			path: "/api/document/",
-			responseBody: {
-				success: true,
-				message: "The document was deleted!",
-			},
+			responseBody: RESPONSE,
 			statusCode: 200,
 		});
 
 		let res = await api.editDocument(DOCUMENT_ID, "Tests: editDocument #2");
 
-		expect(typeof res.message).toBe("string");
+		expect(res.id).toBe(DOCUMENT_ID);
 
 		createMock({
 			method: "patch",
 			path: "/api/document/",
-			responseBody: {
-				success: true,
-				message: "The document was deleted!",
-			},
+			responseBody: RESPONSE,
 			statusCode: 200,
 		});
 
 		res = await api.editDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`), "Tests: editDocument #3");
 
-		expect(typeof res.message).toBe("string");
+		expect(res.id).toBe(DOCUMENT_ID);
 	}, 10000); // timeout 10s
 
 	it("valid without token", async () => {
