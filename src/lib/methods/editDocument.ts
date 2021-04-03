@@ -1,6 +1,7 @@
 import { request } from "https";
-import type { Imperial } from "../Imperial";
+import { Document } from "../Document";
 import type { ImperialResponseEditDocument } from "../helpers/interfaces";
+import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
@@ -9,8 +10,8 @@ export const editDocument = function (
 	this: Imperial,
 	id: string | URL,
 	newText: string,
-	callback?: (error: unknown, data?: ImperialResponseEditDocument) => void
-): Promise<ImperialResponseEditDocument> | void {
+	callback?: (error: unknown, data?: Document) => void
+): Promise<Document> | void {
 	if (callback !== undefined && typeof callback !== "function") {
 		// Throw an error if the data is not a string
 		const err = new TypeError("Parameter `callback` must be callable!");
@@ -79,7 +80,9 @@ export const editDocument = function (
 	if (!callback)
 		return new Promise((resolve, reject) => {
 			const httpRequest = request(opts, (response) => {
-				resolve(parseResponse(response, httpRequest));
+				parseResponse<ImperialResponseEditDocument>(response, httpRequest).then((data) => {
+					resolve(new Document(this, { content: newText, ...data.documentInfo }));
+				}, reject);
 			});
 			httpRequest.on("error", reject);
 			httpRequest.write(dataString);
@@ -87,7 +90,10 @@ export const editDocument = function (
 		});
 
 	const httpRequest = request(opts, (response) => {
-		parseResponse(response, httpRequest).then((data) => callback(null, data), callback);
+		parseResponse<ImperialResponseEditDocument>(response, httpRequest).then(
+			(data) => callback(null, new Document(this, { content: newText, ...data.documentInfo })),
+			callback
+		);
 	});
 	httpRequest.on("error", callback);
 	httpRequest.write(dataString);

@@ -1,6 +1,7 @@
 import { request } from "https";
-import type { Imperial } from "../Imperial";
+import { Document } from "../Document";
 import type { ImperialResponseGetDocument } from "../helpers/interfaces";
+import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
 import { parsePassword } from "../utils/parsePassword";
 import { parseResponse } from "../utils/parseResponse";
@@ -9,9 +10,9 @@ import { prepareRequest } from "../utils/prepareRequest";
 export const getDocument = function (
 	this: Imperial,
 	id: string | URL,
-	passwordOrCallback?: string | ((error: unknown, data?: ImperialResponseGetDocument) => void),
-	cb?: (error: unknown, data?: ImperialResponseGetDocument) => void
-): Promise<ImperialResponseGetDocument> | void {
+	passwordOrCallback?: string | ((error: unknown, data?: Document) => void),
+	cb?: (error: unknown, data?: Document) => void
+): Promise<Document> | void {
 	const [callback, password] =
 		typeof passwordOrCallback === "function" ? [passwordOrCallback] : [cb, passwordOrCallback];
 
@@ -65,14 +66,19 @@ export const getDocument = function (
 	if (!callback)
 		return new Promise((resolve, reject) => {
 			const httpRequest = request(opts, (response) => {
-				resolve(parseResponse(response, httpRequest));
+				parseResponse<ImperialResponseGetDocument>(response, httpRequest).then((data) => {
+					resolve(new Document(this, { content: data.content, ...data.documentInfo }));
+				}, reject);
 			});
 			httpRequest.on("error", reject);
 			httpRequest.end();
 		});
 
 	const httpRequest = request(opts, (response) => {
-		parseResponse(response, httpRequest).then((data) => callback(null, data), callback);
+		parseResponse<ImperialResponseGetDocument>(response, httpRequest).then(
+			(data) => callback(null, new Document(this, { content: data.content, ...data.documentInfo })),
+			callback
+		);
 	});
 	httpRequest.on("error", callback);
 	httpRequest.end();

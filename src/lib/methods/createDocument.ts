@@ -1,15 +1,16 @@
 import { request } from "https";
-import type { Imperial } from "../Imperial";
+import { Document } from "../Document";
 import type { CreateOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../helpers/interfaces";
+import type { Imperial } from "../Imperial";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
 
 export const createDocument = function (
 	this: Imperial,
 	text: string,
-	optionsOrCallback?: ((error: unknown, data?: ImperialResponseCreateDocument) => void) | CreateOptions,
-	cb?: (error: unknown, data?: ImperialResponseCreateDocument) => void
-): Promise<ImperialResponseCreateDocument> | void {
+	optionsOrCallback?: ((error: unknown, data?: Document) => void) | CreateOptions,
+	cb?: (error: unknown, data?: Document) => void
+): Promise<Document> | void {
 	const [callback, options] = typeof optionsOrCallback === "function" ? [optionsOrCallback] : [cb, optionsOrCallback];
 
 	if (callback !== undefined && typeof callback !== "function") {
@@ -64,7 +65,9 @@ export const createDocument = function (
 	if (!callback)
 		return new Promise((resolve, reject) => {
 			const httpRequest = request(opts, (response) => {
-				resolve(parseResponse(response, httpRequest));
+				parseResponse<ImperialResponseCreateDocument>(response, httpRequest).then((data) => {
+					resolve(new Document(this, { content: text, ...data.documentInfo }));
+				}, reject);
 			});
 			httpRequest.on("error", reject);
 			httpRequest.write(dataString);
@@ -72,7 +75,10 @@ export const createDocument = function (
 		});
 
 	const httpRequest = request(opts, (response) => {
-		parseResponse(response, httpRequest).then((data) => callback(null, data), cb);
+		parseResponse<ImperialResponseCreateDocument>(response, httpRequest).then(
+			(data) => callback(null, new Document(this, { content: text, ...data.documentInfo })),
+			cb
+		);
 	});
 	httpRequest.on("error", callback);
 	httpRequest.write(dataString);

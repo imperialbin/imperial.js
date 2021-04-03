@@ -6,8 +6,12 @@ import { ImperialError } from "./ImperialError";
 
 /**
  *  @internal
+ *  Thank you stackoverflow for the generic example <3333
  */
-export const parseResponse = function (response: IncomingMessage, request: ClientRequest): Promise<never> {
+export const parseResponse = function <T extends unknown>(
+	response: IncomingMessage,
+	request: ClientRequest
+): Promise<T> {
 	return new Promise((resolve, reject) => {
 		const data: string[] = [];
 
@@ -32,20 +36,20 @@ export const parseResponse = function (response: IncomingMessage, request: Clien
 			}
 
 			/*
-			 *  This basically removes the success from all of
+			 *  This basically removes the success and message from all of
 			 *  the responses because it would not matter anyway
 			 *
 			 *  I also added the emtpy object so it doesn't cry if
 			 *  the json object is undefined
 			 */
-			const { success, ...content } = json ?? {};
+			const { success, message, ...content } = json ?? {};
 
 			if (response.statusCode === 200 && success === true) {
 				return resolve(content as never);
 			}
 
 			const errorMsg =
-				json?.message ?? humanReadable.get(response.statusCode) ?? `Status code ${response.statusCode ?? null}`;
+				message ?? humanReadable.get(response.statusCode) ?? `Status code ${response.statusCode ?? null}`;
 
 			reject(new ImperialError({ message: errorMsg, status: response.statusCode, path: request.path }));
 		});

@@ -3,6 +3,22 @@ import type { OutgoingHttpHeaders } from "http";
 // interfaces for most of Imperial responses
 
 /**
+ *  All hail document info
+ */
+export interface DocumentInfo {
+	documentId: string;
+	language: string | null;
+	imageEmbed: string;
+	instantDelete: boolean;
+	dateCreated: number;
+	deleteDate: number;
+	allowedEditors: string[];
+	encrypted: boolean;
+	password: string | null;
+	views: number;
+}
+
+/**
  *  Common response that get returned from the server
  */
 export interface ImperialResponseCommon {
@@ -13,26 +29,23 @@ export interface ImperialResponseCommon {
  *  `createDocument` response
  */
 export interface ImperialResponseCreateDocument {
-	documentId: string;
 	rawLink: string;
 	formattedLink: string;
-	expiresIn: string;
-	instantDelete: boolean;
-	encrypted?: boolean;
-	password?: string;
+	documentInfo: DocumentInfo;
 }
 
 /**
  *  `getDocument` response
  */
 export interface ImperialResponseGetDocument {
-	document: string;
+	content: string;
+	documentInfo: DocumentInfo;
 }
 
 /**
  *  `editDocument` response
  */
-export interface ImperialResponseEditDocument extends ImperialResponseCreateDocument, ImperialResponseCommon {}
+export type ImperialResponseEditDocument = ImperialResponseCreateDocument;
 
 /**
  *  `purgeDocuments` response
