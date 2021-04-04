@@ -5,7 +5,7 @@ import type { OutgoingHttpHeaders } from "http";
 /**
  *  All hail document info
  */
-export interface DocumentInfo {
+interface DocumentInfo {
 	documentId: string;
 	language: string | null;
 	imageEmbed: string;
@@ -65,6 +65,22 @@ export interface CreateOptions {
 	expiration?: number;
 	encrypted?: boolean;
 	password?: string;
+}
+
+/**
+ *  Raw Document json data for the Document class
+ */
+export interface RawDocument extends DocumentInfo {
+	content: string;
+	formattedLink: string;
+	rawLink: string;
+}
+
+/**
+ *  Internall data to pass to the Document to create it
+ */
+export interface ConstructorData extends DocumentInfo {
+	content: string;
 }
 
 // Bellow are internal interfaces that do not get exported to the dist folder

@@ -1,16 +1,6 @@
-import type { DocumentInfo } from "./helpers/interfaces";
+import type { RawDocument, ConstructorData } from "./helpers/interfaces";
 import type { Imperial } from "./Imperial";
 import { createFormatedLink, createRawLink } from "./utils/links";
-
-interface RawDocument extends DocumentInfo {
-	content: string;
-	formattedLink: string;
-	rawLink: string;
-}
-
-interface ConstructorData extends DocumentInfo {
-	content: string;
-}
 
 /**
  *  Imperial Document
@@ -95,7 +85,7 @@ export class Document {
 	/**
 	 *  Get raw document data
 	 */
-	public get document(): RawDocument {
+	public get raw(): RawDocument {
 		return this._document;
 	}
 }
