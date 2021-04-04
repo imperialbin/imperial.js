@@ -17,9 +17,6 @@ jobs:
               with:
                   node-version: 14.16.0
 
-            - name: Install yarn
-              run: npm i yarn@1.22.10 -g
-
             - name: Install dependencies
               run: yarn ci
 
