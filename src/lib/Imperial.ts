@@ -20,7 +20,7 @@ export class Imperial {
 	 *  `Imperial` constructor
 	 *  @param token Your API token
 	 */
-	constructor(token?: string) {
+	constructor(token: string | undefined = process.env.IMPERIAL_TOKEN) {
 		if (validateToken(token)) this._token = token;
 	}
 
