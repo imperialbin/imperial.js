@@ -1,7 +1,8 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
-import { createMock } from "../testServer";
+import { NO_TOKEN } from "../lib/helpers/Errors";
+import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
@@ -30,6 +31,6 @@ describe("purgeDocuments", () => {
 			(async () => {
 				await api.purgeDocuments();
 			})()
-		).rejects.toThrowError(new Error("This method requires a token to be set in the constructor!"));
+		).rejects.toThrowError(new Error(NO_TOKEN));
 	});
 });

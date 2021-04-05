@@ -1,7 +1,8 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
-import { createMock } from "../testServer";
+import { OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../lib/helpers/Errors";
+import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
@@ -9,7 +10,7 @@ const RESPONSE = {
 	success: true,
 	rawLink: "https://imperialb.in/r/bwxUUGyD",
 	formattedLink: "https://imperialb.in/p/bwxUUGyD",
-	documentInfo: {
+	document: {
 		documentId: "bwxUUGyD",
 		language: null,
 		imageEmbed: false,
@@ -42,7 +43,7 @@ describe("createDocument", () => {
 	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `text` must be a string!");
+		const err = new TypeError(TEXT_WRONG_TYPE);
 
 		await expect(
 			(async () => {
@@ -76,7 +77,7 @@ describe("createDocument", () => {
 	it("invalid - second param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `options` must be an Object!");
+		const err = new TypeError(OPTIONS_WRONG_TYPE);
 
 		await expect(
 			(async () => {
@@ -96,33 +97,6 @@ describe("createDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.createDocument("Test: createDocument > invalid - second param with wrong type #3", 12345);
-			})()
-		).rejects.toThrow(err);
-	});
-
-	it("invalid - third param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError("Parameter `callback` must be callable!");
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.createDocument("Test: createDocument > invalid - third param with wrong type #1", {}, 12345);
-			})()
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.createDocument("Test: createDocument > invalid - third param with wrong type #2", {}, {});
-			})()
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.createDocument("Test: createDocument > invalid - third param with wrong type #3", {}, []);
 			})()
 		).rejects.toThrow(err);
 	});

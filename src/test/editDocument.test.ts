@@ -1,7 +1,8 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
-import { createMock } from "../testServer";
+import { ID_WRONG_TYPE, NO_TOKEN, TEXT_WRONG_TYPE } from "../lib/helpers/Errors";
+import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
@@ -12,7 +13,7 @@ const RESPONSE = {
 	message: "Successfully edit the document!",
 	rawLink: "https://imperialb.in/r/bwxUUGyD",
 	formattedLink: "https://imperialb.in/p/bwxUUGyD",
-	documentInfo: {
+	document: {
 		documentId: DOCUMENT_ID,
 		language: null,
 		imageEmbed: false,
@@ -58,13 +59,13 @@ describe("editDocument", () => {
 			(async () => {
 				await api.editDocument("test jest bro", "test jest bro");
 			})()
-		).rejects.toThrow(new Error("This method requires a token to be set in the constructor!"));
+		).rejects.toThrow(new Error(NO_TOKEN));
 	}, 10000); // timeout 10s
 
 	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `id` must be a string or an URL!");
+		const err = new TypeError(ID_WRONG_TYPE);
 
 		await expect(
 			(async () => {
@@ -98,7 +99,7 @@ describe("editDocument", () => {
 	it("invalid - second param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `newText` must be a string!");
+		const err = new TypeError(TEXT_WRONG_TYPE);
 
 		await expect(
 			(async () => {
@@ -125,33 +126,6 @@ describe("editDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", () => {}); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
-		).rejects.toThrow(err);
-	});
-
-	it("invalid - third param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError("Parameter `callback` must be callable!");
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", "bbbbbb", {});
-			})()
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", "bbbbbb", []);
-			})()
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", "bbbbbb", 12345);
 			})()
 		).rejects.toThrow(err);
 	});

@@ -1,7 +1,8 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
-import { createMock } from "../testServer";
+import { NO_TOKEN } from "../lib/helpers/Errors";
+import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
@@ -29,6 +30,6 @@ describe("verify", () => {
 			(async () => {
 				await api.verify();
 			})()
-		).rejects.toThrowError(new Error("No or invalid token was provided in the constructor!"));
+		).rejects.toThrowError(new Error(NO_TOKEN));
 	});
 });

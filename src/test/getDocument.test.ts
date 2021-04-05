@@ -2,14 +2,15 @@
 
 import { Imperial } from "../lib";
 import { Document } from "../lib/Document";
-import { createMock } from "../testServer";
+import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/helpers/Errors";
+import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
 const RESPONSE = {
 	success: true,
 	content: "fuck u",
-	documentInfo: {
+	document: {
 		documentId: "bwxUUGyD",
 		language: null,
 		imageEmbed: false,
@@ -53,7 +54,7 @@ describe("getDocument", () => {
 	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `id` must be a string or an URL!");
+		const err = new TypeError(ID_WRONG_TYPE);
 
 		await expect(
 			(async () => {
@@ -87,7 +88,7 @@ describe("getDocument", () => {
 	it("invalid - second param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `password` must be a string!");
+		const err = new TypeError(PASSWORD_WRONG_TYPE);
 
 		await expect(
 			(async () => {
@@ -107,40 +108,6 @@ describe("getDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", 12345);
-			})()
-		).rejects.toThrowError(err);
-	});
-
-	it("invalid - third param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError("Parameter `callback` must be callable!");
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", "bbbbbb", "");
-			})()
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", "bbbbbb", {});
-			})()
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", "bbbbbb", []);
-			})()
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", "bbbbbb", 12345);
 			})()
 		).rejects.toThrowError(err);
 	});
