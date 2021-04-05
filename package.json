@@ -9,8 +9,10 @@
 		"lint": "eslint src/**/*.ts --fix",
 		"format": "prettier --write 'src/**/*.ts'",
 		"test": "jest",
-		"lazy": "yarn format && yarn lint && yarn build && yarn test",
-		"ci": "rm -rf node_modules && yarn install --frozen-lockfile"
+		"ci": "rm -rf node_modules && yarn install --frozen-lockfile",
+		"postinstall": "husky install",
+		"prepublishOnly": "pinst --disable",
+		"postpublish": "pinst --enable"
 	},
 	"repository": {
 		"type": "git",
@@ -35,8 +37,10 @@
 		"dotenv": "^8.2.0",
 		"eslint": "^7.17.0",
 		"eslint-config-prettier": "^7.1.0",
+		"husky": "^6.0.0",
 		"jest": "^26.6.3",
 		"nock": "^13.0.11",
+		"pinst": "^2.1.6",
 		"prettier": "^2.2.1",
 		"rimraf": "^3.0.2",
 		"ts-jest": "^26.5.1",
