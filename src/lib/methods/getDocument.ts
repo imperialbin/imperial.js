@@ -1,5 +1,6 @@
 import { request } from "https";
 import { Document } from "../Document";
+import { ID_WRONG_TYPE, NO_ID, PASSWORD_WRONG_TYPE } from "../helpers/Errors";
 import type { ImperialResponseGetDocument } from "../helpers/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
@@ -7,79 +8,45 @@ import { parsePassword } from "../utils/parsePassword";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
 
-export const getDocument = function (
-	this: Imperial,
-	id: string | URL,
-	passwordOrCallback?: string | ((error: unknown, data?: Document) => void),
-	cb?: (error: unknown, data?: Document) => void
-): Promise<Document> | void {
-	const [callback, password] =
-		typeof passwordOrCallback === "function" ? [passwordOrCallback] : [cb, passwordOrCallback];
+export const getDocument = function (this: Imperial, id: string | URL, password?: string): Promise<Document> {
+	return new Promise((resolve, reject) => {
+		// If no id return
+		if (!id) return reject(new Error(NO_ID));
 
-	if (callback !== undefined && typeof callback !== "function") {
-		// Throw an error if the callback is not a function
-		const err = new TypeError("Parameter `callback` must be callable!");
-		if (!callback) return Promise.reject(err);
-		throw err;
-	}
+		// If id is not the correct type return
+		if (typeof id !== "string" && !(id instanceof URL)) return reject(new TypeError(ID_WRONG_TYPE));
 
-	if (!id) {
-		// Throw an error if the id was empty to not stress the servers
-		const err = new Error("No `id` was provided!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// If password is provided and is the wrong type return
+		if (password && typeof password !== "string") return reject(new TypeError(PASSWORD_WRONG_TYPE));
 
-	if (typeof id !== "string" && !(id instanceof URL)) {
-		// Throw an error if the data is not a string nor an URL
-		const err = new TypeError("Parameter `id` must be a string or an URL!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// Make the user inputed data encoded so it doesn't break stuff
+		const documentId = encodeURIComponent(parseId(id, this.hostnameCheckRegExp));
 
-	if (password && typeof password !== "string") {
-		// Throw an error if the password is not a string
-		const err = new TypeError("Parameter `password` must be a string!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// If the document id is emtpy reutrn
+		if (!documentId) return reject(new Error(NO_ID));
 
-	// Make the user inputed data encoded so it doesn't break stuff
-	const documentId = encodeURIComponent(parseId(id, this.HostnameCheckRegExp));
+		// If no password was set try to extract it from the id
+		const documentPassword = password ?? parsePassword(id);
 
-	if (!documentId) {
-		// Throw an error if the data was empty to not stress the servers
-		const err = new Error("No `id` was provided!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
-
-	const documentPassword = password ?? parsePassword(id);
-
-	const opts = prepareRequest({
-		method: "GET",
-		path: `/document/${documentId}${documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""}`,
-		hostname: this.Hostname,
-		token: this.token,
-	});
-
-	if (!callback)
-		return new Promise((resolve, reject) => {
-			const httpRequest = request(opts, (response) => {
-				parseResponse<ImperialResponseGetDocument>(response, httpRequest).then((data) => {
-					resolve(new Document(this, { content: data.content, ...data.documentInfo }));
-				}, reject);
-			});
-			httpRequest.on("error", reject);
-			httpRequest.end();
+		// Prepare the request
+		const opts = prepareRequest({
+			method: "GET",
+			path: `/document/${documentId}${
+				documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""
+			}`,
+			hostname: this.hostname,
+			token: this.token,
 		});
 
-	const httpRequest = request(opts, (response) => {
-		parseResponse<ImperialResponseGetDocument>(response, httpRequest).then(
-			(data) => callback(null, new Document(this, { content: data.content, ...data.documentInfo })),
-			callback
-		);
+		// Make the request
+		const httpRequest = request(opts, (response) => {
+			// Parse response
+			parseResponse<ImperialResponseGetDocument>(response, httpRequest).then((data) => {
+				// Return the Document class
+				resolve(new Document(this, { content: data.content,  ...data.document }));
+			}, reject);
+		});
+		httpRequest.on("error", reject);
+		httpRequest.end();
 	});
-	httpRequest.on("error", callback);
-	httpRequest.end();
 };

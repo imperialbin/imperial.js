@@ -1,101 +1,59 @@
 import { request } from "https";
 import { Document } from "../Document";
+import { ID_WRONG_TYPE, NO_ID, NO_TEXT, NO_TOKEN, TEXT_WRONG_TYPE } from "../helpers/Errors";
 import type { ImperialResponseEditDocument } from "../helpers/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
 
-export const editDocument = function (
-	this: Imperial,
-	id: string | URL,
-	newText: string,
-	callback?: (error: unknown, data?: Document) => void
-): Promise<Document> | void {
-	if (callback !== undefined && typeof callback !== "function") {
-		// Throw an error if the data is not a string
-		const err = new TypeError("Parameter `callback` must be callable!");
-		if (!callback) return Promise.reject(err);
-		throw err;
-	}
+export const editDocument = function (this: Imperial, id: string | URL, text: string): Promise<Document> {
+	return new Promise((resolve, reject) => {
+		// If no token return
+		if (!this.token) return reject(new Error(NO_TOKEN));
 
-	if (!this.token) {
-		// Throw an error if the token was not set
-		const err = new Error("This method requires a token to be set in the constructor!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// If no id return
+		if (!id) return reject(new Error(NO_ID));
 
-	if (!id) {
-		// Throw an error if the id was empty to not stress the servers
-		const err = new Error("No `id` was provided!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// If id is not the correct type return
+		if (typeof id !== "string" && !(id instanceof URL)) return reject(new TypeError(ID_WRONG_TYPE));
 
-	if (!newText) {
-		// Throw an error if the id was empty to not stress the servers
-		const err = new Error("No `newText` was provided!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// If no newText was provided reutrn
+		if (!text) return reject(new Error(NO_TEXT));
 
-	if (typeof id !== "string" && !(id instanceof URL)) {
-		// Throw an error if the id is not in the correct type
-		const err = new TypeError("Parameter `id` must be a string or an URL!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// If newText is not the correct type return
+		if (typeof text !== "string") return reject(new TypeError(TEXT_WRONG_TYPE));
 
-	if (typeof newText !== "string") {
-		// Throw an error if the data is not a string
-		const err = new TypeError("Parameter `newText` must be a string!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// Parse the documentId
+		const documentId = parseId(id, this.hostnameCheckRegExp);
 
-	const documentId = parseId(id, this.HostnameCheckRegExp);
+		// If the document id is emtpy reutrn
+		if (!documentId) return reject(new Error(NO_ID));
 
-	if (!documentId) {
-		// Throw an error if the data was empty to not stress the servers
-		const err = new Error("No `id` was provided!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
-
-	const data = {
-		document: documentId,
-		newCode: newText,
-	};
-
-	const dataString = JSON.stringify(data);
-
-	const opts = prepareRequest({
-		method: "PATCH",
-		path: `/document/`,
-		hostname: this.Hostname,
-		token: this.token,
-	});
-
-	if (!callback)
-		return new Promise((resolve, reject) => {
-			const httpRequest = request(opts, (response) => {
-				parseResponse<ImperialResponseEditDocument>(response, httpRequest).then((data) => {
-					resolve(new Document(this, { content: newText, ...data.documentInfo }));
-				}, reject);
-			});
-			httpRequest.on("error", reject);
-			httpRequest.write(dataString);
-			httpRequest.end();
+		// Stringify the data
+		const dataString = JSON.stringify({
+			document: documentId,
+			newCode: text,
 		});
 
-	const httpRequest = request(opts, (response) => {
-		parseResponse<ImperialResponseEditDocument>(response, httpRequest).then(
-			(data) => callback(null, new Document(this, { content: newText, ...data.documentInfo })),
-			callback
-		);
+		// Prepare the request
+		const opts = prepareRequest({
+			method: "PATCH",
+			path: `/document/`,
+			hostname: this.hostname,
+			token: this.token,
+		});
+
+		// Make the request
+		const httpRequest = request(opts, (response) => {
+			// Parse response
+			parseResponse<ImperialResponseEditDocument>(response, httpRequest).then((data) => {
+				// Return the Document class
+				resolve(new Document(this, { content: text, ...data.document }));
+			}, reject);
+		});
+		httpRequest.on("error", reject);
+		httpRequest.write(dataString);
+		httpRequest.end();
 	});
-	httpRequest.on("error", callback);
-	httpRequest.write(dataString);
-	httpRequest.end();
 };

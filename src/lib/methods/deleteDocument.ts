@@ -1,72 +1,42 @@
 import { request } from "https";
+import { ID_WRONG_TYPE, NO_ID, NO_TOKEN } from "../helpers/Errors";
 import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
 
-export const deleteDocument = function (
-	this: Imperial,
-	id: string | URL,
-	callback?: (error: unknown, data?: void) => void
-): Promise<void> | void {
-	if (callback !== undefined && typeof callback !== "function") {
-		// Throw an error if the callback is not a function
-		const err = new TypeError("Parameter `callback` must be callable!");
-		if (!callback) return Promise.reject(err);
-		throw err;
-	}
+export const deleteDocument = function (this: Imperial, id: string | URL): Promise<void> {
+	return new Promise((resolve, reject) => {
+		// If not token return
+		if (!this.token) return reject(new Error(NO_TOKEN));
 
-	if (!this.token) {
-		// Throw an error if the token was not set
-		const err = new Error("This method requires a token to be set in the constructor!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// If no id return
+		if (!id) return reject(new Error(NO_ID));
 
-	if (!id) {
-		// Throw an error if the id was empty to not stress the servers
-		const err = new Error("No `id` was provided!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		if (typeof id !== "string" && !(id instanceof URL)) return reject(new TypeError(ID_WRONG_TYPE));
 
-	if (typeof id !== "string" && !(id instanceof URL)) {
-		// Throw an error if the id not a valid type
-		const err = new TypeError("Parameter `id` must be a string or an URL!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
+		// Make the user inputed data encoded so it doesn't break stuff
+		const documentId = encodeURIComponent(parseId(id, this.hostnameCheckRegExp));
 
-	const documentId = encodeURIComponent(parseId(id, this.HostnameCheckRegExp)); // Make the user inputed data encoded so it doesn't break stuff
+		// If the id is emtpy return
+		if (!documentId) return reject(new Error(NO_ID));
 
-	if (!documentId) {
-		// Throw an error if the id was empty to not stress the servers
-		const err = new Error("Parameter `id` came out as an emtpy string!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
-
-	const opts = prepareRequest({
-		method: "DELETE",
-		path: `/document/${documentId}`,
-		hostname: this.Hostname,
-		token: this.token,
-	});
-
-	if (!callback)
-		return new Promise((resolve, reject) => {
-			const httpRequest = request(opts, (response) => {
-				parseResponse(response, httpRequest).then(() => {
-					resolve();
-				}, reject);
-			});
-			httpRequest.on("error", reject);
-			httpRequest.end();
+		// Prepare the request
+		const opts = prepareRequest({
+			method: "DELETE",
+			path: `/document/${documentId}`,
+			hostname: this.hostname,
+			token: this.token,
 		});
 
-	const httpRequest = request(opts, (response) => {
-		parseResponse(response, httpRequest).then(() => callback(null), callback);
+		// Make the request
+		const httpRequest = request(opts, (response) => {
+			parseResponse(response, httpRequest).then(() => {
+				// Resolve nothing
+				resolve();
+			}, reject);
+		});
+		httpRequest.on("error", reject);
+		httpRequest.end();
 	});
-	httpRequest.on("error", callback);
-	httpRequest.end();
 };

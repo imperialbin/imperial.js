@@ -1,44 +1,32 @@
 import { request } from "https";
+import { NO_TOKEN } from "../helpers/Errors";
 import type { ImperialResponseCommon } from "../helpers/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
 
-export const verify = function (this: Imperial, callback?: (error: unknown) => void): Promise<void> | void {
-	if (callback !== undefined && typeof callback !== "function") {
-		// Throw an error if the data is not a string
-		const err = new TypeError("Parameter `callback` must be callable!");
-		if (!callback) return Promise.reject(err);
-		throw err;
-	}
+export const verify = function (this: Imperial): Promise<void> {
+	return new Promise((resolve, reject) => {
+		// If no token return
+		if (!this.token) return reject(new Error(NO_TOKEN));
 
-	if (!this.token) {
-		const err = new Error("No or invalid token was provided in the constructor!");
-		if (!callback) return Promise.reject(err);
-		return callback(err);
-	}
-
-	const opts = prepareRequest({
-		method: "GET",
-		path: `/checkApiToken/${encodeURIComponent(this.token)}`,
-		hostname: this.Hostname,
-		token: this.token,
-	});
-
-	if (!callback)
-		return new Promise((resolve, reject) => {
-			const httpRequest = request(opts, (response) => {
-				parseResponse<ImperialResponseCommon>(response, httpRequest).then(() => {
-					resolve();
-				}, reject);
-			});
-			httpRequest.on("error", reject);
-			httpRequest.end();
+		// Prepare the request
+		const opts = prepareRequest({
+			method: "GET",
+			path: `/checkApiToken/${encodeURIComponent(this.token)}`,
+			hostname: this.hostname,
+			token: this.token,
 		});
 
-	const httpRequest = request(opts, (response) => {
-		parseResponse<ImperialResponseCommon>(response, httpRequest).then(() => callback(null), callback);
+		// Make the request
+		const httpRequest = request(opts, (response) => {
+			// Parse response
+			parseResponse<ImperialResponseCommon>(response, httpRequest).then(() => {
+				// Resolve nothing
+				resolve();
+			}, reject);
+		});
+		httpRequest.on("error", reject);
+		httpRequest.end();
 	});
-	httpRequest.on("error", callback);
-	httpRequest.end();
 };
