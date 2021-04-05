@@ -11,7 +11,7 @@ interface Params {
 type ParamMethods = "get" | "post" | "patch" | "delete";
 
 export const createMock = (mockParams: Params): void => {
-	nock(`https://${new Imperial().Hostname}/`)
+	nock(`https://${new Imperial().hostname}/`)
 		[mockParams.method](mockParams.path)
 		.reply(mockParams.statusCode, mockParams.responseBody);
 };
