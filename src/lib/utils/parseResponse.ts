@@ -1,8 +1,8 @@
 import type { ClientRequest, IncomingMessage } from "http";
-import { HTTPCodes as humanReadable } from "../helpers/HTTPCodes";
 import { imperialResponses } from "../helpers/imperialResponses";
 import type { InternalImperialResponse } from "../helpers/interfaces";
 import { ImperialError } from "./ImperialError";
+import { noError, statusMessage } from "./statusCodeError";
 
 /**
  *  @internal
@@ -44,14 +44,15 @@ export const parseResponse = function <T extends unknown>(
 			 */
 			const { success, message, ...content } = json ?? {};
 
-			if (response.statusCode === 200 && success === true) {
+			const { statusCode } = response;
+
+			if (statusCode && noError(statusCode) && success === true) {
 				return resolve(content as never);
 			}
 
-			const errorMsg =
-				message ?? humanReadable.get(response.statusCode) ?? `Status code ${response.statusCode ?? null}`;
+			const errorMsg = message ?? statusMessage(statusCode) ?? `Status code ${statusCode ?? null}`;
 
-			reject(new ImperialError({ message: errorMsg, status: response.statusCode, path: request.path }));
+			reject(new ImperialError({ message: errorMsg, status: statusCode, path: request.path }));
 		});
 
 		response.on("error", reject);
