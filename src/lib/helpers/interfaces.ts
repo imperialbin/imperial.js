@@ -5,13 +5,13 @@ import type { OutgoingHttpHeaders } from "http";
 /**
  *  All hail document info
  */
-interface DocumentInfo {
+interface Document {
 	documentId: string;
 	language: string | null;
-	imageEmbed: string;
+	imageEmbed: boolean;
 	instantDelete: boolean;
-	dateCreated: number;
-	deleteDate: number;
+	creationDate: number;
+	expirationDate: number;
 	allowedEditors: string[];
 	encrypted: boolean;
 	password: string | null;
@@ -31,7 +31,7 @@ export interface ImperialResponseCommon {
 export interface ImperialResponseCreateDocument {
 	rawLink: string;
 	formattedLink: string;
-	documentInfo: DocumentInfo;
+	document: Document;
 }
 
 /**
@@ -39,7 +39,7 @@ export interface ImperialResponseCreateDocument {
  */
 export interface ImperialResponseGetDocument {
 	content: string;
-	documentInfo: DocumentInfo;
+	document: Document;
 }
 
 /**
@@ -70,7 +70,7 @@ export interface CreateOptions {
 /**
  *  Raw Document json data for the Document class
  */
-export interface RawDocument extends DocumentInfo {
+export interface RawDocument extends Document {
 	content: string;
 	formattedLink: string;
 	rawLink: string;
@@ -79,7 +79,7 @@ export interface RawDocument extends DocumentInfo {
 /**
  *  Internall data to pass to the Document to create it
  */
-export interface ConstructorData extends DocumentInfo {
+export interface ConstructorData extends Document {
 	content: string;
 }
 
