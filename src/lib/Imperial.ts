@@ -1,17 +1,17 @@
 import type { Document } from "./Document";
 import type { CreateOptions } from "./helpers/interfaces";
-
-// Import methods
-import { validateToken } from "./helpers/validToken";
 import { createDocument } from "./methods/createDocument";
 import { deleteDocument } from "./methods/deleteDocument";
 import { editDocument } from "./methods/editDocument";
 import { getDocument } from "./methods/getDocument";
 import { purgeDocuments } from "./methods/purgeDocuments";
 import { verify } from "./methods/verify";
+// Import methods
+import { validateToken } from "./utils/validToken";
 
 /**
- *  The API wrapper class
+ *  The Imperial class
+ *  Easiest way to interact with the Api
  *  @author https://github.com/pxseu
  */
 export class Imperial {
@@ -35,14 +35,14 @@ export class Imperial {
 	/**
 	 *  Imperial's domain name
 	 */
-	public get Hostname(): string {
+	public get hostname(): string {
 		return "imperialb.in";
 	}
 
 	/**
 	 *  Regex to check if the domain provided is part of imperial
 	 */
-	public get HostnameCheckRegExp(): RegExp {
+	public get hostnameCheckRegExp(): RegExp {
 		return /^(www\.)?imperialb(\.in|in.com)$/i;
 	}
 
@@ -64,38 +64,13 @@ export class Imperial {
 	 *  @example createDocument("hi!", { longerUrls: true }).then(console.log); // Prints the response to console
 	 *  @returns `Promise<Document>`
 	 */
-	public createDocument(text: string, opts: CreateOptions): Promise<Document>;
-
-	/**
-	 *  Create a document
-	 *  @param text The text to be sent
-	 *  @param cb Function called after the data is sent or if there was an error
-	 *  @example createDocument("hi!", (e, d) => {if (!e) console.log(d);})
-	 *  // Prints the response to console
-	 *  @returns `void`
-	 */
-	public createDocument(text: string, cb: (error: unknown, data?: Document) => void): void;
-
-	/**
-	 *  Create a document
-	 *  @param text The text to be sent
-	 *  @param opts Additional options for the request **Api key is required**
-	 *  @param cb Function called after the data is sent or if there was an error
-	 *  @example createDocument("hi!", { longerUrls: true }, (e, d) => {if (!e) console.log(d);})
-	 *  // Prints the response to console
-	 *  @returns `void`
-	 */
-	public createDocument(text: string, opts: CreateOptions, cb: (error: unknown, data?: Document) => void): void;
+	public createDocument(text: string, options: CreateOptions): Promise<Document>;
 
 	/**
 	 *  Create a document
 	 */
-	public createDocument(
-		text: string,
-		optionsOrCallback?: ((error: unknown, data?: Document) => void) | CreateOptions,
-		cb?: (error: unknown, data?: Document) => void
-	): Promise<Document> | void {
-		return createDocument.call(this, text, optionsOrCallback, cb);
+	public createDocument(text: string, options?: CreateOptions): Promise<Document> {
+		return createDocument.call(this, text, options);
 	}
 
 	/**
@@ -119,34 +94,9 @@ export class Imperial {
 
 	/**
 	 *  Get a document from the API
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example getDocument("someid", (e, d) => { if (!e) console.log(d) });
-	 *  // Logs the response to the console
-	 *  @returns `void`
 	 */
-	public getDocument(id: string | URL, cb: (error: unknown, data?: Document) => void): void;
-
-	/**
-	 *  Get a document from the API
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *  @param password Password to an encrypted document.
-	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example getDocument("someid", "you shall not pass", (e, d) => { if (!e) console.log(d) });
-	 *  // Logs the response to the console
-	 *  @returns `void`
-	 */
-	public getDocument(id: string | URL, password: string, cb: (error: unknown, data?: Document) => void): void;
-
-	/**
-	 *  Get a document from the API
-	 */
-	public getDocument(
-		id: string | URL,
-		passwordOrCallback?: string | ((error: unknown, data?: Document) => void),
-		cb?: (error: unknown, data?: Document) => void
-	): Promise<Document> | void {
-		return getDocument.call(this, id, passwordOrCallback, cb);
+	public getDocument(id: string | URL, password?: string): Promise<Document> {
+		return getDocument.call(this, id, password);
 	}
 
 	/**
@@ -157,22 +107,11 @@ export class Imperial {
 	 *  @returns `Promise<void>`
 	 */
 	public deleteDocument(id: string | URL): Promise<void>;
-
-	/**
-	 *  Delete a document from the API | **Requires an API Token**
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example deleteDocument("someid", (e, d) => { if (!e) console.log(d) });
-	 *  // Logs the response to the console
-	 *  @returns `void`
-	 */
-	public deleteDocument(id: string | URL, cb: (error: unknown, data?: void) => void): void;
-
 	/**
 	 *  Delete a document from the API | **Requires an API Token**
 	 */
-	public deleteDocument(id: string | URL, cb?: (error: unknown) => void): Promise<void> | void {
-		return deleteDocument.call(this, id, cb);
+	public deleteDocument(id: string | URL): Promise<void> {
+		return deleteDocument.call(this, id);
 	}
 
 	/**
@@ -187,24 +126,9 @@ export class Imperial {
 
 	/**
 	 *  Edit a document from the API | **Requires an API Token**
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *  @param newText Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example editDocument("someid", "i am the new text!", (e, d) => { if (!e) console.log(d);});
-	 *  // Logs the response to the console
-	 *  @returns `void`
 	 */
-	public editDocument(id: string | URL, newText: string, cb: (error: unknown, data?: Document) => void): void;
-
-	/**
-	 *  Edit a document from the API | **Requires an API Token**
-	 */
-	public editDocument(
-		id: string | URL,
-		newText: string,
-		cb?: (error: unknown, data?: Document) => void
-	): Promise<Document> | void {
-		return editDocument.call(this, id, newText, cb);
+	public editDocument(id: string | URL, newText: string): Promise<Document> {
+		return editDocument.call(this, id, newText);
 	}
 
 	/**
@@ -216,19 +140,10 @@ export class Imperial {
 	public verify(): Promise<void>;
 
 	/**
-	 *  Check if your token is valid **Only use when provided the token in the constructor**
-	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example verify((e, d) => {if (!e) console.log(d)})
-	 *  // shows if the token is valid
-	 *  @returns `void`
-	 */
-	public verify(cb?: (error: unknown) => void): void;
-
-	/**
 	 *  Check if your token is valid | **Requires an API Token**
 	 */
-	public verify(cb?: (error: unknown) => void): Promise<void> | void {
-		return verify.call(this, cb);
+	public verify(): Promise<void> {
+		return verify.call(this);
 	}
 
 	/**
@@ -240,18 +155,9 @@ export class Imperial {
 	public purgeDocuments(): Promise<void>;
 
 	/**
-	 *  Purge all documents on the account connected to the Api token **Requires an API Token**
-	 *  @param cb Function called after the data is fetched or if there was an error
-	 *  @example purgeDocuments((e, d) => {if (!e) console.log(d)})
-	 *  // shows if the token is valid
-	 *  @returns `void`
-	 */
-	public purgeDocuments(cb?: (error: unknown) => void): void;
-
-	/**
 	 *  Check if your token is valid | **Requires an API Token**
 	 */
-	public purgeDocuments(cb?: (error: unknown) => void): Promise<void> | void {
-		return purgeDocuments.call(this, cb);
+	public purgeDocuments(): Promise<void> {
+		return purgeDocuments.call(this);
 	}
 }
