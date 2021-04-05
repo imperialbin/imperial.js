@@ -5,7 +5,7 @@ import type { OutgoingHttpHeaders } from "http";
 /**
  *  All hail document info
  */
-interface Document {
+interface ResponseDocument {
 	documentId: string;
 	language: string | null;
 	imageEmbed: boolean;
@@ -31,7 +31,7 @@ export interface ImperialResponseCommon {
 export interface ImperialResponseCreateDocument {
 	rawLink: string;
 	formattedLink: string;
-	document: Document;
+	document: ResponseDocument;
 }
 
 /**
@@ -39,7 +39,7 @@ export interface ImperialResponseCreateDocument {
  */
 export interface ImperialResponseGetDocument {
 	content: string;
-	document: Document;
+	document: ResponseDocument;
 }
 
 /**
@@ -70,7 +70,7 @@ export interface CreateOptions {
 /**
  *  Raw Document json data for the Document class
  */
-export interface RawDocument extends Document {
+export interface RawDocument extends ResponseDocument {
 	content: string;
 	formattedLink: string;
 	rawLink: string;
@@ -79,7 +79,7 @@ export interface RawDocument extends Document {
 /**
  *  Internall data to pass to the Document to create it
  */
-export interface ConstructorData extends Document {
+export interface ConstructorData extends ResponseDocument {
 	content: string;
 }
 
