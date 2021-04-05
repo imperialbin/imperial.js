@@ -72,15 +72,6 @@ export interface CreateOptions {
  */
 export interface RawDocument extends ResponseDocument {
 	content: string;
-	formattedLink: string;
-	rawLink: string;
-}
-
-/**
- *  Internall data to pass to the Document to create it
- */
-export interface ConstructorData extends ResponseDocument {
-	content: string;
 }
 
 // Bellow are internal interfaces that do not get exported to the dist folder

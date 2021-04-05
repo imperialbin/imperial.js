@@ -1,22 +1,22 @@
-import type { ConstructorData, CreateOptions, RawDocument } from "./helpers/interfaces";
+import type { CreateOptions, RawDocument } from "./helpers/interfaces";
 import type { Imperial } from "./Imperial";
 import { getDateDifference } from "./utils/dateDifference";
 import { createFormatedLink, createRawLink } from "./utils/links";
 
 /**
- *  Imperial Document
- *  All data can be accesed here
+ *  Imperial Document,
+ *  All data from the Document can be accesed here
+ *  @author https://github.com/pxseu
+ *  and https://github.com/Hexiro
+ *
  */
 export class Document {
-	private _document: RawDocument;
+	private client: Imperial;
+	private document: RawDocument;
 
-	constructor(private client: Imperial, data: ConstructorData) {
-		this.client;
-		this._document = {
-			...data,
-			formattedLink: createFormatedLink(client, data.documentId),
-			rawLink: createRawLink(client, data.documentId),
-		};
+	constructor(client: Imperial, document: RawDocument) {
+		this.client = client;
+		this.document = document;
 	}
 
 	// Props
@@ -24,58 +24,64 @@ export class Document {
 	/**
 	 *  Content of the Document
 	 */
-	public get code(): string {
-		new Date();
-		return this._document.content;
+	public get content(): string {
+		return this.document.content;
 	}
 
 	/**
-	 * 	Get the formated link
+	 * 	Get the formated link for the Document
 	 */
 	public get formattedLink(): string {
-		return this._document.formattedLink;
+		return createFormatedLink(this.client, this.id);
 	}
 
 	/**
-	 *  Id of the document
+	 * 	Get the raw link for the Document
+	 */
+	public get rawLink(): string {
+		return createRawLink(this.client, this.id);
+	}
+
+	/**
+	 *  Id of the Document
 	 */
 	public get id(): string {
-		return this._document.documentId;
+		return this.document.documentId;
 	}
 
 	/**
 	 *  Will the Document delete after being viewed
 	 */
 	public get instantDelete(): boolean {
-		return this._document.instantDelete;
+		return this.document.instantDelete;
 	}
 
 	/**
 	 * 	Is the document encrypted
 	 */
 	public get encrypted(): boolean {
-		return this._document.encrypted;
+		return this.document.encrypted;
 	}
 
 	/**
 	 * 	Current view count of the Document
 	 */
 	public get views(): number {
-		return this._document.views;
+		return this.document.views;
 	}
 
 	/**
 	 *  Username list of allowed editors
 	 */
-	public get allowedEditors(): string[] {
-		return this._document.allowedEditors;
+	public get editors(): string[] {
+		return this.document.allowedEditors;
 	}
 
 	/**
 	 *  Is the image embed turned on for this document
 	 */
 	public get imageEmbed(): boolean {
-		return this._document.imageEmbed;
+		return this.document.imageEmbed;
 	}
 
 	/**
@@ -83,49 +89,49 @@ export class Document {
 	 * 	Will return null if none was provided
 	 */
 	public get langauge(): string | null {
-		return this._document.language;
+		return this.document.language;
 	}
 
 	/**
 	 *  Is the url
 	 */
 	public get longerUrls(): boolean {
-		return this._document.documentId.length === 26;
+		return this.document.documentId.length === 26;
 	}
 
 	/**
 	 * 	Password for the document
 	 */
 	public get password(): string | null {
-		return this._document.password;
+		return this.document.password;
 	}
 
 	/**
 	 *  Get the date that the document was created at
 	 */
-	public get creationDate(): Date {
-		return new Date(this._document.creationDate);
+	public get creation(): Date {
+		return new Date(this.document.creationDate);
 	}
 
 	/**
-	 *  Get the date that the document was created at
+	 *  Get the date that the document will delete at
 	 */
-	public get deletionDate(): Date {
-		return new Date(this._document.expirationDate);
-	}
-
-	/**
-	 *  Raw Document data
-	 */
-	public get raw(): RawDocument {
-		return this._document;
+	public get expiration(): Date {
+		return new Date(this.document.expirationDate);
 	}
 
 	/**
 	 *  Get the days left for the document
 	 */
 	public get daysLeft(): number {
-		return getDateDifference(new Date(), this.deletionDate);
+		return getDateDifference(new Date(), this.expiration);
+	}
+
+	/**
+	 *  Raw Document data
+	 */
+	public get raw(): RawDocument {
+		return this.document;
 	}
 
 	// Methods
@@ -157,35 +163,73 @@ export class Document {
 			// Easier to extract it here
 			const documentOptions: CreateOptions = {
 				encrypted: options?.encrypted ?? this.encrypted,
-				expiration: options?.expiration ?? getDateDifference(this.creationDate, this.deletionDate),
+				expiration: options?.expiration ?? getDateDifference(this.creation, this.expiration),
 				imageEmbed: options?.imageEmbed ?? this.imageEmbed,
 				longerUrls: options?.longerUrls ?? this.longerUrls,
 				instantDelete: options?.instantDelete ?? this.instantDelete,
 				password: options?.password ?? this.password ?? undefined,
 			};
 
-			this.client.createDocument(this.code, documentOptions).then((newDocument) => {
+			this.client.createDocument(this.content, documentOptions).then((newDocument) => {
 				resolve(newDocument);
 			}, reject);
 		});
 	}
 
 	/**
-	 *  Delete the current document
+	 *  Edit the current document
 	 */
 	public async edit(text: string): Promise<void> {
 		return new Promise((resolve, reject) => {
 			this.client.editDocument(this.id, text).then(() => {
-				this._document.content = text;
+				this.document.content = text;
 				resolve();
 			}, reject);
 		});
 	}
 
 	/**
-	 *  Explode the document
+	 *  ALias of `.content`
 	 */
-	public explode(): Promise<void> {
-		return this.delete();
+	public get code(): typeof Document.prototype.content {
+		return this.content;
 	}
+
+	/**
+	 * 	ALias of `.id`
+	 */
+	public get documentId(): typeof Document.prototype.id {
+		return this.id;
+	}
+
+	/**
+	 *  Alias of `.editors`
+	 */
+	public get allowedEditors(): typeof Document.prototype.editors {
+		return this.editors;
+	}
+
+	/**
+	 *  Alias of `.creation`
+	 */
+	public get creationDate(): typeof Document.prototype.creation {
+		return this.creation;
+	}
+
+	/**
+	 *  Alias of `.expiration`
+	 */
+	public get expirationDate(): typeof Document.prototype.expiration {
+		return this.expiration;
+	}
+}
+
+// Method aliases
+Document.prototype.explode = Document.prototype.delete;
+
+export interface Document {
+	/**
+	 *  Explode the document (Alias of `.delete`)
+	 */
+	explode: typeof Document.prototype.delete;
 }
