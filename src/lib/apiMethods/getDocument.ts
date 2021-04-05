@@ -43,7 +43,7 @@ export const getDocument = function (this: Imperial, id: string | URL, password?
 			// Parse response
 			parseResponse<ImperialResponseGetDocument>(response, httpRequest).then((data) => {
 				// Return the Document class
-				resolve(new Document(this, { content: data.content,  ...data.document }));
+				resolve(new Document(this, { content: data.content, ...data.document }));
 			}, reject);
 		});
 		httpRequest.on("error", reject);

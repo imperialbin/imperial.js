@@ -1,12 +1,11 @@
-import type { Document } from "./Document";
-import type { CreateOptions } from "./helpers/interfaces";
 import { createDocument } from "./apiMethods/createDocument";
 import { deleteDocument } from "./apiMethods/deleteDocument";
 import { editDocument } from "./apiMethods/editDocument";
 import { getDocument } from "./apiMethods/getDocument";
 import { purgeDocuments } from "./apiMethods/purgeDocuments";
 import { verify } from "./apiMethods/verify";
-// Import methods
+import type { Document } from "./Document";
+import type { CreateOptions } from "./helpers/interfaces";
 import { validateToken } from "./utils/validToken";
 
 /**
