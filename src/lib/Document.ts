@@ -6,17 +6,15 @@ import { createFormatedLink, createRawLink } from "./utils/links";
 /**
  *  Imperial Document,
  *  All data from the Document can be accesed here
- *  @author https://github.com/pxseu
- *  and https://github.com/Hexiro
- *
+ *  @author https://github.com/pxseu & https://github.com/Hexiro
  */
 export class Document {
-	private client: Imperial;
-	private document: RawDocument;
+	private _client: Imperial;
+	private _document: RawDocument;
 
 	constructor(client: Imperial, document: RawDocument) {
-		this.client = client;
-		this.document = document;
+		this._client = client;
+		this._document = document;
 	}
 
 	// Props
@@ -25,63 +23,63 @@ export class Document {
 	 *  Content of the Document
 	 */
 	public get content(): string {
-		return this.document.content;
+		return this._document.content;
 	}
 
 	/**
 	 * 	Get the formated link for the Document
 	 */
 	public get formattedLink(): string {
-		return createFormatedLink(this.client, this.id);
+		return createFormatedLink(this._client, this.id);
 	}
 
 	/**
 	 * 	Get the raw link for the Document
 	 */
 	public get rawLink(): string {
-		return createRawLink(this.client, this.id);
+		return createRawLink(this._client, this.id);
 	}
 
 	/**
 	 *  Id of the Document
 	 */
 	public get id(): string {
-		return this.document.documentId;
+		return this._document.documentId;
 	}
 
 	/**
 	 *  Will the Document delete after being viewed
 	 */
 	public get instantDelete(): boolean {
-		return this.document.instantDelete;
+		return this._document.instantDelete;
 	}
 
 	/**
 	 * 	Is the document encrypted
 	 */
 	public get encrypted(): boolean {
-		return this.document.encrypted;
+		return this._document.encrypted;
 	}
 
 	/**
 	 * 	Current view count of the Document
 	 */
 	public get views(): number {
-		return this.document.views;
+		return this._document.views;
 	}
 
 	/**
 	 *  Username list of allowed editors
 	 */
 	public get editors(): string[] {
-		return this.document.allowedEditors;
+		return this._document.allowedEditors;
 	}
 
 	/**
 	 *  Is the image embed turned on for this document
 	 */
 	public get imageEmbed(): boolean {
-		return this.document.imageEmbed;
+		return this._document.imageEmbed;
 	}
 
 	/**
@@ -89,35 +87,35 @@ export class Document {
 	 * 	Will return null if none was provided
 	 */
 	public get langauge(): string | null {
-		return this.document.language;
+		return this._document.language;
 	}
 
 	/**
 	 *  Is the url
 	 */
 	public get longerUrls(): boolean {
-		return this.document.documentId.length === 26;
+		return this._document.documentId.length === 26;
 	}
 
 	/**
 	 * 	Password for the document
 	 */
 	public get password(): string | null {
-		return this.document.password;
+		return this._document.password;
 	}
 
 	/**
 	 *  Get the date that the document was created at
 	 */
 	public get creation(): Date {
-		return new Date(this.document.creationDate);
+		return new Date(this._document.creationDate);
 	}
 
 	/**
 	 *  Get the date that the document will delete at
 	 */
 	public get expiration(): Date {
-		return new Date(this.document.expirationDate);
+		return new Date(this._document.expirationDate);
 	}
 
 	/**
@@ -131,7 +129,7 @@ export class Document {
 	 *  Raw Document data
 	 */
 	public get raw(): RawDocument {
-		return this.document;
+		return this._document;
 	}
 
 	// Methods
@@ -141,7 +139,7 @@ export class Document {
 	 */
 	public delete(): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.client.deleteDocument(this.id).then(() => {
+			this._client.deleteDocument(this.id).then(() => {
 				resolve();
 			}, reject);
 		});
@@ -170,7 +168,7 @@ export class Document {
 				password: options?.password ?? this.password ?? undefined,
 			};
 
-			this.client.createDocument(this.content, documentOptions).then((newDocument) => {
+			this._client.createDocument(this.content, documentOptions).then((newDocument) => {
 				resolve(newDocument);
 			}, reject);
 		});
@@ -181,8 +179,8 @@ export class Document {
 	 */
 	public async edit(text: string): Promise<void> {
 		return new Promise((resolve, reject) => {
-			this.client.editDocument(this.id, text).then(() => {
-				this.document.content = text;
+			this._client.editDocument(this.id, text).then(() => {
+				this._document.content = text;
 				resolve();
 			}, reject);
 		});
