@@ -16,8 +16,8 @@ const RESPONSE = {
 		language: null,
 		imageEmbed: false,
 		instantDelete: true,
-		creationDate: 1617465149267,
-		expirationDate: 1617897149267,
+		creationDate: 1617280121620,
+		expirationDate: 1617452921620,
 		allowedEditors: [],
 		encrypted: false,
 		views: 9,
@@ -61,4 +61,6 @@ test("validate document", async () => {
 	expect(document.imageEmbed).toBeFalsy();
 
 	expect(document.formattedLink).toBe(`https://${api.hostname}/p/${DOCUMENT_ID}`);
+
+	expect(document.daysLeft).toBe(null);
 });
