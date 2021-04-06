@@ -56,9 +56,9 @@ export interface ImperialResponsePurgeDocuments extends ImperialResponseCommon {
 // Misc interfaces
 
 /**
- *  Options for creating the document
+ *  Options for creating the Document
  */
-export interface CreateOptions {
+export interface DocumentOptions {
 	longerUrls?: boolean;
 	instantDelete?: boolean;
 	imageEmbed?: boolean;
@@ -79,7 +79,7 @@ export interface RawDocument extends ResponseDocument {
 /**
  *  @internal
  */
-export interface InternalPostOptions extends CreateOptions {
+export interface InternalPostOptions extends DocumentOptions {
 	code: string;
 	[key: string]: unknown;
 }

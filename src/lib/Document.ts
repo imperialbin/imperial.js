@@ -1,4 +1,4 @@
-import type { CreateOptions, RawDocument } from "./helpers/interfaces";
+import type { DocumentOptions, RawDocument } from "./helpers/interfaces";
 import type { Imperial } from "./Imperial";
 import { getDateDifference } from "./utils/dateDifference";
 import { createFormatedLink, createRawLink } from "./utils/links";
@@ -27,14 +27,14 @@ export class Document {
 	}
 
 	/**
-	 * 	Get the formated link for the Document
+	 * 	URL of the Document, to view in Imperial
 	 */
 	public get formattedLink(): string {
 		return createFormatedLink(this._client, this.id);
 	}
 
 	/**
-	 * 	Get the raw link for the Document
+	 * 	URL to a plain text version of the Document
 	 */
 	public get rawLink(): string {
 		return createRawLink(this._client, this.id);
@@ -48,14 +48,14 @@ export class Document {
 	}
 
 	/**
-	 *  Will the Document delete after being viewed
+	 *  Whether the Document will be deleted after being viewed
 	 */
 	public get instantDelete(): boolean {
 		return this._document.instantDelete;
 	}
 
 	/**
-	 * 	Is the document encrypted
+	 * 	Whether the document is encrypted
 	 */
 	public get encrypted(): boolean {
 		return this._document.encrypted;
@@ -69,64 +69,65 @@ export class Document {
 	}
 
 	/**
-	 *  Username list of allowed editors
+	 *  List of allowed editors of the Document
 	 */
 	public get editors(): string[] {
 		return this._document.allowedEditors;
 	}
 
 	/**
-	 *  Is the image embed turned on for this document
+	 *  Whether the Document will embed an image of the content
 	 */
 	public get imageEmbed(): boolean {
 		return this._document.imageEmbed;
 	}
 
 	/**
-	 * 	Programming langauge that is used for syntax highlighting
-	 * 	Will return null if none was provided
+	 * 	The Programming langauge that was set to the Document
 	 */
 	public get langauge(): string | null {
 		return this._document.language;
 	}
 
 	/**
-	 *  Is the url
+	 *  Wheather is the Document URL longer
 	 */
 	public get longerUrls(): boolean {
 		return this._document.documentId.length === 26;
 	}
 
 	/**
-	 * 	Password for the document
+	 * 	Password for the Document
 	 */
 	public get password(): string | null {
 		return this._document.password;
 	}
 
 	/**
-	 *  Get the date that the document was created at
+	 *  The date that the Document was created at
 	 */
 	public get creation(): Date {
 		return new Date(this._document.creationDate);
 	}
 
 	/**
-	 *  Get the date that the document will delete at
+	 *  The date that the Document will be deleted at
 	 */
 	public get expiration(): Date {
 		return new Date(this._document.expirationDate);
 	}
 
 	/**
-	 *  Get the days left for the document
+	 *  The ammount of days the Doucment will expire at from the current moment
 	 */
-	public get daysLeft(): number {
-		return getDateDifference(new Date(), this.expiration);
+	public get daysLeft(): number | null {
+		const daysLeft = getDateDifference(new Date(), this.expiration);
+		if (daysLeft < 0) return null;
+		return daysLeft;
 	}
 
 	/**
-	 *  Raw Document data
+	 *  The raw JSON data of the Document
 	 */
 	public get raw(): RawDocument {
 		return this._document;
@@ -135,7 +136,7 @@ export class Document {
 	// Methods
 
 	/**
-	 *  Delete the current document
+	 *  Deletes the current Document
 	 */
 	public delete(): Promise<void> {
 		return new Promise((resolve, reject) => {
@@ -146,20 +147,20 @@ export class Document {
 	}
 
 	/**
-	 *  Duplicate the document
+	 *  Duplicates the current Document
 	 */
 	public async duplicate(): Promise<Document>;
 
 	/**
-	 *  Duplicate the document
-	 *  @param options These will override the options from the current document
+	 *  Duplicates the current Document
+	 *  @param options These will override the options from the current Document
 	 */
-	public async duplicate(options: CreateOptions): Promise<Document>;
+	public async duplicate(options: DocumentOptions): Promise<Document>;
 
-	public async duplicate(options?: CreateOptions): Promise<Document> {
+	public async duplicate(options?: DocumentOptions): Promise<Document> {
 		return new Promise((resolve, reject) => {
 			// Easier to extract it here
-			const documentOptions: CreateOptions = {
+			const documentOptions: DocumentOptions = {
 				encrypted: options?.encrypted ?? this.encrypted,
 				expiration: options?.expiration ?? getDateDifference(this.creation, this.expiration),
 				imageEmbed: options?.imageEmbed ?? this.imageEmbed,
@@ -175,7 +176,7 @@ export class Document {
 	}
 
 	/**
-	 *  Edit the current document
+	 *  Edits the content of the current Document
 	 */
 	public async edit(text: string): Promise<void> {
 		return new Promise((resolve, reject) => {
@@ -227,7 +228,7 @@ Document.prototype.explode = Document.prototype.delete;
 
 export interface Document {
 	/**
-	 *  Explode the document (Alias of `.delete`)
+	 *  Explode the Document (Alias of `.delete`)
 	 */
 	explode: typeof Document.prototype.delete;
 }

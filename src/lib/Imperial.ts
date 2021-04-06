@@ -5,7 +5,7 @@ import { getDocument } from "./apiMethods/getDocument";
 import { purgeDocuments } from "./apiMethods/purgeDocuments";
 import { verify } from "./apiMethods/verify";
 import type { Document } from "./Document";
-import type { CreateOptions } from "./helpers/interfaces";
+import type { DocumentOptions } from "./helpers/interfaces";
 import { validateToken } from "./utils/validToken";
 
 /**
@@ -25,28 +25,28 @@ export class Imperial {
 	}
 
 	/**
-	 *  The token you provided in the constructor
+	 *  Token, that was set in the constructor
 	 */
 	public get token(): string | undefined {
 		return this._token;
 	}
 
 	/**
-	 *  Imperial's domain name
+	 *  Imperial's hostname
 	 */
 	public get hostname(): string {
 		return "imperialb.in";
 	}
 
 	/**
-	 *  Regex to check if the domain provided is part of imperial
+	 *  Regular Expression that is used to match against in functions
 	 */
 	public get hostnameCheckRegExp(): RegExp {
 		return /^(www\.)?imperialb(\.in|in.com)$/i;
 	}
 
 	/**
-	 *  Create a document
+	 *  Creates a Document
 	 *  @param text The text to be sent
 	 *  @returns Promise with the data
 	 *  @example createDocument("hi!").then(console.log);
@@ -55,23 +55,23 @@ export class Imperial {
 	public createDocument(text: string): Promise<Document>;
 
 	/**
-	 *  Create a document
+	 *  Creates a Document
 	 *  @param text The text to be sent
 	 *  @param opts Additional options for the request **Api key is required**
 	 *  @returns Promise with the data
 	 *  @example createDocument("hi!", { longerUrls: true }).then(console.log); // Prints the response to console
 	 */
-	public createDocument(text: string, options: CreateOptions): Promise<Document>;
+	public createDocument(text: string, options: DocumentOptions): Promise<Document>;
 
 	/**
-	 *  Create a document
+	 *  Create a Document
 	 */
-	public createDocument(text: string, options?: CreateOptions): Promise<Document> {
+	public createDocument(text: string, options?: DocumentOptions): Promise<Document> {
 		return createDocument.call(this, text, options);
 	}
 
 	/**
-	 *  Get a document from the API
+	 *  Gets a Document from Imperial
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @example getDocument("someid").then(console.log);
 	 *  // Logs the response to the console
@@ -79,7 +79,7 @@ export class Imperial {
 	public getDocument(id: string | URL): Promise<Document>;
 
 	/**
-	 *  Get a document from the API
+	 *  Gets a Document from Imperial
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param password Password to an encrypted document.
 	 *  @example getDocument("someid", "you shall not pass").then(console.log);
@@ -88,14 +88,14 @@ export class Imperial {
 	public getDocument(id: string | URL, password: string): Promise<Document>;
 
 	/**
-	 *  Get a document from the API
+	 *  Gets the Document from Imperial
 	 */
 	public getDocument(id: string | URL, password?: string): Promise<Document> {
 		return getDocument.call(this, id, password);
 	}
 
 	/**
-	 *  Delete a document from the API | **Requires an API Token**
+	 *  Deletes a Document from Imperial | **Requires an API Token**
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @example deleteDocument("someid").then(console.log);
 	 *  // Logs the response to the console
@@ -105,7 +105,7 @@ export class Imperial {
 	}
 
 	/**
-	 *  Edit a document from the API | **Requires an API Token**
+	 *  Edits the Documents content | **Requires an API Token**
 	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @param text Id of the document or a URL to it. It will try to parse a URL and extract the Id.
 	 *  @example editDocument("someid", "i am the new text!").then(console.log);
@@ -116,7 +116,7 @@ export class Imperial {
 	}
 
 	/**
-	 *  Check if your token is valid **Only use when provided the token in the constructor**
+	 *  Verify if your token is valid | **Requires an API Token**
 	 *  @example verify().then(console.log)
 	 *  // shows if the token is valid
 	 */
@@ -125,7 +125,7 @@ export class Imperial {
 	}
 
 	/**
-	 *  Purge all documents on the account connected to the Api token **Only use when provided the token in the constructor**
+	 *  Delete **all** of your created Documents | **Requires an API Token**
 	 *  @example purgeDocuments().then(console.log)
 	 *  // shows if the token is valid
 	 */
