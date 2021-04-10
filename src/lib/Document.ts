@@ -1,4 +1,4 @@
-import type { DocumentOptions, RawDocument } from "./helpers/interfaces";
+import type { DocumentOptions, RawDocument } from "./common/interfaces";
 import type { Imperial } from "./Imperial";
 import { getDateDifference } from "./utils/dateDifference";
 import { createFormatedLink, createRawLink } from "./utils/links";
@@ -10,6 +10,7 @@ import { createFormatedLink, createRawLink } from "./utils/links";
  */
 export class Document {
 	private _client: Imperial;
+
 	private _document: RawDocument;
 
 	constructor(client: Imperial, document: RawDocument) {

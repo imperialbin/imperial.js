@@ -5,7 +5,7 @@ import { getDocument } from "./apiMethods/getDocument";
 import { purgeDocuments } from "./apiMethods/purgeDocuments";
 import { verify } from "./apiMethods/verify";
 import type { Document } from "./Document";
-import type { DocumentOptions } from "./helpers/interfaces";
+import type { DocumentOptions } from "./common/interfaces";
 import { validateToken } from "./utils/validToken";
 
 /**
@@ -34,6 +34,7 @@ export class Imperial {
 	/**
 	 *  Imperial's hostname
 	 */
+	// eslint-disable-next-line class-methods-use-this
 	public get hostname(): string {
 		return "imperialb.in";
 	}
@@ -41,6 +42,7 @@ export class Imperial {
 	/**
 	 *  Regular Expression that is used to match against in functions
 	 */
+	// eslint-disable-next-line class-methods-use-this
 	public get hostnameCheckRegExp(): RegExp {
 		return /^(www\.)?imperialb(\.in|in.com)$/i;
 	}

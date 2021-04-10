@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
-import { ID_WRONG_TYPE, NO_TOKEN } from "../lib/helpers/Errors";
+import { ID_WRONG_TYPE, NO_TOKEN } from "../lib/common/errors";
 import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
@@ -43,7 +43,7 @@ describe("deleteDocument", () => {
 		await expect(
 			(async () => {
 				await api.deleteDocument("bbbbbb");
-			})()
+			})(),
 		).rejects.toThrow(new Error(NO_TOKEN));
 	}, 10000); // timeout 10s
 
@@ -56,28 +56,28 @@ describe("deleteDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.deleteDocument({});
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.deleteDocument([]);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.deleteDocument(12345);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.deleteDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
+			})(),
 		).rejects.toThrow(err);
 	});
 
@@ -86,9 +86,9 @@ describe("deleteDocument", () => {
 
 		await expect(
 			(async () => {
-				//@ts-ignore
+				// @ts-ignore
 				await api.deleteDocument();
-			})()
+			})(),
 		).rejects.toThrow(new Error("No `id` was provided!"));
 	});
 });

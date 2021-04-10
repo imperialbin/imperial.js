@@ -1,3 +1,6 @@
+// nock isn't a required dependancy
+
+// eslint-disable-next-line import/no-extraneous-dependencies
 import nock from "nock";
 import { Imperial } from "./lib/Imperial";
 

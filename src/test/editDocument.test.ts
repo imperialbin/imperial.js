@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
-import { ID_WRONG_TYPE, NO_TOKEN, TEXT_WRONG_TYPE } from "../lib/helpers/Errors";
+import { ID_WRONG_TYPE, NO_TOKEN, TEXT_WRONG_TYPE } from "../lib/common/errors";
 import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
@@ -58,7 +58,7 @@ describe("editDocument", () => {
 		await expect(
 			(async () => {
 				await api.editDocument("test jest bro", "test jest bro");
-			})()
+			})(),
 		).rejects.toThrow(new Error(NO_TOKEN));
 	}, 10000); // timeout 10s
 
@@ -71,28 +71,28 @@ describe("editDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.editDocument({}, "bbbbbb");
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument([], "bbbbbb");
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument(12345, "bbbbbb");
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument(() => {}, "bbbbbb"); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
+			})(),
 		).rejects.toThrow(err);
 	});
 
@@ -105,28 +105,28 @@ describe("editDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", {});
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", []);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", 12345);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", () => {}); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
+			})(),
 		).rejects.toThrow(err);
 	});
 
@@ -135,9 +135,9 @@ describe("editDocument", () => {
 
 		await expect(
 			(async () => {
-				//@ts-ignore
+				// @ts-ignore
 				await api.editDocument();
-			})()
+			})(),
 		).rejects.toThrow(new Error("No `id` was provided!"));
 	});
 });

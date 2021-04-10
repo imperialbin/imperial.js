@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
-import { OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../lib/helpers/Errors";
+import { OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../lib/common/errors";
 import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
@@ -49,28 +49,28 @@ describe("createDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.createDocument({});
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.createDocument([]);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.createDocument(12345);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.createDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
+			})(),
 		).rejects.toThrow(err);
 	});
 
@@ -83,21 +83,21 @@ describe("createDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.createDocument("Test: createDocument > invalid - second param with wrong type #1", "");
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.createDocument("Test: createDocument > invalid - second param with wrong type #2", []);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.createDocument("Test: createDocument > invalid - second param with wrong type #3", 12345);
-			})()
+			})(),
 		).rejects.toThrow(err);
 	});
 
@@ -106,9 +106,9 @@ describe("createDocument", () => {
 
 		await expect(
 			(async () => {
-				//@ts-ignore
+				// @ts-ignore
 				await api.createDocument();
-			})()
+			})(),
 		).rejects.toThrow(new Error("No `text` was provided!"));
 	});
 });

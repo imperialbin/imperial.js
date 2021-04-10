@@ -1,6 +1,6 @@
 import { request } from "https";
-import { NO_TOKEN } from "../helpers/Errors";
-import type { ImperialResponseCommon } from "../helpers/interfaces";
+import { NO_TOKEN } from "../common/errors";
+import type { ImperialResponseCommon } from "../common/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";

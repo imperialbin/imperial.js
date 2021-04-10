@@ -2,7 +2,7 @@
 
 import { Imperial } from "../lib";
 import { Document } from "../lib/Document";
-import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/helpers/Errors";
+import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/common/errors";
 import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
@@ -60,28 +60,28 @@ describe("getDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.getDocument({});
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument([]);
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument(12345);
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
+			})(),
 		).rejects.toThrowError(err);
 	});
 
@@ -94,21 +94,21 @@ describe("getDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", {});
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", []);
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", 12345);
-			})()
+			})(),
 		).rejects.toThrowError(err);
 	});
 
@@ -117,9 +117,9 @@ describe("getDocument", () => {
 
 		await expect(
 			(async () => {
-				//@ts-ignore
+				// @ts-ignore
 				await api.getDocument();
-			})()
+			})(),
 		).rejects.toThrowError(new Error("No `id` was provided!"));
 	});
 });

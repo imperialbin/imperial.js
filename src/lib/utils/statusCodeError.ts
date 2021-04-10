@@ -4,9 +4,7 @@
  *  @internal
  */
 
-export const noError = (statusCode?: number): boolean => {
-	return !!statusCode && statusCode >= 200 && statusCode < 300;
-};
+export const noError = (statusCode?: number): boolean => !!statusCode && statusCode >= 200 && statusCode < 300;
 
 /**
  *  Get status code message

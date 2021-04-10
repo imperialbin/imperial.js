@@ -1,5 +1,5 @@
 import { request } from "https";
-import { NO_TOKEN } from "../helpers/Errors";
+import { NO_TOKEN } from "../common/errors";
 import type { Imperial } from "../Imperial";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
@@ -12,7 +12,7 @@ export const purgeDocuments = function (this: Imperial): Promise<void> {
 		// Prepare the request
 		const opts = prepareRequest({
 			method: "DELETE",
-			path: `/purgeDocuments`,
+			path: "/purgeDocuments",
 			hostname: this.hostname,
 			token: this.token,
 		});

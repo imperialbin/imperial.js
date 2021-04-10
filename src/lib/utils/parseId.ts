@@ -15,15 +15,15 @@ const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {
 export const parseId = function (id: string | URL, hostnameRegex: RegExp): string {
 	if (id instanceof URL) return getIdFromUrl(id as URL, hostnameRegex);
 
-	let _id = id;
+	let localId = id;
 
 	try {
 		// Try to parse a url
-		_id = getIdFromUrl(new URL(id as string), hostnameRegex);
+		localId = getIdFromUrl(new URL(id as string), hostnameRegex);
 	} catch (e) {
 		// Don't do anything with the URL prase error
 	}
 
 	// Try to parse a url
-	return _id;
+	return localId;
 };

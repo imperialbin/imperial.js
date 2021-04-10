@@ -1,6 +1,6 @@
 import type { ClientRequest, IncomingMessage } from "http";
-import { imperialResponses } from "../helpers/imperialResponses";
-import type { InternalImperialResponse } from "../helpers/interfaces";
+import { imperialResponses } from "../common/responseMap";
+import type { InternalImperialResponse } from "../common/interfaces";
 import { ImperialError } from "./ImperialError";
 import { noError, statusMessage } from "./statusCodeError";
 
@@ -10,7 +10,7 @@ import { noError, statusMessage } from "./statusCodeError";
  */
 export const parseResponse = function <T extends unknown>(
 	response: IncomingMessage,
-	request: ClientRequest
+	request: ClientRequest,
 ): Promise<T> {
 	return new Promise((resolve, reject) => {
 		const data: string[] = [];

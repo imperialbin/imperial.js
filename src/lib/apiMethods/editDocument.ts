@@ -1,7 +1,7 @@
 import { request } from "https";
 import { Document } from "../Document";
-import { ID_WRONG_TYPE, NO_ID, NO_TEXT, NO_TOKEN, TEXT_WRONG_TYPE } from "../helpers/Errors";
-import type { ImperialResponseEditDocument } from "../helpers/interfaces";
+import { ID_WRONG_TYPE, NO_ID, NO_TEXT, NO_TOKEN, TEXT_WRONG_TYPE } from "../common/errors";
+import type { ImperialResponseEditDocument } from "../common/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
 import { parseResponse } from "../utils/parseResponse";
@@ -39,7 +39,7 @@ export const editDocument = function (this: Imperial, id: string | URL, text: st
 		// Prepare the request
 		const opts = prepareRequest({
 			method: "PATCH",
-			path: `/document/`,
+			path: "/document/",
 			hostname: this.hostname,
 			token: this.token,
 		});

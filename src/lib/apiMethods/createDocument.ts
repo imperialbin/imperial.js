@@ -1,7 +1,7 @@
 import { request } from "https";
 import { Document } from "../Document";
-import { NO_TEXT, OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../helpers/Errors";
-import type { DocumentOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../helpers/interfaces";
+import { NO_TEXT, OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../common/errors";
+import type { DocumentOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../common/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";
@@ -9,6 +9,7 @@ import { prepareRequest } from "../utils/prepareRequest";
 export const createDocument = function (this: Imperial, text: string, options?: DocumentOptions): Promise<Document> {
 	return new Promise((resolve, reject) => {
 		// If no text or text is an emtpy string reutrn
+
 		if (!text || text === "") return reject(new Error(NO_TEXT));
 
 		// IF text is not a string return
