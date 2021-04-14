@@ -1,6 +1,6 @@
 import type { OutgoingHttpHeaders } from "http";
 import type { RequestOptions } from "https";
-import type { PrepareRequestParams } from "../common/interfaces";
+import type { PrepareRequestParams } from "../helper/interfaces";
 
 /**
  *  @internal

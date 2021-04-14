@@ -1,5 +1,5 @@
 import { request } from "https";
-import { ID_WRONG_TYPE, NO_ID, NO_TOKEN } from "../common/errors";
+import { ID_WRONG_TYPE, NO_ID, NO_TOKEN } from "../helper/errors";
 import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
 import { parseResponse } from "../utils/parseResponse";

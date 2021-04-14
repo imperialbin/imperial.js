@@ -2,7 +2,7 @@
 
 import { Imperial } from "../lib";
 import { Document } from "../lib/Document";
-import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/common/errors";
+import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/helper/errors";
 import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";

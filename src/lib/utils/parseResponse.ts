@@ -1,6 +1,6 @@
 import type { ClientRequest, IncomingMessage } from "http";
-import { imperialResponses } from "../common/responseMap";
-import type { InternalImperialResponse } from "../common/interfaces";
+import { imperialResponses } from "../helper/responseMap";
+import type { InternalImperialResponse } from "../helper/interfaces";
 import { ImperialError } from "./ImperialError";
 import { noError, statusMessage } from "./statusCodeError";
 

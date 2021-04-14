@@ -3,4 +3,4 @@
  *  declarations that they could reuse
  */
 
-export * from "./lib/helpers/interfaces";
+export * from "./lib/common/interfaces";

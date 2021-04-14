@@ -1,5 +1,5 @@
 import { request } from "https";
-import { NO_TOKEN } from "../common/errors";
+import { NO_TOKEN } from "../helper/errors";
 import type { Imperial } from "../Imperial";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";

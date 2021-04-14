@@ -5,7 +5,7 @@ import { getDocument } from "./apiMethods/getDocument";
 import { purgeDocuments } from "./apiMethods/purgeDocuments";
 import { verify } from "./apiMethods/verify";
 import type { Document } from "./Document";
-import type { DocumentOptions } from "./common/interfaces";
+import type { DocumentOptions } from "./helper/interfaces";
 import { validateToken } from "./utils/validToken";
 
 /**

@@ -1,4 +1,4 @@
-import type { ImperialErrorInterface } from "../common/interfaces";
+import type { ImperialErrorInterface } from "../helper/interfaces";
 
 /**
  *  @internal

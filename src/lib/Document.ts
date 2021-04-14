@@ -1,4 +1,4 @@
-import type { DocumentOptions, RawDocument } from "./common/interfaces";
+import type { DocumentOptions, RawDocument } from "./helper/interfaces";
 import type { Imperial } from "./Imperial";
 import { getDateDifference } from "./utils/dateDifference";
 import { createFormatedLink, createRawLink } from "./utils/links";
@@ -150,15 +150,15 @@ export class Document {
 	/**
 	 *  Duplicates the current Document
 	 */
-	public async duplicate(): Promise<Document>;
+	public duplicate(): Promise<Document>;
 
 	/**
 	 *  Duplicates the current Document
 	 *  @param options These will override the options from the current Document
 	 */
-	public async duplicate(options: DocumentOptions): Promise<Document>;
+	public duplicate(options: DocumentOptions): Promise<Document>;
 
-	public async duplicate(options?: DocumentOptions): Promise<Document> {
+	public duplicate(options?: DocumentOptions): Promise<Document> {
 		return new Promise((resolve, reject) => {
 			// Easier to extract it here
 			const documentOptions: DocumentOptions = {
@@ -179,7 +179,7 @@ export class Document {
 	/**
 	 *  Edits the content of the current Document
 	 */
-	public async edit(text: string): Promise<void> {
+	public edit(text: string): Promise<void> {
 		return new Promise((resolve, reject) => {
 			this._client.editDocument(this.id, text).then(() => {
 				this._document.content = text;

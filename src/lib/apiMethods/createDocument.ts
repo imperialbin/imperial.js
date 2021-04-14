@@ -1,7 +1,7 @@
 import { request } from "https";
 import { Document } from "../Document";
-import { NO_TEXT, OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../common/errors";
-import type { DocumentOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../common/interfaces";
+import { NO_TEXT, OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../helper/errors";
+import type { DocumentOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../helper/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseResponse } from "../utils/parseResponse";
 import { prepareRequest } from "../utils/prepareRequest";

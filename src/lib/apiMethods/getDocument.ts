@@ -1,7 +1,7 @@
 import { request } from "https";
 import { Document } from "../Document";
-import { ID_WRONG_TYPE, NO_ID, PASSWORD_WRONG_TYPE } from "../common/errors";
-import type { ImperialResponseGetDocument } from "../common/interfaces";
+import { ID_WRONG_TYPE, NO_ID, PASSWORD_WRONG_TYPE } from "../helper/errors";
+import type { ImperialResponseGetDocument } from "../helper/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
 import { parsePassword } from "../utils/parsePassword";
