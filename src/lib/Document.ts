@@ -101,6 +101,8 @@ export class Document {
 	 * 	Password for the Document
 	 */
 	public get password(): string | null {
+		if (this._document.password === undefined) return null;
+
 		return this._document.password;
 	}
 
@@ -168,6 +170,8 @@ export class Document {
 				longerUrls: options?.longerUrls ?? this.longerUrls,
 				instantDelete: options?.instantDelete ?? this.instantDelete,
 				password: options?.password ?? this.password ?? undefined,
+				editors: options?.editors ?? this.editors,
+				language: options?.language ?? this.langauge ?? undefined,
 			};
 
 			this._client.createDocument(this.content, documentOptions).then((newDocument) => {
