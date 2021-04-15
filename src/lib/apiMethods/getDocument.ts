@@ -1,7 +1,7 @@
 import { request } from "https";
+import type { ImperialResponseGetDocument } from "../helper/interfaces";
 import { Document } from "../Document";
 import { ID_WRONG_TYPE, NO_ID, PASSWORD_WRONG_TYPE } from "../helper/errors";
-import type { ImperialResponseGetDocument } from "../helper/interfaces";
 import type { Imperial } from "../Imperial";
 import { parseId } from "../utils/parseId";
 import { parsePassword } from "../utils/parsePassword";
@@ -17,7 +17,7 @@ export const getDocument = function (this: Imperial, id: string | URL, password?
 		if (typeof id !== "string" && !(id instanceof URL)) return reject(new TypeError(ID_WRONG_TYPE));
 
 		// If password is provided and is the wrong type return
-		if (password && typeof password !== "string") return reject(new TypeError(PASSWORD_WRONG_TYPE));
+		if (password !== undefined && typeof password !== "string") return reject(new TypeError(PASSWORD_WRONG_TYPE));
 
 		// Make the user inputed data encoded so it doesn't break stuff
 		const documentId = encodeURIComponent(parseId(id, this.hostnameCheckRegExp));
@@ -43,7 +43,7 @@ export const getDocument = function (this: Imperial, id: string | URL, password?
 			// Parse response
 			parseResponse<ImperialResponseGetDocument>(response, httpRequest).then((data) => {
 				// Return the Document class
-				resolve(new Document(this, { content: data.content, ...data.document }));
+				resolve(new Document(this, { content: data.content, ...data.document, password: documentPassword }));
 			}, reject);
 		});
 		httpRequest.on("error", reject);

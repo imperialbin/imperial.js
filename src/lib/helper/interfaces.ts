@@ -14,7 +14,7 @@ interface ResponseDocument {
 	expirationDate: number;
 	allowedEditors: string[];
 	encrypted: boolean;
-	password: string | null;
+	password?: string;
 	views: number;
 }
 
@@ -59,12 +59,18 @@ export interface ImperialResponsePurgeDocuments extends ImperialResponseCommon {
  *  Options for creating the Document
  */
 export interface DocumentOptions {
+	editors?: string[];
 	longerUrls?: boolean;
 	instantDelete?: boolean;
 	imageEmbed?: boolean;
 	expiration?: number;
+
+	/**
+	 *  Will be overridden to `true` if you provide a password
+	 */
 	encrypted?: boolean;
 	password?: string;
+	language?: string;
 }
 
 /**
@@ -110,4 +116,15 @@ export interface PrepareRequestParams {
 	path: string;
 	hostname: string;
 	token: string | undefined;
+}
+
+/**
+ * 	@internal
+ */
+export interface Schema {
+	[key: string]: {
+		test: (value: unknown) => boolean;
+		message: string;
+		required?: boolean;
+	};
 }

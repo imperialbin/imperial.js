@@ -3,7 +3,6 @@
  *  @param statusCode The status code of the resposne
  *  @internal
  */
-
 export const noError = (statusCode?: number): boolean => !!statusCode && statusCode >= 200 && statusCode < 300;
 
 /**

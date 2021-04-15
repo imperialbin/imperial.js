@@ -11,3 +11,8 @@ export const ID_WRONG_TYPE = "Parameter `id` must be a string or an URL!";
 export const PASSWORD_WRONG_TYPE = "Parameter `password` must be a string!";
 
 export const OPTIONS_WRONG_TYPE = "Parameter `options` must be an Object!";
+
+export const SCHEMA_FAILED_VALIDATION = (key: string, message: string, required: boolean = false): string =>
+	`Property "${key}" ${required ? "is required and " : ""}must be ${message}`;
+
+export const SCHEMA_INVALID_KEY = (key: string): string => `They key ${key} is not on the schema`;
