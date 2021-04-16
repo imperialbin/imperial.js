@@ -1,12 +1,12 @@
 import { request } from "https";
+import { NO_TEXT, OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../../helper/errors";
+import type { DocumentOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../../helper/interfaces";
+import { OptionsSchema } from "../../helper/schemas";
+import { parseResponse } from "../../utils/parseResponse";
+import { prepareRequest } from "../../utils/prepareRequest";
+import { validateSchema } from "../../utils/schemaValidator";
 import { Document } from "../Document";
-import { NO_TEXT, OPTIONS_WRONG_TYPE, TEXT_WRONG_TYPE } from "../helper/errors";
-import type { DocumentOptions, ImperialResponseCreateDocument, InternalPostOptions } from "../helper/interfaces";
-import { OptionsSchema } from "../helper/schemas";
 import type { Imperial } from "../Imperial";
-import { parseResponse } from "../utils/parseResponse";
-import { prepareRequest } from "../utils/prepareRequest";
-import { validateSchema } from "../utils/schemaValidator";
 
 export const createDocument = function (this: Imperial, text: string, options?: DocumentOptions): Promise<Document> {
 	return new Promise((resolve, reject) => {

@@ -1,8 +1,8 @@
 import type { ClientRequest, IncomingMessage } from "http";
-import { imperialResponses } from "../helper/responseMap";
 import type { InternalImperialResponse } from "../helper/interfaces";
+import { imperialResponses } from "../helper/responseMap";
+import { noError, statusMessage } from "../helper/statusCodeError";
 import { ImperialError } from "./ImperialError";
-import { noError, statusMessage } from "./statusCodeError";
 
 /**
  *  @internal

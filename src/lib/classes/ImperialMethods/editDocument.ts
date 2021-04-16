@@ -1,11 +1,11 @@
 import { request } from "https";
+import { ID_WRONG_TYPE, NO_ID, NO_TEXT, NO_TOKEN, TEXT_WRONG_TYPE } from "../../helper/errors";
+import type { ImperialResponseEditDocument } from "../../helper/interfaces";
+import { parseId } from "../../utils/parseId";
+import { parseResponse } from "../../utils/parseResponse";
+import { prepareRequest } from "../../utils/prepareRequest";
 import { Document } from "../Document";
-import { ID_WRONG_TYPE, NO_ID, NO_TEXT, NO_TOKEN, TEXT_WRONG_TYPE } from "../helper/errors";
-import type { ImperialResponseEditDocument } from "../helper/interfaces";
 import type { Imperial } from "../Imperial";
-import { parseId } from "../utils/parseId";
-import { parseResponse } from "../utils/parseResponse";
-import { prepareRequest } from "../utils/prepareRequest";
 
 export const editDocument = function (this: Imperial, id: string | URL, text: string): Promise<Document> {
 	return new Promise((resolve, reject) => {

@@ -1,8 +1,8 @@
 import { request } from "https";
-import { NO_TOKEN } from "../helper/errors";
+import { NO_TOKEN } from "../../helper/errors";
+import { parseResponse } from "../../utils/parseResponse";
+import { prepareRequest } from "../../utils/prepareRequest";
 import type { Imperial } from "../Imperial";
-import { parseResponse } from "../utils/parseResponse";
-import { prepareRequest } from "../utils/prepareRequest";
 
 export const purgeDocuments = function (this: Imperial): Promise<void> {
 	return new Promise((resolve, reject) => {

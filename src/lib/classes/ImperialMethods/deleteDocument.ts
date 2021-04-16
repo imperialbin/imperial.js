@@ -1,9 +1,9 @@
 import { request } from "https";
-import { ID_WRONG_TYPE, NO_ID, NO_TOKEN } from "../helper/errors";
+import { ID_WRONG_TYPE, NO_ID, NO_TOKEN } from "../../helper/errors";
+import { parseId } from "../../utils/parseId";
+import { parseResponse } from "../../utils/parseResponse";
+import { prepareRequest } from "../../utils/prepareRequest";
 import type { Imperial } from "../Imperial";
-import { parseId } from "../utils/parseId";
-import { parseResponse } from "../utils/parseResponse";
-import { prepareRequest } from "../utils/prepareRequest";
 
 export const deleteDocument = function (this: Imperial, id: string | URL): Promise<void> {
 	return new Promise((resolve, reject) => {

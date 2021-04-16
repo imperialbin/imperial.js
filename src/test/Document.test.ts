@@ -1,7 +1,6 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
-import { Imperial } from "../lib";
-import { Document } from "../lib/Document";
+import { Imperial, Document } from "../lib";
 import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";

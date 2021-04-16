@@ -2,5 +2,5 @@
  *  Future proof current source
  */
 
-export { Document } from "./Document";
-export { Imperial } from "./Imperial";
+export { Document } from "./classes/Document";
+export { Imperial } from "./classes/Imperial";

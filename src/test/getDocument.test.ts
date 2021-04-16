@@ -1,7 +1,6 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
-import { Imperial } from "../lib";
-import { Document } from "../lib/Document";
+import { Imperial, Document } from "../lib";
 import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/helper/errors";
 import { createMock } from "../mockHelper";
 

@@ -1,7 +1,7 @@
-import type { DocumentOptions, RawDocument } from "./helper/interfaces";
+import type { DocumentOptions, RawDocument } from "../helper/interfaces";
+import { createFormatedLink, createRawLink } from "../helper/links";
+import { getDateDifference } from "../utils/dateDifference";
 import type { Imperial } from "./Imperial";
-import { getDateDifference } from "./utils/dateDifference";
-import { createFormatedLink, createRawLink } from "./utils/links";
 
 /**
  *  Imperial Document,

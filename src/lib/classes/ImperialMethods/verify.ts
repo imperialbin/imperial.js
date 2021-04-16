@@ -1,9 +1,9 @@
 import { request } from "https";
-import { NO_TOKEN } from "../helper/errors";
-import type { ImperialResponseCommon } from "../helper/interfaces";
+import { NO_TOKEN } from "../../helper/errors";
+import type { ImperialResponseCommon } from "../../helper/interfaces";
+import { parseResponse } from "../../utils/parseResponse";
+import { prepareRequest } from "../../utils/prepareRequest";
 import type { Imperial } from "../Imperial";
-import { parseResponse } from "../utils/parseResponse";
-import { prepareRequest } from "../utils/prepareRequest";
 
 export const verify = function (this: Imperial): Promise<void> {
 	return new Promise((resolve, reject) => {

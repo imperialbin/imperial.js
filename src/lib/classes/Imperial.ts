@@ -1,12 +1,12 @@
-import { createDocument } from "./apiMethods/createDocument";
-import { deleteDocument } from "./apiMethods/deleteDocument";
-import { editDocument } from "./apiMethods/editDocument";
-import { getDocument } from "./apiMethods/getDocument";
-import { purgeDocuments } from "./apiMethods/purgeDocuments";
-import { verify } from "./apiMethods/verify";
+import type { DocumentOptions } from "../helper/interfaces";
+import { validateToken } from "../utils/validToken";
 import type { Document } from "./Document";
-import type { DocumentOptions } from "./helper/interfaces";
-import { validateToken } from "./utils/validToken";
+import { createDocument } from "./ImperialMethods/createDocument";
+import { deleteDocument } from "./ImperialMethods/deleteDocument";
+import { editDocument } from "./ImperialMethods/editDocument";
+import { getDocument } from "./ImperialMethods/getDocument";
+import { purgeDocuments } from "./ImperialMethods/purgeDocuments";
+import { verify } from "./ImperialMethods/verify";
 
 /**
  *  The Imperial class

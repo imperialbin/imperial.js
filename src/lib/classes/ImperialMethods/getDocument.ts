@@ -1,12 +1,12 @@
 import { request } from "https";
-import type { ImperialResponseGetDocument } from "../helper/interfaces";
+import { ID_WRONG_TYPE, NO_ID, PASSWORD_WRONG_TYPE } from "../../helper/errors";
+import type { ImperialResponseGetDocument } from "../../helper/interfaces";
+import { parseId } from "../../utils/parseId";
+import { parsePassword } from "../../utils/parsePassword";
+import { parseResponse } from "../../utils/parseResponse";
+import { prepareRequest } from "../../utils/prepareRequest";
 import { Document } from "../Document";
-import { ID_WRONG_TYPE, NO_ID, PASSWORD_WRONG_TYPE } from "../helper/errors";
 import type { Imperial } from "../Imperial";
-import { parseId } from "../utils/parseId";
-import { parsePassword } from "../utils/parsePassword";
-import { parseResponse } from "../utils/parseResponse";
-import { prepareRequest } from "../utils/prepareRequest";
 
 export const getDocument = function (this: Imperial, id: string | URL, password?: string): Promise<Document> {
 	return new Promise((resolve, reject) => {
