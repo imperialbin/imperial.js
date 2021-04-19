@@ -1,6 +1,6 @@
 import type { DocumentOptions, RawDocument } from "../helper/interfaces";
 import { createFormatedLink, createRawLink } from "../helper/links";
-import { getDateDifference } from "../utils/dateDifference";
+import { getDateDifference } from "../helper/dateDifference";
 import type { Imperial } from "./Imperial";
 
 /**

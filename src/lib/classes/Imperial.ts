@@ -1,5 +1,5 @@
 import type { DocumentOptions, PurgeDocuments } from "../helper/interfaces";
-import { validateToken } from "../utils/validToken";
+import { validateToken } from "../helper/validToken";
 import type { Document } from "./Document";
 import { createDocument } from "./ImperialMethods/createDocument";
 import { deleteDocument } from "./ImperialMethods/deleteDocument";
