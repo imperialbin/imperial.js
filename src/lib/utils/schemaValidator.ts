@@ -1,6 +1,9 @@
 import { SCHEMA_FAILED_VALIDATION, SCHEMA_INVALID_KEY } from "../helper/errors";
 import type { Schema } from "../helper/interfaces";
 
+/**
+ *  @internal
+ */
 export function validateSchema<T extends Record<string, unknown>>(object: T, schema: Schema): void | Error {
 	const validKeys = Object.keys(schema);
 

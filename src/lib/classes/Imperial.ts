@@ -1,4 +1,4 @@
-import type { DocumentOptions } from "../helper/interfaces";
+import type { DocumentOptions, PurgeDocuments } from "../helper/interfaces";
 import { validateToken } from "../utils/validToken";
 import type { Document } from "./Document";
 import { createDocument } from "./ImperialMethods/createDocument";
@@ -131,7 +131,7 @@ export class Imperial {
 	 *  @example purgeDocuments().then(console.log)
 	 *  // shows if the token is valid
 	 */
-	public purgeDocuments(): Promise<void> {
+	public purgeDocuments(): Promise<PurgeDocuments> {
 		return purgeDocuments.call(this);
 	}
 }

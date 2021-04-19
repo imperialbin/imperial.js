@@ -7,6 +7,7 @@ export const noError = (statusCode?: number): boolean => !!statusCode && statusC
 
 /**
  *  Get status code message
+ *  @internal
  */
 export const statusMessage = (statusCode?: number): string | undefined => {
 	if (!statusCode) return;

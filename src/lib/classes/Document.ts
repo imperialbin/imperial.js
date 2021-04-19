@@ -65,8 +65,8 @@ export class Document {
 	/**
 	 * 	Current view count of the Document
 	 */
-	public get views(): number {
-		return this._document.views;
+	public get views(): number | null {
+		return this._document.views ?? null;
 	}
 
 	/**
@@ -87,7 +87,7 @@ export class Document {
 	 * 	The Programming langauge that was set to the Document
 	 */
 	public get langauge(): string | null {
-		return this._document.language;
+		return this._document.language ?? null;
 	}
 
 	/**
@@ -101,9 +101,7 @@ export class Document {
 	 * 	Password for the Document
 	 */
 	public get password(): string | null {
-		if (this._document.password === undefined) return null;
-
-		return this._document.password;
+		return this._document.password ?? null;
 	}
 
 	/**

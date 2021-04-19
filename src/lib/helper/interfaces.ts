@@ -15,7 +15,7 @@ interface ResponseDocument {
 	allowedEditors: string[];
 	encrypted: boolean;
 	password?: string;
-	views: number;
+	views?: number;
 }
 
 /**
@@ -47,12 +47,15 @@ export interface ImperialResponseGetDocument {
  */
 export type ImperialResponseEditDocument = ImperialResponseCreateDocument;
 
+export interface PurgeDocuments {
+	numberDeleted: number;
+}
+
 /**
  *  `purgeDocuments` response
  */
-export interface ImperialResponsePurgeDocuments extends ImperialResponseCommon {
-	numberDeleted: number;
-}
+export interface ImperialResponsePurgeDocuments extends ImperialResponseCommon, PurgeDocuments {}
+
 // Misc interfaces
 
 /**
@@ -87,7 +90,6 @@ export interface RawDocument extends ResponseDocument {
  */
 export interface InternalPostOptions extends DocumentOptions {
 	code: string;
-	[key: string]: unknown;
 }
 
 /**
