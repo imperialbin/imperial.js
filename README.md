@@ -28,7 +28,7 @@ $ yarn add imperial-node
 
 # Example Usage
 
-Comming soon!
+Coming soon!
 
 # Running Locally
 
