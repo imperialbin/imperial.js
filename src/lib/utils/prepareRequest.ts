@@ -1,6 +1,6 @@
 import type { OutgoingHttpHeaders } from "http";
 import type { RequestOptions } from "https";
-import type { PrepareRequestParams } from "../helpers/interfaces";
+import type { PrepareRequestParams } from "../helper/interfaces";
 
 /**
  *  @internal
@@ -20,13 +20,16 @@ export const prepareRequest = function ({
 
 	if (token) defaultHeaders.Authorization = token;
 
-	headers = Object.assign(headers, defaultHeaders);
+	const headersLocal = {
+		...headers,
+		...defaultHeaders,
+	};
 
 	return {
 		hostname,
 		port: 443,
 		path: `/api${path}`,
 		method,
-		headers,
+		headers: headersLocal,
 	};
 };

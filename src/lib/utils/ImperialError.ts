@@ -1,10 +1,11 @@
-import type { ImperialErrorInterface } from "../helpers/interfaces";
+import type { ImperialErrorInterface } from "../helper/interfaces";
 
 /**
  *  @internal
  */
 export class ImperialError extends Error {
 	public status?: number;
+
 	public path?: string;
 
 	constructor(errorData?: ImperialErrorInterface) {

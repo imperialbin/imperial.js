@@ -6,11 +6,13 @@
 	"types": "./lib/index.d.ts",
 	"scripts": {
 		"build": "rimraf lib && tsc",
-		"lint": "eslint src/**/*.ts --fix",
-		"format": "prettier --write 'src/**/*.ts'",
+		"lint": "eslint src",
+		"format": "prettier --write \"src/**/*.ts\"",
 		"test": "jest",
-		"lazy": "yarn format && yarn lint && yarn build && yarn test",
-		"ci": "rm -rf node_modules && yarn install --frozen-lockfile"
+		"ci": "rm -rf node_modules && yarn install --frozen-lockfile",
+		"postinstall": "husky install",
+		"prepublishOnly": "pinst --disable",
+		"postpublish": "pinst --enable"
 	},
 	"repository": {
 		"type": "git",
@@ -32,10 +34,14 @@
 		"@types/node": "^14.14.20",
 		"@typescript-eslint/eslint-plugin": "^4.13.0",
 		"@typescript-eslint/parser": "^4.13.0",
-		"dotenv": "^8.2.0",
 		"eslint": "^7.17.0",
+		"eslint-config-airbnb-typescript": "^12.3.1",
 		"eslint-config-prettier": "^7.1.0",
+		"eslint-plugin-import": "^2.22.1",
+		"husky": "^6.0.0",
 		"jest": "^26.6.3",
+		"nock": "^13.0.11",
+		"pinst": "^2.1.6",
 		"prettier": "^2.2.1",
 		"rimraf": "^3.0.2",
 		"ts-jest": "^26.5.1",
@@ -50,9 +56,6 @@
 		],
 		"transform": {
 			"^.+\\.ts$": "ts-jest"
-		},
-		"setupFiles": [
-			"dotenv/config"
-		]
+		}
 	}
 }

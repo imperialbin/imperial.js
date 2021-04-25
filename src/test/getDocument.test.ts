@@ -1,147 +1,113 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
-import { Imperial } from "../lib";
+import { Imperial, Document } from "../lib";
+import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/helper/errors";
+import { createMock } from "../mockHelper";
 
-const { IMPERIAL_TOKEN } = process.env;
+const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
-let documentToRead = "";
+const RESPONSE = {
+	success: true,
+	content: "fuck u",
+	document: {
+		documentId: "bwxUUGyD",
+		language: null,
+		imageEmbed: false,
+		instantDelete: false,
+		dateCreated: 1617463955786,
+		deleteDate: 1617895955786,
+		allowedEditors: [],
+		encrypted: false,
+	},
+};
 
 describe("getDocument", () => {
-	if (!IMPERIAL_TOKEN) throw new Error("Env was not preparerd");
-
-	beforeAll(async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		try {
-			const res = await api.createDocument("Tests: getDocument");
-			documentToRead = res.formattedLink;
-		} catch (e) {
-			throw new Error("Failed to prepare tests.");
-		}
-	});
-
-	afterAll(async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		try {
-			await api.deleteDocument(documentToRead);
-		} catch (_) {
-			throw new Error("Failed to delete tested files.");
-		}
-	});
-
 	it("valid with token", async () => {
+		const DOCUMENT_ID = "really-valid-id";
+
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		let res = await api.getDocument(documentToRead);
+		createMock({
+			method: "get",
+			path: `/api/document/${DOCUMENT_ID}`,
+			responseBody: RESPONSE,
+			statusCode: 200,
+		});
 
-		expect(typeof res.document).toBe("string");
+		let res = await api.getDocument(DOCUMENT_ID);
 
-		res = await api.getDocument(new URL(documentToRead));
+		expect(res).toBeInstanceOf(Document);
 
-		expect(typeof res.document).toBe("string");
-	}, 10000); // timout 10s
+		createMock({
+			method: "get",
+			path: `/api/document/${DOCUMENT_ID}`,
+			responseBody: RESPONSE,
+			statusCode: 200,
+		});
 
-	it.skip("valid without token", async () => {
-		const api = new Imperial();
+		res = await api.getDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`));
 
-		const res = await api.getDocument(documentToRead);
-
-		expect(typeof res.document).toBe("string");
+		expect(res).toBeInstanceOf(Document);
 	}, 10000); // timout 10s
 
 	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `id` must be a string or an URL!");
+		const err = new TypeError(ID_WRONG_TYPE);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument({});
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument([]);
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument(12345);
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
+			})(),
 		).rejects.toThrowError(err);
 	});
 
 	it("invalid - second param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `password` must be a string!");
+		const err = new TypeError(PASSWORD_WRONG_TYPE);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", {});
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", []);
-			})()
+			})(),
 		).rejects.toThrowError(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.getDocument("bbbbbb", 12345);
-			})()
-		).rejects.toThrowError(err);
-	});
-
-	it("invalid - third param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError("Parameter `callback` must be callable!");
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", "bbbbbb", "");
-			})()
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", "bbbbbb", {});
-			})()
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", "bbbbbb", []);
-			})()
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", "bbbbbb", 12345);
-			})()
+			})(),
 		).rejects.toThrowError(err);
 	});
 
@@ -150,9 +116,9 @@ describe("getDocument", () => {
 
 		await expect(
 			(async () => {
-				//@ts-ignore
+				// @ts-ignore
 				await api.getDocument();
-			})()
+			})(),
 		).rejects.toThrowError(new Error("No `id` was provided!"));
 	});
 });

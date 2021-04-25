@@ -6,21 +6,26 @@ import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
-describe("verify", () => {
+const RESPONSE = {
+	success: true,
+	message: "Deleted a total of 420 documents!",
+	numberDeleted: 420,
+};
+
+describe("purgeDocuments", () => {
 	it("valid", async () => {
 		createMock({
-			method: "get",
-			path: `/api/checkApiToken/${IMPERIAL_TOKEN}`,
-			responseBody: {
-				success: true,
-				message: "Token is valid!!!!!",
-			},
+			method: "delete",
+			path: "/api/purgeDocuments",
+			responseBody: RESPONSE,
 			statusCode: 200,
 		});
 
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		await api.verify();
+		const response = await api.purgeDocuments();
+
+		expect(response.numberDeleted).toBe(RESPONSE.numberDeleted);
 	}, 10000);
 
 	it("invalid", async () => {
@@ -28,7 +33,7 @@ describe("verify", () => {
 
 		await expect(
 			(async () => {
-				await api.verify();
+				await api.purgeDocuments();
 			})(),
 		).rejects.toThrowError(new Error(NO_TOKEN));
 	});

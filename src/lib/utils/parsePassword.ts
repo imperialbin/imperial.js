@@ -17,6 +17,6 @@ export const parsePassword = function (id: string | URL): string | undefined {
 		return getPasswordFromUrl(new URL(id as string));
 	} catch (e) {
 		// Return undefined if the parsing failed
-		return;
+		return undefined;
 	}
 };

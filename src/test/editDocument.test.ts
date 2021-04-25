@@ -1,44 +1,55 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
+import { ID_WRONG_TYPE, NO_TOKEN, TEXT_WRONG_TYPE } from "../lib/helper/errors";
+import { createMock } from "../mockHelper";
 
-const { IMPERIAL_TOKEN } = process.env;
+const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
-let documentToEdit = "";
+const DOCUMENT_ID = "really-valid-id";
+
+const RESPONSE = {
+	success: true,
+	message: "Successfully edit the document!",
+	rawLink: "https://imperialb.in/r/bwxUUGyD",
+	formattedLink: "https://imperialb.in/p/bwxUUGyD",
+	document: {
+		documentId: DOCUMENT_ID,
+		language: null,
+		imageEmbed: false,
+		instantDelete: false,
+		dateCreated: 1617463955786,
+		deleteDate: 1617895955786,
+		allowedEditors: [],
+		encrypted: false,
+	},
+};
 
 describe("editDocument", () => {
-	if (!IMPERIAL_TOKEN) throw new Error("Env was not preparerd");
-
-	beforeAll(async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		try {
-			const res = await api.createDocument("Tests: editDocument", { longerUrls: true });
-			documentToEdit = res.formattedLink;
-		} catch (e) {
-			throw new Error("Failed to prepare tests.");
-		}
-	});
-
-	afterAll(async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		try {
-			await api.deleteDocument(documentToEdit);
-		} catch (e) {
-			throw new Error("Failed to cleanup tests.");
-		}
-	});
 	it("valid with token", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		let res = await api.editDocument(documentToEdit, "Tests: editDocument #2");
+		createMock({
+			method: "patch",
+			path: "/api/document/",
+			responseBody: RESPONSE,
+			statusCode: 200,
+		});
 
-		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
+		let res = await api.editDocument(DOCUMENT_ID, "Tests: editDocument #2");
 
-		res = await api.editDocument(new URL(documentToEdit), "Tests: editDocument #3");
+		expect(res.id).toBe(DOCUMENT_ID);
 
-		expect(/^successfully(a-zA-Z\s)*/i.test(res.message)).toBeTruthy();
+		createMock({
+			method: "patch",
+			path: "/api/document/",
+			responseBody: RESPONSE,
+			statusCode: 200,
+		});
+
+		res = await api.editDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`), "Tests: editDocument #3");
+
+		expect(res.id).toBe(DOCUMENT_ID);
 	}, 10000); // timeout 10s
 
 	it("valid without token", async () => {
@@ -47,102 +58,75 @@ describe("editDocument", () => {
 		await expect(
 			(async () => {
 				await api.editDocument("test jest bro", "test jest bro");
-			})()
-		).rejects.toThrow(new Error("This method requires a token to be set in the constructor!"));
+			})(),
+		).rejects.toThrow(new Error(NO_TOKEN));
 	}, 10000); // timeout 10s
 
 	it("invalid - first param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `id` must be a string or an URL!");
+		const err = new TypeError(ID_WRONG_TYPE);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument({}, "bbbbbb");
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument([], "bbbbbb");
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument(12345, "bbbbbb");
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument(() => {}, "bbbbbb"); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
+			})(),
 		).rejects.toThrow(err);
 	});
 
 	it("invalid - second param with wrong type", async () => {
 		const api = new Imperial(IMPERIAL_TOKEN);
 
-		const err = new TypeError("Parameter `newText` must be a string!");
+		const err = new TypeError(TEXT_WRONG_TYPE);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", {});
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", []);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", 12345);
-			})()
+			})(),
 		).rejects.toThrow(err);
 
 		await expect(
 			(async () => {
 				// @ts-ignore
 				await api.editDocument("bbbbbb", () => {}); // eslint-disable-line @typescript-eslint/no-empty-function
-			})()
-		).rejects.toThrow(err);
-	});
-
-	it("invalid - third param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError("Parameter `callback` must be callable!");
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", "bbbbbb", {});
-			})()
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", "bbbbbb", []);
-			})()
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", "bbbbbb", 12345);
-			})()
+			})(),
 		).rejects.toThrow(err);
 	});
 
@@ -151,9 +135,9 @@ describe("editDocument", () => {
 
 		await expect(
 			(async () => {
-				//@ts-ignore
+				// @ts-ignore
 				await api.editDocument();
-			})()
+			})(),
 		).rejects.toThrow(new Error("No `id` was provided!"));
 	});
 });

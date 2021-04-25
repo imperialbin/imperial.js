@@ -1,7 +1,7 @@
 name: Format, lint, build and test
 
 on:
-    push:
+    pull_request:
         branches:
             - senpai
 
@@ -15,10 +15,7 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v1
               with:
-                  node-version: 14.0.0
-
-            - name: Install yarn
-              run: npm i yarn@1.22.10 -g
+                  node-version: 14.16.0
 
             - name: Install dependencies
               run: yarn ci
@@ -31,13 +28,6 @@ jobs:
 
             - name: Build
               run: yarn build
-
-            - name: Prepare Test
-              run: |
-                  touch .env
-                  echo "IMPERIAL_TOKEN = $IMPERIAL_TOKEN" > .env
-              env:
-                  IMPERIAL_TOKEN: ${{ secrets.IMPERIAL_TOKEN}}
 
             - name: Test
               run: yarn test

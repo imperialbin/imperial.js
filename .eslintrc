@@ -1,17 +1,27 @@
 {
     "root": true,
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-        "@typescript-eslint"
-    ],
     "parserOptions": {
-        "ecmaVersion": 2020, // Allows for the parsing of modern ECMAScript features
-        "sourceType": "module" // Allows for the use of imports
+        "project": "./tsconfig.eslint.json"
     },
     "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended",
+        "airbnb-typescript/base",
         "prettier"
-    ]
+    ],
+    "rules": {
+        "@typescript-eslint/quotes": [
+            "error",
+            "double"
+        ],
+        "@typescript-eslint/indent": [
+            "error",
+            "tab"
+        ],
+        "func-names": [
+            "error",
+            "as-needed"
+        ],
+        "no-underscore-dangle": "off",
+        "import/prefer-default-export": "off",
+        "consistent-return": "off"
+    }
 }
