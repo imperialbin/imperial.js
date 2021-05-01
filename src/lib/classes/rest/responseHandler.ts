@@ -1,18 +1,20 @@
 import type { ClientRequest, IncomingMessage } from "http";
-import type { InternalImperialResponse } from "../helper/interfaces";
-import { imperialResponses } from "../helper/responseMap";
-import { noError, statusMessage } from "../helper/statusCodeError";
-import { ImperialError } from "./ImperialError";
+import { imperialResponses } from "./responseMap";
+import { noError, statusMessage } from "./statusCode";
+import { ImperialError } from "../../errors/ImperialError";
+import type { ImperialResponseCommon } from "../../common/interfaces";
+
+interface InternalResponse extends ImperialResponseCommon {
+	success: boolean;
+	[key: string]: unknown;
+}
 
 /**
  *  @internal
  *  Thank you stackoverflow for the generic example <3333
  */
-export const parseResponse = function <T extends unknown>(
-	response: IncomingMessage,
-	request: ClientRequest,
-): Promise<T> {
-	return new Promise((resolve, reject) => {
+export const handleResponse = <T extends unknown>(response: IncomingMessage, request: ClientRequest): Promise<T> =>
+	new Promise((resolve, reject) => {
 		const data: string[] = [];
 
 		// Collect all data chunks
@@ -23,7 +25,7 @@ export const parseResponse = function <T extends unknown>(
 		response.on("end", () => {
 			const responseData = data.join("");
 
-			let json: InternalImperialResponse | undefined;
+			let json: InternalResponse | undefined;
 
 			try {
 				json = JSON.parse(responseData);
@@ -57,4 +59,3 @@ export const parseResponse = function <T extends unknown>(
 
 		response.on("error", reject);
 	});
-};
