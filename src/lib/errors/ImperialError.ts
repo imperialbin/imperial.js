@@ -1,4 +1,8 @@
-import type { ImperialErrorInterface } from "../helper/interfaces";
+interface ImperialErrorInterface {
+	message?: string;
+	status?: number;
+	path?: string;
+}
 
 /**
  *  @internal
