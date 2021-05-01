@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
 import { Imperial } from "../lib";
-import { ID_WRONG_TYPE, NO_TOKEN } from "../lib/helper/errors";
+import { ID_WRONG_TYPE, NO_TOKEN } from "../lib/errors/Messages";
 import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";

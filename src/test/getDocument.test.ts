@@ -1,14 +1,14 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
-import { Imperial, Document } from "../lib";
-import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/helper/errors";
+import { Document, Imperial } from "../lib";
+import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/errors/Messages";
 import { createMock } from "../mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
 const RESPONSE = {
 	success: true,
-	content: "fuck u",
+	content: "eqeqeqeqeqeqeq",
 	document: {
 		documentId: "bwxUUGyD",
 		language: null,
