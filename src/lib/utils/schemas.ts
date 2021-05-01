@@ -1,4 +1,4 @@
-import type { Schema } from "./interfaces";
+import type { Schema } from "./schemaValidator";
 
 export const OptionsSchema = {
 	editors: {

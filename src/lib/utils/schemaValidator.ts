@@ -1,5 +1,12 @@
-import { SCHEMA_FAILED_VALIDATION, SCHEMA_INVALID_KEY } from "../helper/errors";
-import type { Schema } from "../helper/interfaces";
+import { SCHEMA_FAILED_VALIDATION, SCHEMA_INVALID_KEY } from "../errors/Messages";
+
+export interface Schema {
+	[key: string]: {
+		test: (value: unknown) => boolean;
+		message: string;
+		required?: boolean;
+	};
+}
 
 /**
  *  @internal
