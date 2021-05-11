@@ -28,10 +28,11 @@
 		"url": "https://github.com/imperialbin/imperial-node/issues"
 	},
 	"homepage": "https://github.com/imperialbin/imperial-node#readme",
-	"dependencies": {},
+	"dependencies": {
+		"@types/node": "^15.0.2"
+	},
 	"devDependencies": {
 		"@types/jest": "^26.0.20",
-		"@types/node": "^14.14.20",
 		"@typescript-eslint/eslint-plugin": "^4.13.0",
 		"@typescript-eslint/parser": "^4.13.0",
 		"eslint": "^7.17.0",
@@ -52,7 +53,7 @@
 			"<rootDir>/src"
 		],
 		"testMatch": [
-			"**/test/**/*.+(ts|js)"
+			"**/test/**/*.test.ts"
 		],
 		"transform": {
 			"^.+\\.ts$": "ts-jest"

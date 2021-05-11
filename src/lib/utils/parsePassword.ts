@@ -1,3 +1,5 @@
+import { URL } from "url";
+
 const getPasswordFromUrl = (url: URL): string | null => {
 	const password = url.searchParams.get("password");
 	if (!password) return null;

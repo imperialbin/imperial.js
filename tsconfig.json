@@ -22,6 +22,9 @@
         // false stuff
         "allowJs": false,
         "removeComments": false,
+        "lib": [
+            "ES6"
+        ]
     },
     "exclude": [
         "node_modules",

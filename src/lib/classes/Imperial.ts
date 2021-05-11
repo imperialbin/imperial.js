@@ -1,3 +1,4 @@
+import type { URL } from "url";
 import { NO_ID, NO_TEXT, NO_TOKEN, OPTIONS_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../errors/Messages";
 import type {
 	DocumentOptions,

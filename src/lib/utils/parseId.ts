@@ -1,3 +1,4 @@
+import { URL } from "url";
 import { ID_WRONG_TYPE } from "../errors/Messages";
 
 const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string | null => {
