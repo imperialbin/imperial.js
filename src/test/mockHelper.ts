@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import nock from "nock";
-import { Imperial } from "./lib";
+import { Imperial } from "../lib";
 
 interface Params {
 	path: string;

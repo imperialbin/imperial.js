@@ -1,8 +1,9 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
+import { URL } from "url";
 import { Document, Imperial } from "../lib";
 import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/errors/Messages";
-import { createMock } from "../mockHelper";
+import { createMock } from "./mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
