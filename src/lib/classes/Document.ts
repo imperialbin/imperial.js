@@ -3,6 +3,7 @@ import type { DocumentOptions, RawDocument } from "../common/interfaces";
 import { createFormatedLink, createRawLink } from "../utils/links";
 import { Base } from "./Base";
 import type { Imperial } from "./Imperial";
+import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
 
 /**
  *  Imperial Document,
@@ -14,20 +15,71 @@ export class Document extends Base {
 		super(client);
 
 		if (document) this._setDocument(document);
+
+		this.deleted = false;
 	}
 
-	private _setDocument(document: RawDocument) {
-		this.id = document.documentId ?? null;
-		this.content = document.content ?? null;
-		this.instantDelete = document.instantDelete ?? false;
-		this.encrypted = document.encrypted ?? false;
-		this.views = document.views ?? 0;
-		this.editors = document.allowedEditors ?? [];
-		this.imageEmbed = document.imageEmbed ?? false;
-		this.language = document.language ?? "auto";
-		this.password = document.password ?? null;
-		this.creation = new Date(document.creationDate);
-		this.expiration = new Date(document.expirationDate);
+	private _setDocument(document: unknown) {
+		const documentData = document as RawDocument;
+
+		this.id = documentData.documentId;
+
+		if ("content" in documentData) {
+			this.content = documentData.content;
+		} else if (typeof this.content !== "string") {
+			// @ts-ignore
+			this.content = null;
+		}
+
+		if ("instantDelete" in documentData) {
+			this.instantDelete = documentData.instantDelete;
+		} else if (typeof this.instantDelete !== "boolean") {
+			this.instantDelete = false;
+		}
+
+		if ("encrypted" in documentData) {
+			this.encrypted = documentData.encrypted;
+		} else if (typeof this.encrypted !== "boolean") {
+			this.encrypted = false;
+		}
+
+		if ("views" in documentData) {
+			this.views = documentData.views;
+		} else if (typeof this.views !== "number") {
+			this.views = 0;
+		}
+
+		this.editors = [];
+
+		if ("allowedEditors" in documentData) {
+			this.editors = documentData.allowedEditors;
+		}
+
+		if ("imageEmbed" in documentData) {
+			this.imageEmbed = documentData.imageEmbed;
+		} else if (typeof this.imageEmbed !== "boolean") {
+			this.imageEmbed = false;
+		}
+
+		if ("language" in documentData) {
+			this.language = documentData.language;
+		} else if (typeof this.language !== "string") {
+			this.language = "auto";
+		}
+
+		if ("password" in documentData) {
+			this.password = documentData.password;
+		} else if (typeof this.password !== "string") {
+			this.password = null;
+		}
+
+		if ("creationDate" in documentData) {
+			this.creation = new Date(documentData.creationDate);
+		}
+
+		if ("expirationDate" in documentData) {
+			this.expiration = new Date(documentData.expirationDate);
+		}
 	}
 
 	/**
@@ -66,7 +118,12 @@ export class Document extends Base {
 	 *  Deletes the current Document
 	 */
 	public async delete(): Promise<Document> {
+		if (this.deleted) throw new DocumentNotFound();
+
 		await this.client.deleteDocument(this.id);
+
+		this.deleted = true;
+		this.expiration = new Date();
 
 		return this;
 	}
@@ -91,7 +148,7 @@ export class Document extends Base {
 			instantDelete: options?.instantDelete ?? this.instantDelete,
 			password: options?.password ?? this.password ?? undefined,
 			editors: options?.editors ?? this.editors,
-			language: options?.language ?? this.language ?? undefined,
+			language: options?.language ?? this.language,
 		};
 
 		const document = await this.client.createDocument(this.content, documentOptions);
@@ -103,8 +160,12 @@ export class Document extends Base {
 	 *  Edits the content of the current Document
 	 */
 	public async edit(text: string): Promise<Document> {
+		if (this.deleted) throw new DocumentNotFound();
+
 		const document = await this.client.editDocument(this.id, text);
+
 		this._setDocument(document.toJSON());
+
 		return this;
 	}
 
@@ -235,4 +296,9 @@ export interface Document {
 	 *  The date that the Document will be deleted at
 	 */
 	expiration: Date;
+
+	/**
+	 * Whether this Document has been deleted
+	 */
+	deleted: boolean;
 }

@@ -14,6 +14,8 @@ import { parsePassword } from "../utils/parsePassword";
 import { validateSchema } from "../utils/schemaValidator";
 import { Document } from "./Document";
 import { Rest } from "./rest/Rest";
+import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
+import { ImperialError } from "../errors/ImperialError";
 
 /**
  *  The Imperial class
@@ -141,12 +143,22 @@ export class Imperial {
 
 		if (documentPassword && typeof documentPassword !== "string") throw new Error(PASSWORD_WRONG_TYPE);
 
-		const data = await this.rest.request<ImperialResponseGetDocument>(
-			"GET",
-			`/document/${encodeURIComponent(documentId)}${
-				documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""
-			}`,
-		);
+		let data: ImperialResponseGetDocument;
+
+		try {
+			data = await this.rest.request<ImperialResponseGetDocument>(
+				"GET",
+				`/document/${encodeURIComponent(documentId)}${
+					documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""
+				}`,
+			);
+		} catch (error) {
+			if (error instanceof ImperialError && error.status === 404) {
+				throw new DocumentNotFound(error);
+			}
+
+			throw error;
+		}
 
 		return new Document(this, { content: data.content, ...data.document, password: documentPassword });
 	}
@@ -167,7 +179,15 @@ export class Imperial {
 		// If the id is emtpy return
 		if (!documentId) throw new Error(NO_ID);
 
-		await this.rest.request("DELETE", `/document/${encodeURIComponent(documentId)}`);
+		try {
+			await this.rest.request("DELETE", `/document/${encodeURIComponent(documentId)}`);
+		} catch (error) {
+			if (error instanceof ImperialError && error.status === 404) {
+				throw new DocumentNotFound(error);
+			}
+
+			throw error;
+		}
 	}
 
 	/**
@@ -190,12 +210,22 @@ export class Imperial {
 		// If no newText was provided reutrn
 		if (!text) throw new Error(NO_TEXT);
 
-		const data = await this.rest.request<ImperialResponseEditDocument>("PATCH", "/document", {
-			data: {
-				document: documentId,
-				newCode: String(text),
-			},
-		});
+		let data: ImperialResponseEditDocument;
+
+		try {
+			data = await this.rest.request<ImperialResponseEditDocument>("PATCH", "/document", {
+				data: {
+					document: documentId,
+					newCode: String(text),
+				},
+			});
+		} catch (error) {
+			if (error instanceof ImperialError && error.status === 404) {
+				throw new DocumentNotFound(error);
+			}
+
+			throw error;
+		}
 
 		return new Document(this, {
 			content: text,
@@ -233,6 +263,7 @@ export class Imperial {
 
 export interface Imperial {
 	/**
+	 *  Main Class to handle interactions with the REST Api
 	 * @internal
 	 */
 	rest: Rest;

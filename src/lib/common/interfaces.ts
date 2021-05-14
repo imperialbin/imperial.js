@@ -5,7 +5,7 @@
  */
 interface ResponseDocument {
 	documentId: string;
-	language: string | null;
+	language: string;
 	imageEmbed: boolean;
 	instantDelete: boolean;
 	creationDate: number;
