@@ -179,20 +179,14 @@ export class Document extends Base {
 	/**
 	 *  Converts the Document to the raw response
 	 */
-	public toJSON(): RawDocument {
-		return {
-			documentId: this.id,
-			content: this.content,
-			creationDate: this.creation.valueOf(),
-			expirationDate: this.expiration.valueOf(),
-			allowedEditors: this.editors,
-			encrypted: this.encrypted,
-			imageEmbed: this.imageEmbed,
-			instantDelete: this.instantDelete,
-			language: this.language,
-			password: this.password,
-			views: this.views,
-		};
+	public toJSON() {
+		return super.toJSON({
+			id: "documentId",
+			creation: "creationDate",
+			expiration: "expirationDate",
+			editors: "allowedEditors",
+			deleted: false,
+		});
 	}
 
 	// Aliases
