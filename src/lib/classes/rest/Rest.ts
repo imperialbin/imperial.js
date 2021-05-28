@@ -1,5 +1,6 @@
 import type { OutgoingHttpHeaders } from "http";
 import { request } from "https";
+import { Base } from "../Base";
 import type { Imperial } from "../Imperial";
 import { handleResponse } from "./responseHandler";
 
@@ -12,8 +13,9 @@ interface Options {
 
 /**
  *  Class for ease of rest Api requests
+ *  @internal
  */
-export class Rest {
+export class Rest extends Base {
 	/**
 	 *  Imperial's hostname
 	 */
@@ -23,10 +25,6 @@ export class Rest {
 	 *  Regular Expression that is used to match against in functions
 	 */
 	readonly hostnameCheckRegExp = /^(www\.)?imp(erial)?b(\.in|in.com)$/i;
-
-	constructor(client: Imperial) {
-		this.client = client;
-	}
 
 	request<T extends unknown>(method: Methods, path: string, options: Options = {}): Promise<T> {
 		return new Promise((resolve, reject) => {
