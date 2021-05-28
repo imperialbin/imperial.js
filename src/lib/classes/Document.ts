@@ -73,6 +73,12 @@ export class Document extends Base {
 			this.password = null;
 		}
 
+		if ("public" in documentData) {
+			this.public = documentData.public;
+		} else if (typeof this.public !== "boolean") {
+			this.public = false;
+		}
+
 		if ("creationDate" in documentData) {
 			this.creation = new Date(documentData.creationDate);
 		}
@@ -300,4 +306,9 @@ export interface Document {
 	 * Whether this Document has been deleted
 	 */
 	deleted: boolean;
+
+	/**
+	 * Whether this Document is public
+	 */
+	public: boolean;
 }

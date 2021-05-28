@@ -14,6 +14,7 @@ interface ResponseDocument {
 	encrypted: boolean;
 	password: string | null;
 	views: number;
+	public: boolean;
 }
 
 /**
