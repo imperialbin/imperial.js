@@ -147,15 +147,13 @@ export class Document extends Base {
 	public duplicate(options: DocumentOptions): Promise<Document>;
 
 	public async duplicate(options: DocumentOptions = {}): Promise<Document> {
-		const documentOptions: DocumentOptions = {
-			encrypted: options?.encrypted ?? this.encrypted,
-			expiration: options?.expiration ?? getDateDifference(this.creation, this.expiration),
-			imageEmbed: options?.imageEmbed ?? this.imageEmbed,
-			longerUrls: options?.longerUrls ?? this.longerUrls,
-			instantDelete: options?.instantDelete ?? this.instantDelete,
-			password: options?.password ?? this.password ?? undefined,
-			editors: options?.editors ?? this.editors,
-			language: options?.language ?? this.language,
+		const currOptions = (this.toJSON() as any) as RawDocument;
+
+		const documentOptions = {
+			...currOptions,
+			editors: this.editors,
+			password: currOptions.password ?? undefined,
+			...options,
 		};
 
 		const document = await this.client.createDocument(this.content, documentOptions);

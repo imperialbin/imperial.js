@@ -1,4 +1,4 @@
-import { SCHEMA_FAILED_VALIDATION, SCHEMA_INVALID_KEY } from "../errors/Messages";
+import { SCHEMA_FAILED_VALIDATION /* , SCHEMA_INVALID_KEY */ } from "../errors/Messages";
 
 export interface Schema {
 	[key: string]: {
@@ -24,7 +24,9 @@ export function validateSchema<T extends Record<string, unknown>>(object: T, sch
 
 	if (errors.length > 0) return errors[0];
 
-	const invalidKeys = Object.keys(object).filter((key) => !validKeys.includes(key));
+	// Remove the checks for not existing props
 
-	if (invalidKeys.length > 0) return new Error(SCHEMA_INVALID_KEY(invalidKeys[0]));
+	// const invalidKeys = Object.keys(object).filter((key) => !validKeys.includes(key));
+
+	// if (invalidKeys.length > 0) return new Error(SCHEMA_INVALID_KEY(invalidKeys[0]));
 }

@@ -7,7 +7,8 @@ export abstract class Base {
 	}
 
 	toJSON(...props: Parameters<typeof flatten>[1][]) {
-		return flatten(this, ...props);
+		// a little hack so typing do not yell at me
+		return flatten(this as Record<string, unknown>, ...props);
 	}
 }
 

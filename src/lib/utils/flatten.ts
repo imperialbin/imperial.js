@@ -1,6 +1,9 @@
 const isObject = (object: unknown) => typeof object === "object" && object !== null;
 
-export const flatten = (object: Object, ...props: Record<string, string | boolean>[]) => {
+export const flatten = (
+	object: Record<string, unknown>,
+	...props: Record<string, string | boolean>[]
+): Record<string, unknown> => {
 	if (!isObject(object)) return object;
 
 	const objProps = Object.keys(object)
