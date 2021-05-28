@@ -62,6 +62,7 @@ export interface ImperialResponsePurgeDocuments extends ImperialResponseCommon, 
 export interface DocumentOptions {
 	editors?: string[];
 	longerUrls?: boolean;
+	shortUrls?: boolean;
 	instantDelete?: boolean;
 	imageEmbed?: boolean;
 	expiration?: number;
@@ -72,6 +73,7 @@ export interface DocumentOptions {
 	encrypted?: boolean;
 	password?: string;
 	language?: string;
+	public?: boolean;
 }
 
 /**

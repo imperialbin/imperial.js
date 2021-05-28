@@ -104,6 +104,13 @@ export class Document extends Base {
 	}
 
 	/**
+	 *  Wheather is the Document URL shorter
+	 */
+	public get shortUrls(): boolean {
+		return this.id.length === 4;
+	}
+
+	/**
 	 *  The ammount of days the Doucment will expire at from the current moment
 	 */
 	public get daysLeft(): number | null {

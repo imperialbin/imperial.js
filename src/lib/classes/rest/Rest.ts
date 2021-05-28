@@ -22,7 +22,7 @@ export class Rest {
 	/**
 	 *  Regular Expression that is used to match against in functions
 	 */
-	readonly hostnameCheckRegExp = /^(www\.)?imperialb(\.in|in.com)$/i;
+	readonly hostnameCheckRegExp = /^(www\.)?imp(erial)?b(\.in|in.com)$/i;
 
 	constructor(client: Imperial) {
 		this.client = client;

@@ -9,6 +9,10 @@ export const OptionsSchema = {
 		message: "a Boolean",
 		test: (value) => typeof value === "boolean",
 	},
+	shortUrls: {
+		message: "a Boolean",
+		test: (value) => typeof value === "boolean",
+	},
 	instantDelete: {
 		message: "a Boolean",
 		test: (value) => typeof value === "boolean",
@@ -18,7 +22,7 @@ export const OptionsSchema = {
 		test: (value) => typeof value === "boolean",
 	},
 	expiration: {
-		message: "a Boolean",
+		message: "a Number",
 		test: (value) => typeof value === "number",
 	},
 	encrypted: {
@@ -32,5 +36,9 @@ export const OptionsSchema = {
 	language: {
 		message: "a String",
 		test: (value) => typeof value === "string",
+	},
+	public: {
+		message: "a Boolean",
+		test: (value) => typeof value === "boolean",
 	},
 } as Schema;
