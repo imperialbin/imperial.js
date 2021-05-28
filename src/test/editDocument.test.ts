@@ -12,17 +12,19 @@ const DOCUMENT_ID = "really-valid-id";
 const RESPONSE = {
 	success: true,
 	message: "Successfully edit the document!",
-	rawLink: "https://imperialb.in/r/bwxUUGyD",
-	formattedLink: "https://imperialb.in/p/bwxUUGyD",
+	rawLink: `https://imperialb.in/r/${DOCUMENT_ID}`,
+	formattedLink: `https://imperialb.in/p/${DOCUMENT_ID}`,
 	document: {
 		documentId: DOCUMENT_ID,
 		language: null,
 		imageEmbed: false,
-		instantDelete: false,
-		dateCreated: 1617463955786,
-		deleteDate: 1617895955786,
+		instantDelete: true,
+		creationDate: 1617280121620,
+		expirationDate: 1617452921620,
 		allowedEditors: [],
 		encrypted: false,
+		views: 9,
+		public: true,
 	},
 };
 

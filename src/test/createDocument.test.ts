@@ -20,6 +20,7 @@ const RESPONSE = {
 		allowedEditors: [],
 		encrypted: false,
 		password: null,
+		public: true,
 	},
 };
 
@@ -38,6 +39,7 @@ describe("createDocument", () => {
 
 		expect(typeof res.id).toBe("string");
 		expect(res.instantDelete).toBeTruthy();
+		expect(res.public).toBeTruthy();
 	}, 10000); // timeout 10s
 
 	it("invalid - second param with wrong type", async () => {

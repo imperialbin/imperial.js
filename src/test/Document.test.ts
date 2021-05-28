@@ -10,6 +10,8 @@ const DOCUMENT_ID = "really-valid-id";
 const RESPONSE = {
 	success: true,
 	content: "hi looskie!!!!! pt3",
+	rawLink: `https://imperialb.in/r/${DOCUMENT_ID}`,
+	formattedLink: `https://imperialb.in/p/${DOCUMENT_ID}`,
 	document: {
 		documentId: DOCUMENT_ID,
 		language: null,
@@ -20,6 +22,7 @@ const RESPONSE = {
 		allowedEditors: [],
 		encrypted: false,
 		views: 9,
+		public: true,
 	},
 };
 
@@ -62,4 +65,8 @@ test("validate document", async () => {
 	expect(document.link).toBe(`https://${api.rest.hostname}/p/${DOCUMENT_ID}`);
 
 	expect(document.daysLeft).toBe(null);
+
+	expect(document.public).toBeTruthy();
+
+	expect(document.shortUrls).toBeFalsy();
 });
