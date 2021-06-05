@@ -4,9 +4,6 @@ interface ImperialErrorInterface {
 	path?: string;
 }
 
-/**
- *  @internal
- */
 export class ImperialError extends Error {
 	public status?: number;
 
