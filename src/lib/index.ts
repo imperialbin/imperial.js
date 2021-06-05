@@ -1,6 +1,5 @@
-/*
- *  Future proof current source
- */
+// Export all main classes
+export * from "./classes";
 
-export { Document } from "./classes/Document";
-export { Imperial } from "./classes/Imperial";
+// Export all errors for the user
+export * from "./errors";
