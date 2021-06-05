@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import nock from "nock";
-import { Imperial } from "./lib";
+import { Imperial } from "../lib";
 
 interface Params {
 	path: string;
@@ -14,7 +14,7 @@ interface Params {
 type ParamMethods = "get" | "post" | "patch" | "delete";
 
 export const createMock = (mockParams: Params): void => {
-	nock(`https://${new Imperial().hostname}/`)
+	nock(`https://${new Imperial().rest.hostname}/`)
 		[mockParams.method](mockParams.path)
 		.reply(mockParams.statusCode, mockParams.responseBody);
 };

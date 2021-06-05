@@ -1,12 +1,23 @@
-import type { DocumentOptions, PurgeDocuments } from "../helper/interfaces";
-import { validateToken } from "../helper/validToken";
-import type { Document } from "./Document";
-import { createDocument } from "./ImperialMethods/createDocument";
-import { deleteDocument } from "./ImperialMethods/deleteDocument";
-import { editDocument } from "./ImperialMethods/editDocument";
-import { getDocument } from "./ImperialMethods/getDocument";
-import { purgeDocuments } from "./ImperialMethods/purgeDocuments";
-import { verify } from "./ImperialMethods/verify";
+import type { URL } from "url";
+import { NO_ID, NO_TEXT, NO_TOKEN, OPTIONS_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../errors/Messages";
+import type {
+	DocumentOptions,
+	ImperialResponseCreateDocument,
+	ImperialResponseEditDocument,
+	ImperialResponseGetDocument,
+	ImperialResponsePurgeDocuments,
+	PurgeDocuments,
+} from "../common/interfaces";
+import { OptionsSchema } from "../utils/schemas";
+import { validateToken } from "../utils/validToken";
+import { parseId } from "../utils/parseId";
+import { parsePassword } from "../utils/parsePassword";
+import { validateSchema } from "../utils/schemaValidator";
+import { Document } from "./Document";
+import { Rest } from "./rest/Rest";
+import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
+import { ImperialError } from "../errors/ImperialError";
+import { NotAllowed } from "../errors/HTTPErrors/NotAllowed";
 
 /**
  *  The Imperial class
@@ -20,31 +31,29 @@ export class Imperial {
 	 *  `Imperial` constructor
 	 *  @param token Your API token
 	 */
-	constructor(token: string | undefined = process.env.IMPERIAL_TOKEN) {
-		if (validateToken(token)) this._token = token;
+	constructor(token?: string | null) {
+		this.setApiToken(token);
+
+		Object.defineProperty(this, "rest", { value: new Rest(this) });
 	}
 
 	/**
-	 *  Token, that was set in the constructor
+	 *  Get the Api Token from the Class
 	 */
-	public get token(): string | undefined {
+	public get apiToken(): string | undefined {
 		return this._token;
 	}
 
 	/**
-	 *  Imperial's hostname
+	 *  Change the Api Token on the Class
+	 *
 	 */
-	// eslint-disable-next-line class-methods-use-this
-	public get hostname(): string {
-		return "imperialb.in";
-	}
+	public setApiToken(token: string | null | undefined = process.env.IMPERIAL_TOKEN): void {
+		if (validateToken(token)) this._token = token as string;
 
-	/**
-	 *  Regular Expression that is used to match against in functions
-	 */
-	// eslint-disable-next-line class-methods-use-this
-	public get hostnameCheckRegExp(): RegExp {
-		return /^(www\.)?imperialb(\.in|in.com)$/i;
+		if (token === null) {
+			this._token = undefined;
+		}
 	}
 
 	/**
@@ -68,8 +77,40 @@ export class Imperial {
 	/**
 	 *  Create a Document
 	 */
-	public createDocument(text: string, options?: DocumentOptions): Promise<Document> {
-		return createDocument.call(this, text, options);
+	public async createDocument(text: string, options: DocumentOptions = {}): Promise<Document> {
+		const convertedText = String(text);
+		// If no text or text is an emtpy string reutrn
+		if (!text || !convertedText) throw new Error(NO_TEXT);
+
+		if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError(OPTIONS_WRONG_TYPE);
+
+		const validateOptions = validateSchema(options as never, OptionsSchema);
+
+		// If the returned data is an error reject with it
+		if (validateOptions instanceof Error) {
+			throw validateOptions;
+		}
+
+		// Internal options to not modify parameters
+		const internalOptions = options as DocumentOptions;
+
+		// If there is a password provided, make the document default to encypted
+		if (internalOptions?.password) {
+			internalOptions.encrypted = true;
+		}
+
+		const data = await this.rest.request<ImperialResponseCreateDocument>("POST", "/document", {
+			data: {
+				...internalOptions,
+				code: text,
+			},
+		});
+
+		return new Document(this, {
+			...data.document,
+			content: convertedText,
+			password: internalOptions?.password ?? data.document.password,
+		});
 	}
 
 	/**
@@ -92,8 +133,34 @@ export class Imperial {
 	/**
 	 *  Gets the Document from Imperial
 	 */
-	public getDocument(id: string | URL, password?: string): Promise<Document> {
-		return getDocument.call(this, id, password);
+	public async getDocument(id: string | URL, password?: string): Promise<Document> {
+		// Make the user inputed data encoded so it doesn't break stuff
+		const documentId = parseId(id, this.rest.hostnameCheckRegExp);
+
+		// If the id is emtpy return
+		if (!documentId) throw new Error(NO_ID);
+
+		// If no password was set try to extract it from the id
+		const documentPassword = password ?? parsePassword(id);
+
+		if (documentPassword && typeof documentPassword !== "string") throw new Error(PASSWORD_WRONG_TYPE);
+
+		try {
+			const data = await this.rest.request<ImperialResponseGetDocument>(
+				"GET",
+				`/document/${encodeURIComponent(documentId)}${
+					documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""
+				}`,
+			);
+
+			return new Document(this, { content: data.content, ...data.document, password: documentPassword });
+		} catch (error) {
+			if (error instanceof ImperialError && error.status === 404) {
+				throw new DocumentNotFound(error);
+			}
+
+			throw error;
+		}
 	}
 
 	/**
@@ -102,8 +169,33 @@ export class Imperial {
 	 *  @example deleteDocument("someid").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public deleteDocument(id: string | URL): Promise<void> {
-		return deleteDocument.call(this, id);
+	public async deleteDocument(id: string | URL): Promise<void> {
+		// If not token return
+		if (!this.apiToken) throw new Error(NO_TOKEN);
+
+		// Make the user inputed data encoded so it doesn't break stuff
+		const documentId = parseId(id, this.rest.hostnameCheckRegExp);
+
+		// If the id is emtpy return
+		if (!documentId) throw new Error(NO_ID);
+
+		try {
+			await this.rest.request("DELETE", `/document/${encodeURIComponent(documentId)}`);
+		} catch (error) {
+			if (error instanceof ImperialError) {
+				switch (error.status) {
+					case 404:
+						throw new DocumentNotFound(error);
+
+					case 401:
+						throw new NotAllowed(error);
+
+					default: // Empty because we throw bellow
+				}
+			}
+
+			throw error;
+		}
 	}
 
 	/**
@@ -113,8 +205,46 @@ export class Imperial {
 	 *  @example editDocument("someid", "i am the new text!").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public editDocument(id: string | URL, text: string): Promise<Document> {
-		return editDocument.call(this, id, text);
+	public async editDocument(id: string | URL, text: string): Promise<Document> {
+		// If no token return
+		if (!this.apiToken) throw new Error(NO_TOKEN);
+
+		// Make the user inputed data encoded so it doesn't break stuff
+		const documentId = parseId(id, this.rest.hostnameCheckRegExp);
+
+		// If the id is emtpy return
+		if (!documentId) throw new Error(NO_ID);
+
+		// If no newText was provided reutrn
+		if (!text) throw new Error(NO_TEXT);
+
+		try {
+			const data = await this.rest.request<ImperialResponseEditDocument>("PATCH", "/document", {
+				data: {
+					document: documentId,
+					newCode: String(text),
+				},
+			});
+
+			return new Document(this, {
+				content: text,
+				...data.document,
+			});
+		} catch (error) {
+			if (error instanceof ImperialError) {
+				switch (error.status) {
+					case 404:
+						throw new DocumentNotFound(error);
+
+					case 401:
+						throw new NotAllowed(error);
+
+					default: // Empty because we throw bellow
+				}
+			}
+
+			throw error;
+		}
 	}
 
 	/**
@@ -122,8 +252,11 @@ export class Imperial {
 	 *  @example verify().then(console.log)
 	 *  // shows if the token is valid
 	 */
-	public verify(): Promise<void> {
-		return verify.call(this);
+	public async verify(): Promise<void> {
+		// If no token return
+		if (!this.apiToken) throw new Error(NO_TOKEN);
+
+		await this.rest.request("GET", `/checkApiToken/${encodeURIComponent(this.apiToken)}`);
 	}
 
 	/**
@@ -131,7 +264,20 @@ export class Imperial {
 	 *  @example purgeDocuments().then(console.log)
 	 *  // shows if the token is valid
 	 */
-	public purgeDocuments(): Promise<PurgeDocuments> {
-		return purgeDocuments.call(this);
+	public async purgeDocuments(): Promise<PurgeDocuments> {
+		// If no token return
+		if (!this.apiToken) throw new Error(NO_TOKEN);
+
+		const { numberDeleted } = await this.rest.request<ImperialResponsePurgeDocuments>("DELETE", "/purgeDocuments");
+
+		return { numberDeleted };
 	}
+}
+
+export interface Imperial {
+	/**
+	 *  Main Class to handle interactions with the REST Api
+	 *  @internal
+	 */
+	rest: Rest;
 }

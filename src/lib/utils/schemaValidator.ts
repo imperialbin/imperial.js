@@ -1,5 +1,12 @@
-import { SCHEMA_FAILED_VALIDATION, SCHEMA_INVALID_KEY } from "../helper/errors";
-import type { Schema } from "../helper/interfaces";
+import { SCHEMA_FAILED_VALIDATION /* , SCHEMA_INVALID_KEY */ } from "../errors/Messages";
+
+export interface Schema {
+	[key: string]: {
+		test: (value: unknown) => boolean;
+		message: string;
+		required?: boolean;
+	};
+}
 
 /**
  *  @internal
@@ -17,7 +24,9 @@ export function validateSchema<T extends Record<string, unknown>>(object: T, sch
 
 	if (errors.length > 0) return errors[0];
 
-	const invalidKeys = Object.keys(object).filter((key) => !validKeys.includes(key));
+	// Remove the checks for not existing props
 
-	if (invalidKeys.length > 0) return new Error(SCHEMA_INVALID_KEY(invalidKeys[0]));
+	// const invalidKeys = Object.keys(object).filter((key) => !validKeys.includes(key));
+
+	// if (invalidKeys.length > 0) return new Error(SCHEMA_INVALID_KEY(invalidKeys[0]));
 }

@@ -1,121 +1,119 @@
-import type { DocumentOptions, RawDocument } from "../helper/interfaces";
-import { createFormatedLink, createRawLink } from "../helper/links";
-import { getDateDifference } from "../helper/dateDifference";
+import { getDateDifference } from "../utils/dateDifference";
+import type { DocumentOptions, RawDocument } from "../common/interfaces";
+import { createFormatedLink, createRawLink } from "../utils/links";
+import { Base } from "./Base";
 import type { Imperial } from "./Imperial";
+import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
 
 /**
  *  Imperial Document,
  *  All data from the Document can be accesed here
  *  @author https://github.com/pxseu & https://github.com/Hexiro
  */
-export class Document {
-	private _client: Imperial;
-
-	private _document: RawDocument;
-
+export class Document extends Base {
 	constructor(client: Imperial, document: RawDocument) {
-		this._client = client;
-		this._document = document;
+		super(client);
+
+		if (document) this._setDocument(document);
+
+		this.deleted = false;
 	}
 
-	// Props
+	private _setDocument(document: unknown) {
+		const documentData = document as RawDocument;
 
-	/**
-	 *  Content of the Document
-	 */
-	public get content(): string {
-		return this._document.content;
+		this.id = documentData.documentId;
+
+		if ("content" in documentData) {
+			this.content = documentData.content;
+		} else if (typeof this.content !== "string") {
+			// @ts-ignore
+			this.content = null;
+		}
+
+		if ("instantDelete" in documentData) {
+			this.instantDelete = documentData.instantDelete;
+		} else if (typeof this.instantDelete !== "boolean") {
+			this.instantDelete = false;
+		}
+
+		if ("encrypted" in documentData) {
+			this.encrypted = documentData.encrypted;
+		} else if (typeof this.encrypted !== "boolean") {
+			this.encrypted = false;
+		}
+
+		if ("views" in documentData) {
+			this.views = documentData.views;
+		} else if (typeof this.views !== "number") {
+			this.views = 0;
+		}
+
+		this.editors = [];
+
+		if ("allowedEditors" in documentData) {
+			this.editors = documentData.allowedEditors;
+		}
+
+		if ("imageEmbed" in documentData) {
+			this.imageEmbed = documentData.imageEmbed;
+		} else if (typeof this.imageEmbed !== "boolean") {
+			this.imageEmbed = false;
+		}
+
+		if ("language" in documentData) {
+			this.language = documentData.language;
+		} else if (typeof this.language !== "string") {
+			this.language = "auto";
+		}
+
+		if ("password" in documentData) {
+			this.password = documentData.password;
+		} else if (typeof this.password !== "string") {
+			this.password = null;
+		}
+
+		if ("public" in documentData) {
+			this.public = documentData.public;
+		} else if (typeof this.public !== "boolean") {
+			this.public = false;
+		}
+
+		if ("creationDate" in documentData) {
+			this.creation = new Date(documentData.creationDate);
+		}
+
+		if ("expirationDate" in documentData) {
+			this.expiration = new Date(documentData.expirationDate);
+		}
 	}
 
 	/**
 	 * 	URL of the Document, to view in Imperial
 	 */
-	public get formattedLink(): string {
-		return createFormatedLink(this._client, this.id);
+	public get link(): string {
+		return createFormatedLink(this.client, this.id);
 	}
 
 	/**
 	 * 	URL to a plain text version of the Document
 	 */
 	public get rawLink(): string {
-		return createRawLink(this._client, this.id);
-	}
-
-	/**
-	 *  Id of the Document
-	 */
-	public get id(): string {
-		return this._document.documentId;
-	}
-
-	/**
-	 *  Whether the Document will be deleted after being viewed
-	 */
-	public get instantDelete(): boolean {
-		return this._document.instantDelete;
-	}
-
-	/**
-	 * 	Whether the document is encrypted
-	 */
-	public get encrypted(): boolean {
-		return this._document.encrypted;
-	}
-
-	/**
-	 * 	Current view count of the Document
-	 */
-	public get views(): number | null {
-		return this._document.views ?? null;
-	}
-
-	/**
-	 *  List of allowed editors of the Document
-	 */
-	public get editors(): string[] {
-		return this._document.allowedEditors;
-	}
-
-	/**
-	 *  Whether the Document will embed an image of the content
-	 */
-	public get imageEmbed(): boolean {
-		return this._document.imageEmbed;
-	}
-
-	/**
-	 * 	The Programming langauge that was set to the Document
-	 */
-	public get langauge(): string | null {
-		return this._document.language ?? null;
+		return createRawLink(this.client, this.id);
 	}
 
 	/**
 	 *  Wheather is the Document URL longer
 	 */
 	public get longerUrls(): boolean {
-		return this._document.documentId.length === 26;
+		return this.id.length === 26;
 	}
 
 	/**
-	 * 	Password for the Document
+	 *  Wheather is the Document URL shorter
 	 */
-	public get password(): string | null {
-		return this._document.password ?? null;
-	}
-
-	/**
-	 *  The date that the Document was created at
-	 */
-	public get creation(): Date {
-		return new Date(this._document.creationDate);
-	}
-
-	/**
-	 *  The date that the Document will be deleted at
-	 */
-	public get expiration(): Date {
-		return new Date(this._document.expirationDate);
+	public get shortUrls(): boolean {
+		return this.id.length === 4;
 	}
 
 	/**
@@ -127,24 +125,20 @@ export class Document {
 		return daysLeft;
 	}
 
-	/**
-	 *  The raw JSON data of the Document
-	 */
-	public get raw(): RawDocument {
-		return this._document;
-	}
-
 	// Methods
 
 	/**
 	 *  Deletes the current Document
 	 */
-	public delete(): Promise<void> {
-		return new Promise((resolve, reject) => {
-			this._client.deleteDocument(this.id).then(() => {
-				resolve();
-			}, reject);
-		});
+	public async delete(): Promise<Document> {
+		if (this.deleted) throw new DocumentNotFound();
+
+		await this.client.deleteDocument(this.id);
+
+		this.deleted = true;
+		this.expiration = new Date();
+
+		return this;
 	}
 
 	/**
@@ -158,38 +152,55 @@ export class Document {
 	 */
 	public duplicate(options: DocumentOptions): Promise<Document>;
 
-	public duplicate(options?: DocumentOptions): Promise<Document> {
-		return new Promise((resolve, reject) => {
-			// Easier to extract it here
-			const documentOptions: DocumentOptions = {
-				encrypted: options?.encrypted ?? this.encrypted,
-				expiration: options?.expiration ?? getDateDifference(this.creation, this.expiration),
-				imageEmbed: options?.imageEmbed ?? this.imageEmbed,
-				longerUrls: options?.longerUrls ?? this.longerUrls,
-				instantDelete: options?.instantDelete ?? this.instantDelete,
-				password: options?.password ?? this.password ?? undefined,
-				editors: options?.editors ?? this.editors,
-				language: options?.language ?? this.langauge ?? undefined,
-			};
+	public async duplicate(options: DocumentOptions = {}): Promise<Document> {
+		const currOptions = this.toJSON() as RawDocument;
 
-			this._client.createDocument(this.content, documentOptions).then((newDocument) => {
-				resolve(newDocument);
-			}, reject);
-		});
+		const documentOptions = {
+			...currOptions,
+			editors: this.editors,
+			password: currOptions.password ?? undefined,
+			...options,
+		};
+
+		const document = await this.client.createDocument(this.content, documentOptions);
+
+		return document;
 	}
 
 	/**
 	 *  Edits the content of the current Document
 	 */
-	public edit(text: string): Promise<void> {
-		return new Promise((resolve, reject) => {
-			this._client.editDocument(this.id, text).then(() => {
-				this._document.content = text;
-				resolve();
-			}, reject);
+	public async edit(text: string): Promise<Document> {
+		if (this.deleted) throw new DocumentNotFound();
+
+		const document = await this.client.editDocument(this.id, text);
+
+		this._setDocument(document.toJSON());
+
+		return this;
+	}
+
+	/**
+	 *  Concatonate the content insted of the object
+	 */
+	public toString(): string {
+		return this.content;
+	}
+
+	/**
+	 *  Converts the Document to the raw response
+	 */
+	public toJSON() {
+		return super.toJSON({
+			id: "documentId",
+			creation: "creationDate",
+			expiration: "expirationDate",
+			editors: "allowedEditors",
+			deleted: false,
 		});
 	}
 
+	// Aliases
 	/**
 	 *  ALias of `.content`
 	 */
@@ -224,14 +235,80 @@ export class Document {
 	public get expirationDate(): typeof Document.prototype.expiration {
 		return this.expiration;
 	}
-}
 
-// Method aliases
-Document.prototype.explode = Document.prototype.delete;
-
-export interface Document {
 	/**
 	 *  Explode the Document (Alias of `.delete`)
 	 */
-	explode: typeof Document.prototype.delete;
+	public explode(
+		...args: Parameters<typeof Document.prototype.delete>
+	): ReturnType<typeof Document.prototype.delete> {
+		return this.delete(...args);
+	}
+}
+
+export interface Document {
+	/**
+	 *  Id of the Document
+	 */
+	id: string;
+
+	/**
+	 *  Content of the Document
+	 */
+	content: string;
+
+	/**
+	 *  Whether the Document will be deleted after being viewed
+	 */
+	instantDelete: boolean;
+
+	/**
+	 * 	Whether the document is encrypted
+	 */
+	encrypted: boolean;
+
+	/**
+	 * 	Current view count of the Document
+	 */
+	views: number;
+
+	/**
+	 *  List of allowed editors of the Document
+	 */
+	editors: string[];
+
+	/**
+	 *  Whether the Document will embed an image of the content
+	 */
+	imageEmbed: boolean;
+
+	/**
+	 * 	The Programming langauge that was set to the Document
+	 */
+	language: string;
+
+	/**
+	 * 	Password for the Document
+	 */
+	password: string | null;
+
+	/**
+	 *  The date that the Document was created at
+	 */
+	creation: Date;
+
+	/**
+	 *  The date that the Document will be deleted at
+	 */
+	expiration: Date;
+
+	/**
+	 * Whether this Document has been deleted
+	 */
+	deleted: boolean;
+
+	/**
+	 * Whether this Document is public
+	 */
+	public: boolean;
 }

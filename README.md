@@ -18,12 +18,16 @@ Installation is done using these commands:
 
 ```sh
 $ npm install imperial-node
+$ # if you use Typescript also install
+$ npm i @types/node --save-dev
 ```
 
 or with yarn
 
 ```sh
 $ yarn add imperial-node
+$ # if you use Typescript also install
+$ yarn add @types/node -D
 ```
 
 # Example Usage

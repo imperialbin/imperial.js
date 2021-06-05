@@ -1,8 +1,9 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
+import { URL } from "url";
 import { Imperial } from "../lib";
-import { ID_WRONG_TYPE, NO_TOKEN, TEXT_WRONG_TYPE } from "../lib/helper/errors";
-import { createMock } from "../mockHelper";
+import { ID_WRONG_TYPE, NO_TOKEN } from "../lib/errors/Messages";
+import { createMock } from "./mockHelper";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
@@ -11,17 +12,19 @@ const DOCUMENT_ID = "really-valid-id";
 const RESPONSE = {
 	success: true,
 	message: "Successfully edit the document!",
-	rawLink: "https://imperialb.in/r/bwxUUGyD",
-	formattedLink: "https://imperialb.in/p/bwxUUGyD",
+	rawLink: `https://imperialb.in/r/${DOCUMENT_ID}`,
+	formattedLink: `https://imperialb.in/p/${DOCUMENT_ID}`,
 	document: {
 		documentId: DOCUMENT_ID,
 		language: null,
 		imageEmbed: false,
-		instantDelete: false,
-		dateCreated: 1617463955786,
-		deleteDate: 1617895955786,
+		instantDelete: true,
+		creationDate: 1617280121620,
+		expirationDate: 1617452921620,
 		allowedEditors: [],
 		encrypted: false,
+		views: 9,
+		public: true,
 	},
 };
 
@@ -31,7 +34,7 @@ describe("editDocument", () => {
 
 		createMock({
 			method: "patch",
-			path: "/api/document/",
+			path: "/api/document",
 			responseBody: RESPONSE,
 			statusCode: 200,
 		});
@@ -42,7 +45,7 @@ describe("editDocument", () => {
 
 		createMock({
 			method: "patch",
-			path: "/api/document/",
+			path: "/api/document",
 			responseBody: RESPONSE,
 			statusCode: 200,
 		});
@@ -92,40 +95,6 @@ describe("editDocument", () => {
 			(async () => {
 				// @ts-ignore
 				await api.editDocument(() => {}, "bbbbbb"); // eslint-disable-line @typescript-eslint/no-empty-function
-			})(),
-		).rejects.toThrow(err);
-	});
-
-	it("invalid - second param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError(TEXT_WRONG_TYPE);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", {});
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", []);
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", 12345);
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument("bbbbbb", () => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 			})(),
 		).rejects.toThrow(err);
 	});

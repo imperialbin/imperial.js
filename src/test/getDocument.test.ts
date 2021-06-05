@@ -1,30 +1,33 @@
 /* eslint @typescript-eslint/ban-ts-comment:0 */
 
-import { Imperial, Document } from "../lib";
-import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/helper/errors";
-import { createMock } from "../mockHelper";
+import { URL } from "url";
+import { Document, Imperial } from "../lib";
+import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/errors/Messages";
+import { createMock } from "./mockHelper";
+
+const DOCUMENT_ID = "really-valid-id";
 
 const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
 
 const RESPONSE = {
 	success: true,
-	content: "fuck u",
+	content: "eqeqeqeqeqeqeq",
 	document: {
-		documentId: "bwxUUGyD",
+		documentId: DOCUMENT_ID,
 		language: null,
 		imageEmbed: false,
-		instantDelete: false,
-		dateCreated: 1617463955786,
-		deleteDate: 1617895955786,
+		instantDelete: true,
+		creationDate: 1617280121620,
+		expirationDate: 1617452921620,
 		allowedEditors: [],
 		encrypted: false,
+		views: 9,
+		public: true,
 	},
 };
 
 describe("getDocument", () => {
 	it("valid with token", async () => {
-		const DOCUMENT_ID = "really-valid-id";
-
 		const api = new Imperial(IMPERIAL_TOKEN);
 
 		createMock({

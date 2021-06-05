@@ -22,6 +22,7 @@
         ],
         "no-underscore-dangle": "off",
         "import/prefer-default-export": "off",
-        "consistent-return": "off"
+        "consistent-return": "off",
+        "no-restricted-syntax": "off"
     }
 }

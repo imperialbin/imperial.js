@@ -1,4 +1,7 @@
-const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {
+import { URL } from "url";
+import { ID_WRONG_TYPE } from "../errors/Messages";
+
+const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string | null => {
 	const splitPath = url.pathname.split("/");
 
 	if (hostnameRegex.test(url.hostname) && splitPath.length > 0) {
@@ -6,24 +9,23 @@ const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {
 		return splitPath[splitPath.length - 1];
 	}
 
-	return url.toString();
+	return null;
 };
 
 /**
+ *  Extract the id from a string or URL object
  *  @internal
  */
-export const parseId = function (id: string | URL, hostnameRegex: RegExp): string {
-	if (id instanceof URL) return getIdFromUrl(id as URL, hostnameRegex);
+export const parseId = function (id: string | URL | undefined, hostnameRegex: RegExp): string | null {
+	if (!id) return null;
 
-	let localId = id;
+	if (id instanceof URL) return getIdFromUrl(id, hostnameRegex);
+	if (typeof id !== "string") throw new Error(ID_WRONG_TYPE);
 
 	try {
 		// Try to parse a url
-		localId = getIdFromUrl(new URL(id as string), hostnameRegex);
+		return getIdFromUrl(new URL(id), hostnameRegex);
 	} catch (e) {
-		// Don't do anything with the URL prase error
+		return id;
 	}
-
-	// Try to parse a url
-	return localId;
 };

@@ -1,5 +1,3 @@
-import type { OutgoingHttpHeaders } from "http";
-
 // interfaces for most of Imperial responses
 
 /**
@@ -7,15 +5,16 @@ import type { OutgoingHttpHeaders } from "http";
  */
 interface ResponseDocument {
 	documentId: string;
-	language: string | null;
+	language: string;
 	imageEmbed: boolean;
 	instantDelete: boolean;
 	creationDate: number;
 	expirationDate: number;
 	allowedEditors: string[];
 	encrypted: boolean;
-	password?: string;
-	views?: number;
+	password: string | null;
+	views: number;
+	public: boolean;
 }
 
 /**
@@ -64,6 +63,7 @@ export interface ImperialResponsePurgeDocuments extends ImperialResponseCommon, 
 export interface DocumentOptions {
 	editors?: string[];
 	longerUrls?: boolean;
+	shortUrls?: boolean;
 	instantDelete?: boolean;
 	imageEmbed?: boolean;
 	expiration?: number;
@@ -74,6 +74,7 @@ export interface DocumentOptions {
 	encrypted?: boolean;
 	password?: string;
 	language?: string;
+	public?: boolean;
 }
 
 /**
@@ -81,52 +82,4 @@ export interface DocumentOptions {
  */
 export interface RawDocument extends ResponseDocument {
 	content: string;
-}
-
-// Bellow are internal interfaces that do not get exported to the dist folder
-
-/**
- *  @internal
- */
-export interface InternalPostOptions extends DocumentOptions {
-	code: string;
-}
-
-/**
- *  @internal
- */
-export interface ImperialErrorInterface {
-	message?: string;
-	status?: number;
-	path?: string;
-}
-
-/**
- *  @internal
- */
-export interface InternalImperialResponse extends ImperialResponseCommon {
-	success: boolean;
-	[key: string]: unknown;
-}
-
-/**
- *  @internal
- */
-export interface PrepareRequestParams {
-	method: string;
-	headers?: OutgoingHttpHeaders;
-	path: string;
-	hostname: string;
-	token: string | undefined;
-}
-
-/**
- * 	@internal
- */
-export interface Schema {
-	[key: string]: {
-		test: (value: unknown) => boolean;
-		message: string;
-		required?: boolean;
-	};
 }
