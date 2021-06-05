@@ -5,6 +5,7 @@ import type {
 	ImperialResponseCreateDocument,
 	ImperialResponseEditDocument,
 	ImperialResponseGetDocument,
+	ImperialResponsePurgeDocuments,
 	PurgeDocuments,
 } from "../common/interfaces";
 import { OptionsSchema } from "../utils/schemas";
@@ -16,6 +17,7 @@ import { Document } from "./Document";
 import { Rest } from "./rest/Rest";
 import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
 import { ImperialError } from "../errors/ImperialError";
+import { NotAllowed } from "../errors/HTTPErrors/NotAllowed";
 
 /**
  *  The Imperial class
@@ -143,15 +145,15 @@ export class Imperial {
 
 		if (documentPassword && typeof documentPassword !== "string") throw new Error(PASSWORD_WRONG_TYPE);
 
-		let data: ImperialResponseGetDocument;
-
 		try {
-			data = await this.rest.request<ImperialResponseGetDocument>(
+			const data = await this.rest.request<ImperialResponseGetDocument>(
 				"GET",
 				`/document/${encodeURIComponent(documentId)}${
 					documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""
 				}`,
 			);
+
+			return new Document(this, { content: data.content, ...data.document, password: documentPassword });
 		} catch (error) {
 			if (error instanceof ImperialError && error.status === 404) {
 				throw new DocumentNotFound(error);
@@ -159,8 +161,6 @@ export class Imperial {
 
 			throw error;
 		}
-
-		return new Document(this, { content: data.content, ...data.document, password: documentPassword });
 	}
 
 	/**
@@ -182,8 +182,16 @@ export class Imperial {
 		try {
 			await this.rest.request("DELETE", `/document/${encodeURIComponent(documentId)}`);
 		} catch (error) {
-			if (error instanceof ImperialError && error.status === 404) {
-				throw new DocumentNotFound(error);
+			if (error instanceof ImperialError) {
+				switch (error.status) {
+					case 404:
+						throw new DocumentNotFound(error);
+
+					case 401:
+						throw new NotAllowed(error);
+
+					default: // Empty because we throw bellow
+				}
 			}
 
 			throw error;
@@ -210,27 +218,33 @@ export class Imperial {
 		// If no newText was provided reutrn
 		if (!text) throw new Error(NO_TEXT);
 
-		let data: ImperialResponseEditDocument;
-
 		try {
-			data = await this.rest.request<ImperialResponseEditDocument>("PATCH", "/document", {
+			const data = await this.rest.request<ImperialResponseEditDocument>("PATCH", "/document", {
 				data: {
 					document: documentId,
 					newCode: String(text),
 				},
 			});
+
+			return new Document(this, {
+				content: text,
+				...data.document,
+			});
 		} catch (error) {
-			if (error instanceof ImperialError && error.status === 404) {
-				throw new DocumentNotFound(error);
+			if (error instanceof ImperialError) {
+				switch (error.status) {
+					case 404:
+						throw new DocumentNotFound(error);
+
+					case 401:
+						throw new NotAllowed(error);
+
+					default: // Empty because we throw bellow
+				}
 			}
 
 			throw error;
 		}
-
-		return new Document(this, {
-			content: text,
-			...data.document,
-		});
 	}
 
 	/**
@@ -254,7 +268,6 @@ export class Imperial {
 		// If no token return
 		if (!this.apiToken) throw new Error(NO_TOKEN);
 
-		// @ts-ignore
 		const { numberDeleted } = await this.rest.request<ImperialResponsePurgeDocuments>("DELETE", "/purgeDocuments");
 
 		return { numberDeleted };
@@ -264,7 +277,7 @@ export class Imperial {
 export interface Imperial {
 	/**
 	 *  Main Class to handle interactions with the REST Api
-	 * @internal
+	 *  @internal
 	 */
 	rest: Rest;
 }
