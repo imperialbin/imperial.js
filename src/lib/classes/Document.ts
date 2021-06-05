@@ -153,7 +153,7 @@ export class Document extends Base {
 	public duplicate(options: DocumentOptions): Promise<Document>;
 
 	public async duplicate(options: DocumentOptions = {}): Promise<Document> {
-		const currOptions = (this.toJSON() as any) as RawDocument;
+		const currOptions = this.toJSON() as RawDocument;
 
 		const documentOptions = {
 			...currOptions,
