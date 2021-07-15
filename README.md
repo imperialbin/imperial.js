@@ -6,12 +6,12 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-typescript.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/not-a-bug-a-feature.svg)](https://forthebadge.com)
 
-### About
+## About
 
 This is an official API wrapper for the [Imperial](http://imperialb.in/) API.
 It's written in typescript and has premade type declarations.
 
-# Installation
+## Installation
 
 Before using, make sure you have Node.js 8.0.0 or higher installed.
 Installation is done using these commands:
@@ -30,11 +30,11 @@ $ # if you use Typescript also install
 $ yarn add @types/node -D
 ```
 
-# Example Usage
+## Example Usage
 
 Coming soon!
 
-# Running Locally
+## Running Locally
 
 You can use these to run the tests:
 
@@ -51,17 +51,17 @@ $ yarn install --frozen-lockfile
 $ yarn test
 ```
 
-# Contributing
+## Contributing
 
-1. Fork the repo on GitHub
-2. Clone the project to your own machine
-3. Commit changes to your own branch
-4. Push your work to your fork
-5. Submit a Pull request so that I can review your changes
+1.  Fork the repo on GitHub
+2.  Clone the project to your own machine
+3.  Commit changes to your own branch
+4.  Push your work to your fork
+5.  Submit a Pull request so that I can review your changes
 
 NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
-# License
+## License
 
 Copyright 2021 pxseu
 
