@@ -1,6 +1,7 @@
 import type { URL } from "url";
 import { NO_ID, NO_TEXT, NO_TOKEN, OPTIONS_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../errors/Messages";
 import type {
+	ImperialOptions,
 	DocumentOptions,
 	ImperialResponseCreateDocument,
 	ImperialResponseEditDocument,
@@ -18,6 +19,7 @@ import { Rest } from "./rest/Rest";
 import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
 import { ImperialError } from "../errors/ImperialError";
 import { NotAllowed } from "../errors/HTTPErrors/NotAllowed";
+import { defaultOptions } from "../utils/defaultOptions";
 
 /**
  *  The Imperial class
@@ -31,9 +33,33 @@ export class Imperial {
 	 *  `Imperial` constructor
 	 *  @param token Your API token
 	 */
-	constructor(token?: string | null) {
+	constructor(token?: string);
+
+	/**
+	 *  `Imperial` constructor
+	 *  @param options Options for the class
+	 */
+	constructor(options?: ImperialOptions);
+
+	/**
+	 *  `Imperial` constructor
+	 *  @param token Your API token
+	 *  @param options Options for the class
+	 */
+	constructor(token?: string, options?: ImperialOptions);
+
+	constructor(tokenOrOptions?: ImperialOptions | string, paramOptions: ImperialOptions = {}) {
+		const options = typeof tokenOrOptions === "object" && tokenOrOptions !== null ? tokenOrOptions : paramOptions;
+		const token = typeof tokenOrOptions === "string" ? tokenOrOptions : undefined;
+
 		this.setApiToken(token);
 
+		Object.defineProperty(this, "options", {
+			value: {
+				...defaultOptions,
+				...options,
+			},
+		});
 		Object.defineProperty(this, "rest", { value: new Rest(this) });
 	}
 
@@ -48,12 +74,8 @@ export class Imperial {
 	 *  Change the Api Token on the Class
 	 *
 	 */
-	public setApiToken(token: string | null | undefined = process.env.IMPERIAL_TOKEN): void {
-		if (validateToken(token)) this._token = token as string;
-
-		if (token === null) {
-			this._token = undefined;
-		}
+	public setApiToken(token: string | undefined = process.env.IMPERIAL_TOKEN): void {
+		if (validateToken(token)) this._token = token;
 	}
 
 	/**
@@ -280,4 +302,10 @@ export interface Imperial {
 	 *  @internal
 	 */
 	rest: Rest;
+
+	/**
+	 *  Client options
+	 *  @internal
+	 */
+	options: ImperialOptions;
 }

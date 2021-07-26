@@ -7,6 +7,7 @@ const tokenRegex = /^IMPERIAL-[a-zA-Z\d]{8}(-[a-zA-Z\d]{4}){3}-[a-zA-Z\d]{12}$/;
  *  @internal
  */
 export const validateToken = (token: unknown): boolean => {
+	if (typeof token === "undefined") return true;
 	if (typeof token !== "string") return false;
 	return tokenRegex.test(token);
 };

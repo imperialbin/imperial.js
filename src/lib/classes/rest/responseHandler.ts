@@ -1,4 +1,5 @@
-import type { ClientRequest, IncomingMessage } from "http";
+import type { Response } from "node-fetch";
+import { URL } from "url";
 import { imperialResponses } from "./responseMap";
 import { noError, statusMessage } from "./statusCode";
 import { ImperialError } from "../../errors/ImperialError";
@@ -12,48 +13,29 @@ interface InternalResponse extends ImperialResponseCommon {
 /**
  *  @internal
  */
-export const handleResponse = <T extends unknown>(response: IncomingMessage, request: ClientRequest): Promise<T> =>
-	new Promise((resolve, reject) => {
-		const data: string[] = [];
+export const handleResponse = async <T extends unknown>(response: Response): Promise<T> => {
+	let json: InternalResponse | undefined;
 
-		// Collect all data chunks
-		response.on("data", (chunk: string) => {
-			data.push(chunk);
-		});
+	// try to parse the json data
+	try {
+		json = await response.json();
+	} catch (e) {
+		// Ignore parse error
+	}
+	// remove not needed data
+	const { success, message, ...content } = json ?? {};
 
-		response.on("end", () => {
-			// join all data chunks into one
-			const responseData = data.join("");
+	// extract the status code
+	const { status } = response;
 
-			let json: InternalResponse | undefined;
+	// if everything is okay resolve
+	if (status && noError(status) && success === true) {
+		return content as never;
+	}
 
-			// try to parse the json data
-			try {
-				json = JSON.parse(responseData);
-			} catch (e) {
-				// Ignore parse error
-			}
-			// remove not needed data
-			const { success, message, ...content } = json ?? {};
+	// find an error message
+	const errorMsg = imperialResponses(message) ?? message ?? statusMessage(status) ?? `Status code ${status ?? null}`;
 
-			// extract the status code
-			const { statusCode } = response;
-
-			// if everything is okay resolve
-			if (statusCode && noError(statusCode) && success === true) {
-				return resolve(content as never);
-			}
-
-			// find an error message
-			const errorMsg =
-				imperialResponses(message) ??
-				message ??
-				statusMessage(statusCode) ??
-				`Status code ${statusCode ?? null}`;
-
-			// reject
-			reject(new ImperialError({ message: errorMsg, status: statusCode, path: request.path }));
-		});
-
-		response.on("error", reject);
-	});
+	// throw an error
+	throw new ImperialError({ message: errorMsg, status, path: new URL(response.url).pathname });
+};

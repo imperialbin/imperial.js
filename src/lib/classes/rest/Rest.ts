@@ -1,5 +1,6 @@
-import type { OutgoingHttpHeaders } from "http";
-import { request } from "https";
+import AbortController from "abort-controller";
+import fetch, { Response } from "node-fetch";
+import { Aborted } from "../../errors/HTTPErrors/Aborted";
 import { Base } from "../Base";
 import type { Imperial } from "../Imperial";
 import { handleResponse } from "./responseHandler";
@@ -8,7 +9,7 @@ type Methods = "POST" | "GET" | "PATCH" | "DELETE";
 
 interface Options {
 	data?: Record<string, unknown>;
-	headers?: OutgoingHttpHeaders;
+	headers?: Record<string, unknown>;
 }
 
 /**
@@ -19,62 +20,68 @@ export class Rest extends Base {
 	/**
 	 *  Imperial's hostname
 	 */
-	readonly hostname = "imperialb.in";
+	readonly hostname = "https://imperialb.in/api";
+
+	/**
+	 *  Api Vesrion
+	 */
+	readonly version = ""; // soon "/1"
 
 	/**
 	 *  Regular Expression that is used to match against in functions
 	 */
 	readonly hostnameCheckRegExp = /^(www\.)?imp(erial)?b(\.in|in.com)$/i;
 
-	request<T extends unknown>(method: Methods, path: string, options: Options = {}): Promise<T> {
-		return new Promise((resolve, reject) => {
-			const defaultHeaders: OutgoingHttpHeaders = {
-				// best thing to happen
-				"Content-Type": "application/json",
-				"User-Agent": "imperial-node; (+https://github.com/imperialbin/imperial-node)",
-			};
+	async request<T extends unknown>(method: Methods, path: string, options: Options = {}): Promise<T> {
+		// default headers
+		const defaultHeaders: Record<string, any> = {
+			"Content-Type": "application/json",
+			"User-Agent": "imperial-node; (+https://github.com/imperialbin/imperial-node)",
+		};
 
-			if (this.client.apiToken) defaultHeaders.Authorization = this.client.apiToken;
+		// add authorization header if apiToken is set
+		if (this.client.apiToken) defaultHeaders.Authorization = this.client.apiToken;
 
-			const headers = {
-				...options.headers,
-				...defaultHeaders,
-			};
+		// set the headers
+		const headers = {
+			...options.headers,
+			...defaultHeaders,
+		};
 
-			let dataString: string | null = null;
+		// set the data
+		let body: string | undefined;
 
-			if (options.data)
-				try {
-					dataString = JSON.stringify(options.data);
-					headers["Content-Length"] = Buffer.byteLength(dataString);
-				} catch (e) {
-					reject(e);
-				}
+		// if `options.data` is set, serialize it to a string
+		if (options.data)
+			try {
+				body = JSON.stringify(options.data);
+			} catch (e) {
+				throw new Error(`Failed to serialize data to JSON: ${e.message}`);
+			}
 
-			// Prepare the request
-			const requestOptions = {
-				method,
-				path: `/api${path}`,
+		const controller = new AbortController();
+
+		const abortTimeout = setTimeout(() => controller.abort(), this.client.options.requestTimeout);
+
+		let response: Response;
+
+		try {
+			response = await fetch(`${this.hostname}${this.version}${path}`, {
 				headers,
-				hostname: this.hostname,
-				token: this.client.apiToken,
-			};
-
-			// Make the request
-			const httpRequest = request(requestOptions);
-
-			if (dataString) httpRequest.write(dataString);
-
-			httpRequest.on("response", (response) => {
-				// Parse the response
-				handleResponse<T>(response, httpRequest).then((data) => {
-					// Return the Document class
-					resolve(data);
-				}, reject);
+				method,
+				body,
+				signal: controller.signal,
+				redirect: "error",
 			});
-			httpRequest.on("error", reject);
-			httpRequest.end();
-		});
+		} catch (error) {
+			if (error.name === "AbortError") throw new Aborted();
+
+			throw error;
+		} finally {
+			clearTimeout(abortTimeout);
+		}
+
+		return handleResponse(response);
 	}
 }
 
