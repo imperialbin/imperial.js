@@ -59,13 +59,16 @@ export class Rest extends Base {
 				throw new Error(`Failed to serialize data to JSON: ${e.message}`);
 			}
 
+		// create the controller
 		const controller = new AbortController();
 
+		// create a timeout to abort the request after
 		const abortTimeout = setTimeout(() => controller.abort(), this.client.options.requestTimeout);
 
 		let response: Response;
 
 		try {
+			// make the request
 			response = await fetch(`${this.hostname}${this.version}${path}`, {
 				headers,
 				method,
@@ -74,13 +77,17 @@ export class Rest extends Base {
 				redirect: "error",
 			});
 		} catch (error) {
+			// if error was an aborted error, throw a custom error
 			if (error.name === "AbortError") throw new Aborted();
 
+			// else throw the error
 			throw error;
 		} finally {
+			// clear the timeout
 			clearTimeout(abortTimeout);
 		}
 
+		// handle the response
 		return handleResponse(response);
 	}
 }

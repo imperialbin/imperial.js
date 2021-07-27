@@ -100,9 +100,8 @@ export class Imperial {
 	 *  Create a Document
 	 */
 	public async createDocument(text: string, options: DocumentOptions = {}): Promise<Document> {
-		const convertedText = String(text);
 		// If no text or text is an emtpy string reutrn
-		if (!text || !convertedText) throw new Error(NO_TEXT);
+		if (!text) throw new Error(NO_TEXT);
 
 		if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError(OPTIONS_WRONG_TYPE);
 
@@ -121,16 +120,18 @@ export class Imperial {
 			internalOptions.encrypted = true;
 		}
 
+		const content = String(text);
+
 		const data = await this.rest.request<ImperialResponseCreateDocument>("POST", "/document", {
 			data: {
 				...internalOptions,
-				code: text,
+				code: content,
 			},
 		});
 
 		return new Document(this, {
 			...data.document,
-			content: convertedText,
+			content,
 			password: internalOptions?.password ?? data.document.password,
 		});
 	}

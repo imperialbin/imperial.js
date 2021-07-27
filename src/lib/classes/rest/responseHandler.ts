@@ -22,6 +22,7 @@ export const handleResponse = async <T extends unknown>(response: Response): Pro
 	} catch (e) {
 		// Ignore parse error
 	}
+
 	// remove not needed data
 	const { success, message, ...content } = json ?? {};
 
