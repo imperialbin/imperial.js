@@ -1,89 +1,69 @@
-/* eslint @typescript-eslint/ban-ts-comment:0 */
+/* eslint-disable import/first */
+/* eslint-disable import/newline-after-import */
+import fetchMockJest from "fetch-mock-jest";
+jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
-import { Imperial } from "../lib";
-import { OPTIONS_WRONG_TYPE } from "../lib/errors/Messages";
-import { createMock } from "./mockHelper";
-
-const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
-
-const RESPONSE = {
-	success: true,
-	rawLink: "https://imperialb.in/r/bwxUUGyD",
-	formattedLink: "https://imperialb.in/p/bwxUUGyD",
-	document: {
-		documentId: "bwxUUGyD",
-		language: null,
-		imageEmbed: false,
-		instantDelete: true,
-		dateCreated: 1617463955786,
-		deleteDate: 1617895955786,
-		allowedEditors: [],
-		encrypted: false,
-		password: null,
-		public: true,
-	},
-};
+import { Document, Imperial } from "../lib";
+import { NO_TEXT, OPTIONS_WRONG_TYPE } from "../lib/errors/Messages";
+import { IMPERIAL_TOKEN, RESPONSE } from "./common";
+const fetchMock: typeof fetchMockJest = require("node-fetch");
 
 describe("createDocument", () => {
-	it("valid - with token", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
+	let client: Imperial;
 
-		createMock({
-			method: "post",
-			path: "/api/document",
-			responseBody: RESPONSE,
-			statusCode: 200,
+	beforeEach(() => {
+		client = new Imperial(IMPERIAL_TOKEN);
+
+		fetchMock.post(`${client.rest.hostname}${client.rest.version}/document`, {
+			body: RESPONSE,
+			headers: { "Content-Type": "application/json" },
 		});
-
-		const res = await api.createDocument("Test: createDocument > valid - with token", { instantDelete: true });
-
-		expect(typeof res.id).toBe("string");
-		expect(res.instantDelete).toBeTruthy();
-		expect(res.public).toBeTruthy();
-	}, 10000); // timeout 10s
-
-	it("invalid - second param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError(OPTIONS_WRONG_TYPE);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.createDocument("Test: createDocument > invalid - second param with wrong type #1", "");
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.createDocument("Test: createDocument > invalid - second param with wrong type #2", []);
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.createDocument("Test: createDocument > invalid - second param with wrong type #3", 12345);
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.createDocument("Test: createDocument > invalid - second param with wrong type #4", null);
-			})(),
-		).rejects.toThrow(err);
 	});
 
-	it("invalid - no data", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
+	it("should create a document - fully valid", async () => {
+		const document = await client.createDocument("i am a valid request");
 
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.createDocument();
-			})(),
-		).rejects.toThrow(new Error("No `text` was provided!"));
+		expect(document.id).toBe(RESPONSE.document.documentId);
+		expect(document.public).toBe(RESPONSE.document.public);
+		expect(document.imageEmbed).toBe(RESPONSE.document.imageEmbed);
+	});
+
+	it("should create a document - text not a string", async () => {
+		// @ts-expect-error
+		await expect(client.createDocument({})).resolves.toBeInstanceOf(Document);
+
+		// @ts-expect-error
+		await expect(client.createDocument([])).resolves.toBeInstanceOf(Document);
+
+		// @ts-expect-error
+		await expect(client.createDocument(12345)).resolves.toBeInstanceOf(Document);
+
+		// @ts-expect-error
+		await expect(client.createDocument(() => {})).resolves.toBeInstanceOf(Document);
+	});
+
+	it("should fail to create a document - wrong second parameter", async () => {
+		const error = new TypeError(OPTIONS_WRONG_TYPE);
+
+		// @ts-expect-error
+		await expect(client.createDocument("STRING", "")).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.createDocument("ARRAY", [])).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.createDocument("NUMBER", 12345)).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.createDocument("NULL", null)).rejects.toThrow(error);
+	});
+
+	it("should fail to create a document - no data", async () => {
+		// @ts-expect-error
+		await expect(client.createDocument()).rejects.toThrow(new Error(NO_TEXT));
+	});
+
+	afterEach(() => {
+		fetchMock.reset();
 	});
 });

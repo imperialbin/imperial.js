@@ -1,127 +1,54 @@
-/* eslint @typescript-eslint/ban-ts-comment:0 */
-
+/* eslint-disable import/first */
+/* eslint-disable import/newline-after-import */
+import fetchMockJest from "fetch-mock-jest";
 import { URL } from "url";
-import { Document, Imperial } from "../lib";
-import { ID_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../lib/errors/Messages";
-import { createMock } from "./mockHelper";
+jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
-const DOCUMENT_ID = "really-valid-id";
+import { Imperial } from "../lib";
+import { ID_WRONG_TYPE, NO_ID } from "../lib/errors/Messages";
+import { IMPERIAL_TOKEN, RESPONSE } from "./common";
+const fetchMock: typeof fetchMockJest = require("node-fetch");
 
-const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
+describe("createDocument", () => {
+	let client: Imperial;
 
-const RESPONSE = {
-	success: true,
-	content: "eqeqeqeqeqeqeq",
-	document: {
-		documentId: DOCUMENT_ID,
-		language: null,
-		imageEmbed: false,
-		instantDelete: true,
-		creationDate: 1617280121620,
-		expirationDate: 1617452921620,
-		allowedEditors: [],
-		encrypted: false,
-		views: 9,
-		public: true,
-	},
-};
+	beforeEach(() => {
+		client = new Imperial(IMPERIAL_TOKEN);
 
-describe("getDocument", () => {
-	it("valid with token", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		createMock({
-			method: "get",
-			path: `/api/document/${DOCUMENT_ID}`,
-			responseBody: RESPONSE,
-			statusCode: 200,
+		fetchMock.get(`${client.rest.hostname}${client.rest.version}/document/${RESPONSE.document.documentId}`, {
+			body: { success: true },
+			headers: { "Content-Type": "application/json" },
 		});
-
-		let res = await api.getDocument(DOCUMENT_ID);
-
-		expect(res).toBeInstanceOf(Document);
-
-		createMock({
-			method: "get",
-			path: `/api/document/${DOCUMENT_ID}`,
-			responseBody: RESPONSE,
-			statusCode: 200,
-		});
-
-		res = await api.getDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`));
-
-		expect(res).toBeInstanceOf(Document);
-	}, 10000); // timout 10s
-
-	it("invalid - first param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError(ID_WRONG_TYPE);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument({});
-			})(),
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument([]);
-			})(),
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument(12345);
-			})(),
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
-			})(),
-		).rejects.toThrowError(err);
 	});
 
-	it("invalid - second param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
+	it("should fetch a document - fully valid", async () => {
+		await client.getDocument(RESPONSE.document.documentId);
 
-		const err = new TypeError(PASSWORD_WRONG_TYPE);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", {});
-			})(),
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", []);
-			})(),
-		).rejects.toThrowError(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument("bbbbbb", 12345);
-			})(),
-		).rejects.toThrowError(err);
+		await client.getDocument(new URL(`https://imperialb.in/p/${RESPONSE.document.documentId}`));
 	});
 
-	it("invalid - no data", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
+	it("should fail to fetch a document - wrong id type", async () => {
+		const error = new Error(ID_WRONG_TYPE);
 
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.getDocument();
-			})(),
-		).rejects.toThrowError(new Error("No `id` was provided!"));
+		// @ts-expect-error
+		await expect(client.getDocument({})).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.getDocument([])).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.getDocument(12345)).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.getDocument(() => {})).rejects.toThrow(error);
+	});
+
+	it("should fail to fetch a document - no id", async () => {
+		// @ts-expect-error
+		await expect(client.getDocument()).rejects.toThrow(new Error(NO_ID));
+	});
+
+	afterEach(() => {
+		fetchMock.reset();
 	});
 });

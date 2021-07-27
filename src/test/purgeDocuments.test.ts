@@ -1,40 +1,44 @@
-/* eslint @typescript-eslint/ban-ts-comment:0 */
+/* eslint-disable import/first */
+/* eslint-disable import/newline-after-import */
+import fetchMockJest from "fetch-mock-jest";
+jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
 import { Imperial } from "../lib";
 import { NO_TOKEN } from "../lib/errors/Messages";
-import { createMock } from "./mockHelper";
+import { IMPERIAL_TOKEN } from "./common";
+const fetchMock: typeof fetchMockJest = require("node-fetch");
 
-const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
+const numberDeleted = 420;
 
-const RESPONSE = {
-	success: true,
-	message: "Deleted a total of 420 documents!",
-	numberDeleted: 420,
-};
+describe("createDocument", () => {
+	let client: Imperial;
 
-describe("purgeDocuments", () => {
-	it("valid", async () => {
-		createMock({
-			method: "delete",
-			path: "/api/purgeDocuments",
-			responseBody: RESPONSE,
-			statusCode: 200,
+	beforeEach(() => {
+		client = new Imperial(IMPERIAL_TOKEN);
+
+		fetchMock.delete(`${client.rest.hostname}${client.rest.version}/purgeDocuments`, {
+			body: {
+				success: true,
+				message: "Deleted a total of 420 documents!",
+				numberDeleted,
+			},
+			headers: { "Content-Type": "application/json" },
 		});
+	});
 
-		const api = new Imperial(IMPERIAL_TOKEN);
+	it("should purge document - valid", async () => {
+		const response = await client.purgeDocuments();
 
-		const response = await api.purgeDocuments();
+		expect(response.numberDeleted).toBe(numberDeleted);
+	});
 
-		expect(response.numberDeleted).toBe(RESPONSE.numberDeleted);
-	}, 10000);
+	it("should not purge document - no token", async () => {
+		client.setApiToken();
 
-	it("invalid", async () => {
-		const api = new Imperial();
+		await expect(client.purgeDocuments()).rejects.toThrowError(new Error(NO_TOKEN));
+	});
 
-		await expect(
-			(async () => {
-				await api.purgeDocuments();
-			})(),
-		).rejects.toThrowError(new Error(NO_TOKEN));
+	afterEach(() => {
+		fetchMock.reset();
 	});
 });

@@ -1,112 +1,92 @@
-/* eslint @typescript-eslint/ban-ts-comment:0 */
-
+/* eslint-disable import/first */
+/* eslint-disable import/newline-after-import */
+import fetchMockJest from "fetch-mock-jest";
 import { URL } from "url";
-import { Imperial } from "../lib";
-import { ID_WRONG_TYPE, NO_TOKEN } from "../lib/errors/Messages";
-import { createMock } from "./mockHelper";
+jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
-const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
+import { Document, Imperial } from "../lib";
+import { ID_WRONG_TYPE, NO_ID, NO_TEXT, NO_TOKEN } from "../lib/errors/Messages";
+import { IMPERIAL_TOKEN, RESPONSE } from "./common";
+const fetchMock: typeof fetchMockJest = require("node-fetch");
 
-const DOCUMENT_ID = "really-valid-id";
+describe("createDocument", () => {
+	let client: Imperial;
 
-const RESPONSE = {
-	success: true,
-	message: "Successfully edit the document!",
-	rawLink: `https://imperialb.in/r/${DOCUMENT_ID}`,
-	formattedLink: `https://imperialb.in/p/${DOCUMENT_ID}`,
-	document: {
-		documentId: DOCUMENT_ID,
-		language: null,
-		imageEmbed: false,
-		instantDelete: true,
-		creationDate: 1617280121620,
-		expirationDate: 1617452921620,
-		allowedEditors: [],
-		encrypted: false,
-		views: 9,
-		public: true,
-	},
-};
+	beforeEach(() => {
+		client = new Imperial(IMPERIAL_TOKEN);
 
-describe("editDocument", () => {
-	it("valid with token", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
+		fetchMock.patch(`${client.rest.hostname}${client.rest.version}/document`, (_: any, req: any) => {
+			if (JSON.parse(req.body).document !== RESPONSE.document.documentId)
+				return {
+					body: { success: false },
+					status: 400,
+				};
 
-		createMock({
-			method: "patch",
-			path: "/api/document",
-			responseBody: RESPONSE,
-			statusCode: 200,
+			return {
+				body: RESPONSE,
+				headers: { "Content-Type": "application/json" },
+			};
 		});
-
-		let res = await api.editDocument(DOCUMENT_ID, "Tests: editDocument #2");
-
-		expect(res.id).toBe(DOCUMENT_ID);
-
-		createMock({
-			method: "patch",
-			path: "/api/document",
-			responseBody: RESPONSE,
-			statusCode: 200,
-		});
-
-		res = await api.editDocument(new URL(`https://imperialb.in/p/${DOCUMENT_ID}`), "Tests: editDocument #3");
-
-		expect(res.id).toBe(DOCUMENT_ID);
-	}, 10000); // timeout 10s
-
-	it("valid without token", async () => {
-		const api = new Imperial();
-
-		await expect(
-			(async () => {
-				await api.editDocument("test jest bro", "test jest bro");
-			})(),
-		).rejects.toThrow(new Error(NO_TOKEN));
-	}, 10000); // timeout 10s
-
-	it("invalid - first param with wrong type", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
-
-		const err = new TypeError(ID_WRONG_TYPE);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument({}, "bbbbbb");
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument([], "bbbbbb");
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument(12345, "bbbbbb");
-			})(),
-		).rejects.toThrow(err);
-
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument(() => {}, "bbbbbb"); // eslint-disable-line @typescript-eslint/no-empty-function
-			})(),
-		).rejects.toThrow(err);
 	});
 
-	it("invalid - no data", async () => {
-		const api = new Imperial(IMPERIAL_TOKEN);
+	it("should edit a document - fully valid", async () => {
+		await client.editDocument(RESPONSE.document.documentId, "i am a valid edit");
 
-		await expect(
-			(async () => {
-				// @ts-ignore
-				await api.editDocument();
-			})(),
-		).rejects.toThrow(new Error("No `id` was provided!"));
+		await client.editDocument(
+			new URL(`https://imperialb.in/p/${RESPONSE.document.documentId}`),
+			"i am a valid edit",
+		);
+	});
+
+	it("should edit a document - text not a string", async () => {
+		// @ts-expect-error
+		await expect(client.editDocument(RESPONSE.document.documentId, {})).resolves.toBeInstanceOf(Document);
+
+		// @ts-expect-error
+		await expect(client.editDocument(RESPONSE.document.documentId, [])).resolves.toBeInstanceOf(Document);
+
+		// @ts-expect-error
+		await expect(client.editDocument(RESPONSE.document.documentId, 12345)).resolves.toBeInstanceOf(Document);
+
+		// @ts-expect-error
+		await expect(client.editDocument(RESPONSE.document.documentId, () => {})).resolves.toBeInstanceOf(Document);
+	});
+
+	it("should fail to edit a document - no token", async () => {
+		client.setApiToken(undefined);
+
+		await expect(async () => {
+			await client.editDocument(RESPONSE.document.documentId, "i am a valid edit");
+		}).rejects.toThrow(new Error(NO_TOKEN));
+	});
+
+	it("should fail to delete a document - no id", async () => {
+		// @ts-expect-error
+		await expect(client.editDocument()).rejects.toThrow(new Error(NO_ID));
+	});
+
+	it("should fail to edit a document - wrong type of id", async () => {
+		const error = new Error(ID_WRONG_TYPE);
+
+		// @ts-expect-error
+		await expect(client.editDocument({})).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.editDocument([])).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.editDocument(12345)).rejects.toThrow(error);
+
+		// @ts-expect-error
+		await expect(client.editDocument(() => {})).rejects.toThrow(error);
+	});
+
+	it("should fail to delete a document - no text", async () => {
+		// @ts-expect-error
+		await expect(client.editDocument(RESPONSE.document.documentId)).rejects.toThrow(new Error(NO_TEXT));
+	});
+
+	afterEach(() => {
+		fetchMock.reset();
 	});
 });
