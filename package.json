@@ -29,12 +29,15 @@
 	},
 	"homepage": "https://github.com/imperialbin/imperial-node#readme",
 	"dependencies": {
+		"@types/node": "^16.4.4",
 		"abort-controller": "^3.0.0",
 		"node-fetch": "^2.6.1"
 	},
+	"engines": {
+		"node": ">=8"
+	},
 	"devDependencies": {
 		"@types/jest": "^26.0.20",
-		"@types/node": "^15.6.1",
 		"@types/node-fetch": "^2.5.12",
 		"@typescript-eslint/eslint-plugin": "^4.13.0",
 		"@typescript-eslint/parser": "^4.13.0",

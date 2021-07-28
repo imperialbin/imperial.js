@@ -18,21 +18,27 @@ Installation is done using these commands:
 
 ```sh
 $ npm install imperial-node
-$ # if you use Typescript also install
-$ npm i @types/node --save-dev
 ```
 
 or with yarn
 
 ```sh
 $ yarn add imperial-node
-$ # if you use Typescript also install
-$ yarn add @types/node -D
 ```
 
 ## Example Usage
 
-Coming soon!
+```js
+import { Imperial } from "imperial-node";
+// or
+const Imperial = require("imperial-node").Imperial;
+
+const client = new Imperial(/* token */);
+
+client.createDocument("hello").then(console.log, console.error);
+```
+
+More can be found [in the Imperial Documentation](https://docs.imperialb.in/imperial-node/welcome).
 
 ## Running Locally
 
