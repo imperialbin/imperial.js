@@ -1,5 +1,6 @@
 import AbortController from "abort-controller";
 import fetch, { Response } from "node-fetch";
+import { FailedToFetch } from "../../errors";
 import { Aborted } from "../../errors/HTTPErrors/Aborted";
 import { Base } from "../Base";
 import type { Imperial } from "../Imperial";
@@ -81,7 +82,7 @@ export class Rest extends Base {
 			if (error.name === "AbortError") throw new Aborted();
 
 			// else throw the error
-			throw error;
+			throw new FailedToFetch(error);
 		} finally {
 			// clear the timeout
 			clearTimeout(abortTimeout);
