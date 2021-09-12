@@ -16,7 +16,7 @@ describe("createDocument", () => {
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.delete(`${client.rest.hostname}${client.rest.version}/purgeDocuments`, {
+		fetchMock.delete(`${client.rest.api}/purgeDocuments`, {
 			body: {
 				success: true,
 				message: "Deleted a total of 420 documents!",

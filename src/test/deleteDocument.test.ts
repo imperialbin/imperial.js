@@ -15,7 +15,7 @@ describe("createDocument", () => {
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.delete(`${client.rest.hostname}${client.rest.version}/document/${RESPONSE.document.documentId}`, {
+		fetchMock.delete(`${client.rest.api}/document/${RESPONSE.document.documentId}`, {
 			body: { success: true },
 			headers: { "Content-Type": "application/json" },
 		});
@@ -24,7 +24,7 @@ describe("createDocument", () => {
 	it("should delete a document - fully valid", async () => {
 		await client.deleteDocument(RESPONSE.document.documentId);
 
-		await client.deleteDocument(new URL(`https://imperialb.in/p/${RESPONSE.document.documentId}`));
+		await client.deleteDocument(new URL(`https://${client.rest.hostname}/p/${RESPONSE.document.documentId}`));
 	});
 
 	it("should fail to delete a document - no token", async () => {
@@ -36,16 +36,12 @@ describe("createDocument", () => {
 	it("should fail to delete a document - wrong id type", async () => {
 		const error = new Error(ID_WRONG_TYPE);
 
-		// @ts-expect-error
 		await expect(client.deleteDocument({})).rejects.toThrow(error);
 
-		// @ts-expect-error
 		await expect(client.deleteDocument([])).rejects.toThrow(error);
 
-		// @ts-expect-error
 		await expect(client.deleteDocument(12345)).rejects.toThrow(error);
 
-		// @ts-expect-error
 		await expect(client.deleteDocument(() => {})).rejects.toThrow(error);
 	});
 

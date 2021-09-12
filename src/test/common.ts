@@ -4,14 +4,15 @@ export const RESPONSE = {
 	success: true,
 	document: {
 		documentId: "bwxUUGyD",
-		language: null,
+		language: "auto",
 		imageEmbed: false,
 		instantDelete: true,
-		dateCreated: 1617463955786,
-		deleteDate: 1617895955786,
+		creationDate: 1617463955786,
+		expirationDate: 1617895955786,
 		allowedEditors: [],
 		encrypted: false,
 		password: null,
 		public: true,
+		views: 0,
 	},
 };

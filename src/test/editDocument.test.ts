@@ -15,7 +15,7 @@ describe("createDocument", () => {
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.patch(`${client.rest.hostname}${client.rest.version}/document`, (_: any, req: any) => {
+		fetchMock.patch(`${client.rest.api}/document`, (_: any, req: any) => {
 			if (JSON.parse(req.body).document !== RESPONSE.document.documentId)
 				return {
 					body: { success: false },
@@ -33,7 +33,7 @@ describe("createDocument", () => {
 		await client.editDocument(RESPONSE.document.documentId, "i am a valid edit");
 
 		await client.editDocument(
-			new URL(`https://imperialb.in/p/${RESPONSE.document.documentId}`),
+			new URL(`https://${client.rest.hostname}/p/${RESPONSE.document.documentId}`),
 			"i am a valid edit",
 		);
 	});

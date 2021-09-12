@@ -14,7 +14,7 @@ describe("createDocument", () => {
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.post(`${client.rest.hostname}${client.rest.version}/document`, {
+		fetchMock.post(`${client.rest.api}/document`, {
 			body: RESPONSE,
 			headers: { "Content-Type": "application/json" },
 		});

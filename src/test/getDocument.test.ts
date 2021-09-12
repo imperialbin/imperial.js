@@ -15,7 +15,7 @@ describe("createDocument", () => {
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.get(`${client.rest.hostname}${client.rest.version}/document/${RESPONSE.document.documentId}`, {
+		fetchMock.get(`${client.rest.api}/document/${RESPONSE.document.documentId}`, {
 			body: { success: true },
 			headers: { "Content-Type": "application/json" },
 		});
@@ -24,22 +24,18 @@ describe("createDocument", () => {
 	it("should fetch a document - fully valid", async () => {
 		await client.getDocument(RESPONSE.document.documentId);
 
-		await client.getDocument(new URL(`https://imperialb.in/p/${RESPONSE.document.documentId}`));
+		await client.getDocument(new URL(`https://${client.rest.hostname}/p/${RESPONSE.document.documentId}`));
 	});
 
 	it("should fail to fetch a document - wrong id type", async () => {
 		const error = new Error(ID_WRONG_TYPE);
 
-		// @ts-expect-error
 		await expect(client.getDocument({})).rejects.toThrow(error);
 
-		// @ts-expect-error
 		await expect(client.getDocument([])).rejects.toThrow(error);
 
-		// @ts-expect-error
 		await expect(client.getDocument(12345)).rejects.toThrow(error);
 
-		// @ts-expect-error
 		await expect(client.getDocument(() => {})).rejects.toThrow(error);
 	});
 
