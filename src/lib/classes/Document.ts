@@ -8,20 +8,22 @@ import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
 /**
  *  Imperial Document,
  *  All data from the Document can be accesed here
- *  @author https://github.com/pxseu & https://github.com/Hexiro
+ *  @author pxseu <https://github.com/pxseu> & hexiro <https://github.com/Hexiro>
  */
 export class Document extends Base {
 	constructor(client: Imperial, document: RawDocument) {
 		super(client);
 
-		if (document) this._setDocument(document);
+		if (!document) throw new Error("NO DATA WAS PROVIDED");
 
+		this._patch(document);
 		this.deleted = false;
 	}
 
-	private _setDocument(document: unknown) {
-		const documentData = document as RawDocument;
-
+	/**
+	 *  @internal
+	 */
+	public _patch(documentData: RawDocument) {
 		this.id = documentData.documentId;
 
 		if ("content" in documentData) {
@@ -49,10 +51,10 @@ export class Document extends Base {
 			this.views = 0;
 		}
 
-		this.editors = [];
-
 		if ("allowedEditors" in documentData) {
 			this.editors = documentData.allowedEditors;
+		} else if (!Array.isArray(documentData.allowedEditors)) {
+			this.editors = [];
 		}
 
 		if ("imageEmbed" in documentData) {
@@ -129,6 +131,7 @@ export class Document extends Base {
 
 	/**
 	 *  Deletes the current Document
+	 *  @returns Deleted Document
 	 */
 	public async delete(): Promise<Document> {
 		if (this.deleted) throw new DocumentNotFound();
@@ -143,12 +146,14 @@ export class Document extends Base {
 
 	/**
 	 *  Duplicates the current Document
+	 *  @returns Duplicated Document
 	 */
 	public duplicate(): Promise<Document>;
 
 	/**
 	 *  Duplicates the current Document
 	 *  @param options These will override the options from the current Document
+	 *  @returns Duplicated Document
 	 */
 	public duplicate(options: DocumentOptions): Promise<Document>;
 
@@ -169,15 +174,17 @@ export class Document extends Base {
 
 	/**
 	 *  Edits the content of the current Document
+	 *  @param content The new content of the Document
+	 *  @returns Edited Document
 	 */
 	public async edit(text: string): Promise<Document> {
 		if (this.deleted) throw new DocumentNotFound();
 
 		const document = await this.client.editDocument(this.id, text);
 
-		this._setDocument(document.toJSON());
+		const old = this._update(document.toJSON());
 
-		return this;
+		return old;
 	}
 
 	/**

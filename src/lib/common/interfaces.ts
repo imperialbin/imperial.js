@@ -90,3 +90,8 @@ export interface RawDocument extends ResponseDocument {
 export interface ImperialOptions {
 	requestTimeout?: number;
 }
+
+/**
+ *  Id or url of the document
+ */
+export type IdResolvable = string | any;

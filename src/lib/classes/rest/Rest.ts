@@ -21,12 +21,17 @@ export class Rest extends Base {
 	/**
 	 *  Imperial's hostname
 	 */
-	readonly hostname = "https://imperialb.in/api";
+	readonly hostname = "imperialb.in";
 
 	/**
 	 *  Api Vesrion
 	 */
 	readonly version = ""; // soon "/1"
+
+	/**
+	 *  Imperial Api url
+	 */
+	readonly api = `https://${this.hostname}/api${this.version}` as const;
 
 	/**
 	 *  Regular Expression that is used to match against in functions
@@ -56,8 +61,8 @@ export class Rest extends Base {
 		if (options.data)
 			try {
 				body = JSON.stringify(options.data);
-			} catch (e) {
-				throw new Error(`Failed to serialize data to JSON: ${e.message}`);
+			} catch (error: any) {
+				throw new Error(`Failed to serialize data to JSON: ${error?.message}`);
 			}
 
 		// create the controller
@@ -70,16 +75,16 @@ export class Rest extends Base {
 
 		try {
 			// make the request
-			response = await fetch(`${this.hostname}${this.version}${path}`, {
+			response = await fetch(`${this.api}${path}`, {
 				headers,
 				method,
 				body,
 				signal: controller.signal,
 				redirect: "error",
 			});
-		} catch (error) {
+		} catch (error: any) {
 			// if error was an aborted error, throw a custom error
-			if (error.name === "AbortError") throw new Aborted();
+			if (error?.name === "AbortError") throw new Aborted();
 
 			// else throw the error
 			throw new FailedToFetch(error);

@@ -1,4 +1,3 @@
-import type { URL } from "url";
 import { NO_ID, NO_TEXT, NO_TOKEN, OPTIONS_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../errors/Messages";
 import type {
 	ImperialOptions,
@@ -8,6 +7,7 @@ import type {
 	ImperialResponseGetDocument,
 	ImperialResponsePurgeDocuments,
 	PurgeDocuments,
+	IdResolvable,
 } from "../common/interfaces";
 import { OptionsSchema } from "../utils/schemas";
 import { validateToken } from "../utils/validToken";
@@ -20,15 +20,14 @@ import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
 import { ImperialError } from "../errors/ImperialError";
 import { NotAllowed } from "../errors/HTTPErrors/NotAllowed";
 import { defaultOptions } from "../utils/defaultOptions";
+import { stringify } from "../utils/stringify";
 
 /**
  *  The Imperial class
  *  Easiest way to interact with the Api
- *  @author https://github.com/pxseu
+ *  @author `pxseu` <https://github.com/pxseu>
  */
 export class Imperial {
-	private _token: string | undefined;
-
 	/**
 	 *  `Imperial` constructor
 	 *  @param token Your API token
@@ -53,13 +52,8 @@ export class Imperial {
 		const token = typeof tokenOrOptions === "string" ? tokenOrOptions : undefined;
 
 		this.setApiToken(token);
+		this.options = { ...defaultOptions, ...options };
 
-		Object.defineProperty(this, "options", {
-			value: {
-				...defaultOptions,
-				...options,
-			},
-		});
 		Object.defineProperty(this, "rest", { value: new Rest(this) });
 	}
 
@@ -75,7 +69,7 @@ export class Imperial {
 	 *
 	 */
 	public setApiToken(token: string | undefined = process.env.IMPERIAL_TOKEN): void {
-		if (validateToken(token)) this._token = token;
+		if (validateToken(token)) Object.defineProperty(this, "_token", { value: token, configurable: true });
 	}
 
 	/**
@@ -120,7 +114,7 @@ export class Imperial {
 			internalOptions.encrypted = true;
 		}
 
-		const content = String(text);
+		const content = stringify(text);
 
 		const data = await this.rest.request<ImperialResponseCreateDocument>("POST", "/document", {
 			data: {
@@ -142,7 +136,7 @@ export class Imperial {
 	 *  @example getDocument("someid").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public getDocument(id: string | URL): Promise<Document>;
+	public getDocument(id: IdResolvable): Promise<Document>;
 
 	/**
 	 *  Gets a Document from Imperial
@@ -151,12 +145,12 @@ export class Imperial {
 	 *  @example getDocument("someid", "you shall not pass").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public getDocument(id: string | URL, password: string): Promise<Document>;
+	public getDocument(id: IdResolvable, password: string): Promise<Document>;
 
 	/**
 	 *  Gets the Document from Imperial
 	 */
-	public async getDocument(id: string | URL, password?: string): Promise<Document> {
+	public async getDocument(id: IdResolvable, password?: string): Promise<Document> {
 		// Make the user inputed data encoded so it doesn't break stuff
 		const documentId = parseId(id, this.rest.hostnameCheckRegExp);
 
@@ -192,7 +186,7 @@ export class Imperial {
 	 *  @example deleteDocument("someid").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public async deleteDocument(id: string | URL): Promise<void> {
+	public async deleteDocument(id: IdResolvable): Promise<void> {
 		// If not token return
 		if (!this.apiToken) throw new Error(NO_TOKEN);
 
@@ -228,7 +222,7 @@ export class Imperial {
 	 *  @example editDocument("someid", "i am the new text!").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public async editDocument(id: string | URL, text: string): Promise<Document> {
+	public async editDocument(id: IdResolvable, text: string): Promise<Document> {
 		// If no token return
 		if (!this.apiToken) throw new Error(NO_TOKEN);
 
@@ -241,11 +235,13 @@ export class Imperial {
 		// If no newText was provided reutrn
 		if (!text) throw new Error(NO_TEXT);
 
+		const content = stringify(text);
+
 		try {
 			const data = await this.rest.request<ImperialResponseEditDocument>("PATCH", "/document", {
 				data: {
 					document: documentId,
-					newCode: String(text),
+					newCode: content,
 				},
 			});
 
@@ -298,6 +294,12 @@ export class Imperial {
 }
 
 export interface Imperial {
+	/**
+	 *  The token
+	 *  @internal
+	 */
+	_token: string | undefined;
+
 	/**
 	 *  Main Class to handle interactions with the REST Api
 	 *  @internal
