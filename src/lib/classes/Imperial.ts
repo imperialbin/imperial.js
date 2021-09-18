@@ -110,9 +110,7 @@ export class Imperial {
 		const internalOptions = options as DocumentOptions;
 
 		// If there is a password provided, make the document default to encypted
-		if (internalOptions?.password) {
-			internalOptions.encrypted = true;
-		}
+		internalOptions.encrypted = !!internalOptions?.password;
 
 		const content = stringify(text);
 
