@@ -14,8 +14,8 @@ import { validateToken } from "../utils/validToken";
 import { parseId } from "../utils/parseId";
 import { parsePassword } from "../utils/parsePassword";
 import { validateSchema } from "../utils/schemaValidator";
-import { Document } from "./Document";
-import { Rest } from "./rest/Rest";
+import { Document } from "../classes/Document";
+import { Rest } from "./Rest";
 import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
 import { ImperialError } from "../errors/ImperialError";
 import { NotAllowed } from "../errors/HTTPErrors/NotAllowed";
@@ -265,18 +265,6 @@ export class Imperial {
 	}
 
 	/**
-	 *  Verify if your token is valid | **Requires an API Token**
-	 *  @example verify().then(console.log)
-	 *  // shows if the token is valid
-	 */
-	public async verify(): Promise<void> {
-		// If no token return
-		if (!this.apiToken) throw new Error(NO_TOKEN);
-
-		await this.rest.request("GET", `/checkApiToken/${encodeURIComponent(this.apiToken)}`);
-	}
-
-	/**
 	 *  Delete **all** of your created Documents | **Requires an API Token**
 	 *  @example purgeDocuments().then(console.log)
 	 *  // shows if the token is valid
@@ -288,6 +276,18 @@ export class Imperial {
 		const { numberDeleted } = await this.rest.request<ImperialResponsePurgeDocuments>("DELETE", "/purgeDocuments");
 
 		return { numberDeleted };
+	}
+
+	/**
+	 *  Verify if your token is valid | **Requires an API Token**
+	 *  @example verify().then(console.log)
+	 *  // shows if the token is valid
+	 */
+	public async verify(): Promise<void> {
+		// If no token return
+		if (!this.apiToken) throw new Error(NO_TOKEN);
+
+		await this.rest.request("GET", `/checkApiToken/${encodeURIComponent(this.apiToken)}`);
 	}
 }
 

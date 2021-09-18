@@ -2,7 +2,7 @@ import AbortController from "abort-controller";
 import fetch, { Response } from "node-fetch";
 import { FailedToFetch } from "../../errors";
 import { Aborted } from "../../errors/HTTPErrors/Aborted";
-import { Base } from "../Base";
+import { BaseClient } from "../BaseClient";
 import type { Imperial } from "../Imperial";
 import { handleResponse } from "./responseHandler";
 
@@ -17,7 +17,7 @@ interface Options {
  *  Class for ease of rest Api requests
  *  @internal
  */
-export class Rest extends Base {
+export class Rest extends BaseClient {
 	/**
 	 *  Imperial's hostname
 	 */

@@ -1,4 +1,7 @@
-// Export all main classes
+// Export client
+export * from "./client";
+
+// Export all structures
 export * from "./classes";
 
 // Export all errors for the user

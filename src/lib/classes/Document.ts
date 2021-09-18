@@ -2,7 +2,7 @@ import { getDateDifference } from "../utils/dateDifference";
 import type { DocumentOptions, RawDocument } from "../common/interfaces";
 import { createFormatedLink, createRawLink } from "../utils/links";
 import { Base } from "./Base";
-import type { Imperial } from "./Imperial";
+import type { Imperial } from "../client/Imperial";
 import { DocumentNotFound } from "../errors/HTTPErrors/DocumentNotFound";
 
 /**

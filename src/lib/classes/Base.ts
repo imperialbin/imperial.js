@@ -1,5 +1,5 @@
 import { flatten } from "../utils/flatten";
-import type { Imperial } from "./Imperial";
+import type { Imperial } from "../client/Imperial";
 
 export abstract class Base {
 	constructor(client: Imperial) {
