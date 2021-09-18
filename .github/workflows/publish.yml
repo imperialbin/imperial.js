@@ -18,8 +18,9 @@ jobs:
                   registry-url: https://registry.npmjs.org/
 
             - name: Check if tag is pre-release
-              id: check-tag
+              id: tag
               run: |
+                  echo ::set-output name=name::${GITHUB_REF#refs/*/}
                   if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$ ]]; then
                     echo ::set-output name=match::true
                   fi
@@ -50,7 +51,7 @@ jobs:
               uses: "marvinpinto/action-automatic-releases@latest"
               with:
                   repo_token: ${{ secrets.GITHUB_TOKEN }}
-                  prerelease: ${{ steps.check-tag.outputs.match == 'true' }}
-                  title: "Version: ${{ steps.vars.outputs.tag }}"
+                  prerelease: ${{ steps.tag.outputs.match == 'true' }}
+                  title: "Version: ${{ steps.tag.outputs.name }}"
                   files: |
                       *.tgz
