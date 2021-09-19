@@ -1,4 +1,4 @@
-# imperial-node
+# imperial.js
 
 > A hastebin alternative but with user experience in mind with much more features!
 
@@ -17,28 +17,28 @@ Before using, make sure you have Node.js 8.0.0 or higher installed.
 Installation is done using these commands:
 
 ```sh
-$ npm install imperial-node
+$ npm install imperial.js
 ```
 
 or with yarn
 
 ```sh
-$ yarn add imperial-node
+$ yarn add imperial.js
 ```
 
 ## Example Usage
 
 ```js
-import { Imperial } from "imperial-node";
+import { Imperial } from "imperial.js";
 // or
-const Imperial = require("imperial-node").Imperial;
+const Imperial = require("imperial.js").Imperial;
 
 const client = new Imperial(/* token */);
 
 client.createDocument("hello").then(console.log, console.error);
 ```
 
-More can be found [in the Imperial Documentation](https://docs.imperialb.in/imperial-node/welcome).
+More can be found [in the Imperial Documentation](https://docs.imperialb.in/imperial.js/welcome).
 
 ## Running Locally
 
