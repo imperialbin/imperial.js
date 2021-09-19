@@ -19,6 +19,11 @@ interface Options {
  */
 export class Rest extends BaseClient {
 	/**
+	 *  Useragent
+	 */
+	readonly useragent: string = `imperial.js; (+https://github.com/imperialbin/imperial.js) NodeJS ${process.versions.node} on ${process.platform}`;
+
+	/**
 	 *  Imperial's hostname
 	 */
 	readonly hostname = "imperialb.in";
@@ -42,7 +47,7 @@ export class Rest extends BaseClient {
 		// default headers
 		const defaultHeaders: Record<string, any> = {
 			"Content-Type": "application/json",
-			"User-Agent": "imperial-node; (+https://github.com/imperialbin/imperial-node)",
+			"User-Agent": this.useragent,
 		};
 
 		// add authorization header if apiToken is set
