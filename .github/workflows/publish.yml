@@ -48,7 +48,7 @@ jobs:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Publish Canary!
-              if: ${{ steps.tag.outputs.match != 'true' }}
+              if: ${{ steps.tag.outputs.match == 'true' }}
               run: yarn publish --non-interactive --tag canary
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
