@@ -21,46 +21,46 @@ describe("createDocument", () => {
 	});
 
 	it("should create a document - fully valid", async () => {
-		const document = await client.createDocument("i am a valid request");
+		const document = await client.document.create("i am a valid request");
 
-		expect(document.id).toBe(RESPONSE.document.documentId);
-		expect(document.public).toBe(RESPONSE.document.public);
-		expect(document.imageEmbed).toBe(RESPONSE.document.imageEmbed);
+		expect(document.id).toBe(RESPONSE.data.id);
+		expect(document.settings.public).toBe(RESPONSE.data.settings.public);
+		expect(document.settings.imageEmbed).toBe(RESPONSE.data.settings.imageEmbed);
 	});
 
 	it("should create a document - text not a string", async () => {
 		// @ts-expect-error
-		await expect(client.createDocument({})).resolves.toBeInstanceOf(Document);
+		await expect(client.document.create({})).resolves.toBeInstanceOf(Document);
 
 		// @ts-expect-error
-		await expect(client.createDocument([])).resolves.toBeInstanceOf(Document);
+		await expect(client.document.create([])).resolves.toBeInstanceOf(Document);
 
 		// @ts-expect-error
-		await expect(client.createDocument(12345)).resolves.toBeInstanceOf(Document);
+		await expect(client.document.create(12345)).resolves.toBeInstanceOf(Document);
 
 		// @ts-expect-error
-		await expect(client.createDocument(() => {})).resolves.toBeInstanceOf(Document);
+		await expect(client.document.create(() => {})).resolves.toBeInstanceOf(Document);
 	});
 
 	it("should fail to create a document - wrong second parameter", async () => {
 		const error = new TypeError(OPTIONS_WRONG_TYPE);
 
 		// @ts-expect-error
-		await expect(client.createDocument("STRING", "")).rejects.toThrow(error);
+		await expect(client.document.create("STRING", "")).rejects.toThrow(error);
 
 		// @ts-expect-error
-		await expect(client.createDocument("ARRAY", [])).rejects.toThrow(error);
+		await expect(client.document.create("ARRAY", [])).rejects.toThrow(error);
 
 		// @ts-expect-error
-		await expect(client.createDocument("NUMBER", 12345)).rejects.toThrow(error);
+		await expect(client.document.create("NUMBER", 12345)).rejects.toThrow(error);
 
 		// @ts-expect-error
-		await expect(client.createDocument("NULL", null)).rejects.toThrow(error);
+		await expect(client.document.create("NULL", null)).rejects.toThrow(error);
 	});
 
 	it("should fail to create a document - no data", async () => {
 		// @ts-expect-error
-		await expect(client.createDocument()).rejects.toThrow(new Error(NO_TEXT));
+		await expect(client.document.create()).rejects.toThrow(new Error(NO_TEXT));
 	});
 
 	afterEach(() => {

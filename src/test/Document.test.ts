@@ -1,7 +1,5 @@
 import { Document, Imperial } from "../lib";
-import { IMPERIAL_TOKEN, RESPONSE } from "./common";
-
-const DAY = 86_400_000;
+import { DAY, IMPERIAL_TOKEN, RESPONSE } from "./common";
 
 describe("Document", () => {
 	const content = "test";
@@ -9,20 +7,25 @@ describe("Document", () => {
 	let document: Document;
 
 	beforeEach(() => {
-		document = new Document(client, { ...RESPONSE.document, content });
+		document = new Document(client, { ...RESPONSE.data, content });
 	});
 
 	it("should be valid", () => {
 		expect(document).toBeInstanceOf(Document);
-		expect(document.id).toBe(RESPONSE.document.documentId);
-		expect(document.link).toBe(`https://${client.rest.hostname}/p/${RESPONSE.document.documentId}`);
+		expect(document.id).toBe(RESPONSE.data.id);
+		expect(document.link).toBe(`https://${client.rest.hostname}/p/${RESPONSE.data.id}`);
 		expect(document.content).toBe(content);
-		expect(document.creation).toBeInstanceOf(Date);
-		expect(document.daysLeft).toBe(null);
+		expect(document.timestamps.creation).toBeInstanceOf(Date);
+		expect(document.timestamps.daysLeft).toBe(null);
 	});
 
 	it("should not be null", () => {
-		document = new Document(client, { ...document.toJSON(), expirationDate: new Date().valueOf() + DAY });
-		expect(document.daysLeft).not.toBe(null);
+		const json = document.toJSON();
+
+		document = new Document(client, {
+			...json,
+			timestamps: { ...json.timestamps, expiration: (new Date().valueOf() + DAY) / 1000 },
+		});
+		expect(document.timestamps.daysLeft).not.toBe(null);
 	});
 });
