@@ -1,6 +1,6 @@
 const isObject = (object: unknown) => typeof object === "object" && object !== null;
 
-export const flatten = (object: Record<string, unknown>, ...props: Record<string, string | boolean>[]): any => {
+export const objectify = (object: Record<string, unknown>, ...props: Record<string, string | boolean>[]): any => {
 	if (!isObject(object)) return object;
 
 	const objProps = Object.keys(object)
@@ -20,9 +20,11 @@ export const flatten = (object: Record<string, unknown>, ...props: Record<string
 			const element = (object as any)[prop] as any;
 			const elemIsObj = isObject(element);
 			const valueOf = elemIsObj && typeof element.valueOf === "function" ? element.valueOf() : null;
+			const toJson = elemIsObj && typeof element.toJSON === "function" ? element.toJSON() : null;
 
-			if (Array.isArray(element)) out[currProp] = element.map((e) => flatten(e));
+			if (Array.isArray(element)) out[currProp] = element.map((e) => objectify(e));
 			else if (typeof valueOf !== "object") out[currProp] = valueOf;
+			else if (toJson !== null) out[currProp] = toJson;
 			else if (!elemIsObj) out[currProp] = element;
 		}
 	}

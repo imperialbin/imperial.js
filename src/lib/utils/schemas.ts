@@ -1,23 +1,35 @@
 import type { Schema } from "./schemaValidator";
 
-export const OptionsSchema = {
+export const EditOptionsSchema: Schema = {
 	editors: {
 		message: "an Array of Strings",
 		test: (value) => Array.isArray(value) && value.filter((element) => typeof element !== "string").length === 0,
-	},
-	longerUrls: {
-		message: "a Boolean",
-		test: (value) => typeof value === "boolean",
-	},
-	shortUrls: {
-		message: "a Boolean",
-		test: (value) => typeof value === "boolean",
 	},
 	instantDelete: {
 		message: "a Boolean",
 		test: (value) => typeof value === "boolean",
 	},
 	imageEmbed: {
+		message: "a Boolean",
+		test: (value) => typeof value === "boolean",
+	},
+	language: {
+		message: "a String",
+		test: (value) => typeof value === "string",
+	},
+	public: {
+		message: "a Boolean",
+		test: (value) => typeof value === "boolean",
+	},
+};
+
+export const CreateOptionsSchema: Schema = {
+	...EditOptionsSchema,
+	longerUrls: {
+		message: "a Boolean",
+		test: (value) => typeof value === "boolean",
+	},
+	shortUrls: {
 		message: "a Boolean",
 		test: (value) => typeof value === "boolean",
 	},
@@ -33,12 +45,8 @@ export const OptionsSchema = {
 		message: "a String",
 		test: (value) => typeof value === "string",
 	},
-	language: {
-		message: "a String",
-		test: (value) => typeof value === "string",
-	},
-	public: {
+	createGist: {
 		message: "a Boolean",
 		test: (value) => typeof value === "boolean",
 	},
-} as Schema;
+};
