@@ -1,4 +1,4 @@
-import { flatten } from "../utils/flatten";
+import { objectify } from "../utils/objectify";
 import type { Imperial } from "../client/Imperial";
 
 export abstract class Base {
@@ -30,9 +30,9 @@ export abstract class Base {
 		return clone;
 	}
 
-	public toJSON(...props: Parameters<typeof flatten>[1][]) {
+	public toJSON(...props: Parameters<typeof objectify>[1][]) {
 		// a little hack so typing do not yell at me
-		return flatten(this as Record<string, unknown>, ...props);
+		return objectify(this as Record<string, unknown>, ...props);
 	}
 }
 
