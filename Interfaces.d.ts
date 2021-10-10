@@ -3,4 +3,5 @@
  *  declarations that they could reuse
  */
 
-export * from "./lib/common/interfaces";
+export * from "./lib/types/common";
+export * from "./lib/types/document";
