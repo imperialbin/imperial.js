@@ -31,12 +31,12 @@ export class Rest extends BaseClient {
 	/**
 	 *  Api Vesrion
 	 */
-	readonly version = ""; // soon "/1"
+	readonly version = "v1"; // soon "/1"
 
 	/**
 	 *  Imperial Api url
 	 */
-	readonly api = `https://${this.hostname}/api${this.version}` as const;
+	readonly api = `https://staging-balls-api.impb.in/${this.version}` as const;
 
 	/**
 	 *  Regular Expression that is used to match against in functions
@@ -104,5 +104,5 @@ export class Rest extends BaseClient {
 }
 
 export interface Rest {
-	client: Imperial;
+	readonly client: Imperial;
 }

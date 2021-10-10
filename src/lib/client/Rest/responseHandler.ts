@@ -1,12 +1,12 @@
 import type { Response } from "node-fetch";
 import { URL } from "url";
-import { imperialResponses } from "./responseMap";
 import { noError, statusMessage } from "./statusCode";
 import { ImperialError } from "../../errors/ImperialError";
-import type { ImperialResponseCommon } from "../../common/interfaces";
 
-interface InternalResponse extends ImperialResponseCommon {
+interface InternalResponse<T> {
 	success: boolean;
+	data: T;
+	message?: string;
 	[key: string]: unknown;
 }
 
@@ -14,7 +14,7 @@ interface InternalResponse extends ImperialResponseCommon {
  *  @internal
  */
 export const handleResponse = async <T extends unknown>(response: Response): Promise<T> => {
-	let json: InternalResponse | undefined;
+	let json: InternalResponse<T> | undefined;
 
 	// try to parse the json data
 	try {
@@ -24,18 +24,20 @@ export const handleResponse = async <T extends unknown>(response: Response): Pro
 	}
 
 	// remove not needed data
-	const { success, message, ...content } = json ?? {};
+	const { success, message, data } = json ?? {};
 
 	// extract the status code
 	const { status } = response;
 
+	// console.log(status, data);
+
 	// if everything is okay resolve
 	if (status && noError(status) && success === true) {
-		return content as never;
+		return data as T;
 	}
 
 	// find an error message
-	const errorMsg = imperialResponses(message) ?? message ?? statusMessage(status) ?? `Status code ${status ?? null}`;
+	const errorMsg = message ?? statusMessage(status) ?? `Status code ${status ?? null}`;
 
 	// throw an error
 	throw new ImperialError({ message: errorMsg, status, path: new URL(response.url).pathname });
