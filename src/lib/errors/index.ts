@@ -1,5 +1,6 @@
-export { DocumentNotFound } from "./HTTPErrors/DocumentNotFound";
-export { NotAllowed } from "./HTTPErrors/NotAllowed";
+export { DocumentNotFound } from "./Imperial/DocumentNotFound";
 export { ImperialError } from "./ImperialError";
 export { Aborted } from "./HTTPErrors/Aborted";
 export { FailedToFetch } from "./HTTPErrors/FailedToFetch";
+export { NotAllowed } from "./Imperial/EditNotAllowed";
+export { WrongPassword } from "./Imperial/WrongPassword";
