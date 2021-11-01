@@ -1,4 +1,4 @@
-import type { Imperial } from "..";
+import type { Imperial } from "../client";
 
 export class Base {
 	constructor(client: Imperial) {
