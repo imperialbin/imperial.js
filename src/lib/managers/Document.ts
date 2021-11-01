@@ -1,14 +1,13 @@
 import { Base } from "./Base";
-import { NO_ID, NO_TEXT, NO_TOKEN, OPTIONS_WRONG_TYPE, PASSWORD_WRONG_TYPE } from "../../errors/Messages";
-import type { IdResolvable } from "../../types/common";
-import type { DocumentEditOptions, Document as ResponseDocument, DocumentCreateOptions } from "../../types/document";
-import { CreateOptionsSchema, EditOptionsSchema } from "../../utils/schemas";
-import { parseId } from "../../utils/parseId";
-import { parsePassword } from "../../utils/parsePassword";
-import { validateSchema } from "../../utils/schemaValidator";
-import { Document } from "../../classes/Document";
-import { stringify } from "../../utils/stringify";
-import { WrongPassword, NotAllowed, DocumentNotFound, ImperialError } from "../../errors";
+import { ErrorMessage } from "../errors/Messages";
+import type { IdResolvable } from "../types/common";
+import type { DocumentEditOptions, Document as ResponseDocument, DocumentCreateOptions } from "../types/document";
+import { CreateOptionsSchema, EditOptionsSchema } from "../utils/schemas";
+import { parseId } from "../utils/parseId";
+import { parsePassword } from "../utils/parsePassword";
+import { validateSchema } from "../utils/schemaValidator";
+import { Document } from "../classes/Document";
+import { stringify } from "../utils/stringify";
 
 export class DocumentManager extends Base {
 	/**
@@ -34,9 +33,10 @@ export class DocumentManager extends Base {
 	 */
 	public async create(text: string, options: DocumentCreateOptions = {}): Promise<Document> {
 		// If no text or text is an emtpy string reutrn
-		if (!text) throw new Error(NO_TEXT);
+		if (!text) throw new Error(ErrorMessage("NO_TEXT"));
 
-		if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError(OPTIONS_WRONG_TYPE);
+		if (!options || typeof options !== "object" || Array.isArray(options))
+			throw new TypeError(ErrorMessage("OPTIONS_WRONG_TYPE"));
 
 		const validateOptions = validateSchema(options as never, CreateOptionsSchema);
 
@@ -85,40 +85,22 @@ export class DocumentManager extends Base {
 	 */
 	public async get(id: IdResolvable, password?: string): Promise<Document> {
 		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = parseId(id, this.client.rest.hostnameCheckRegExp);
-
-		// If the id is emtpy return
-		if (!documentId) throw new Error(NO_ID);
+		const documentId = parseId(id, this.client.rest.hostnameRe);
 
 		// If no password was set try to extract it from the id
 		const documentPassword = password ?? parsePassword(id);
 
-		if (documentPassword && typeof documentPassword !== "string") throw new Error(PASSWORD_WRONG_TYPE);
+		if (documentPassword && typeof documentPassword !== "string")
+			throw new TypeError(ErrorMessage("PASSWORD_WRONG_TYPE"));
 
-		try {
-			const data = await this.client.rest.request<ResponseDocument>(
-				"GET",
-				`/document/${encodeURIComponent(documentId)}${
-					documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""
-				}`,
-			);
+		const data = await this.client.rest.request<ResponseDocument>(
+			"GET",
+			`/document/${encodeURIComponent(documentId)}${
+				documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""
+			}`,
+		);
 
-			return new Document(this.client, data);
-		} catch (error) {
-			if (error instanceof ImperialError) {
-				switch (error.status) {
-					case 404:
-						throw new DocumentNotFound(error);
-
-					case 401:
-						throw new WrongPassword(error);
-
-					default: // Empty because we throw bellow
-				}
-			}
-
-			throw error;
-		}
+		return new Document(this.client, data);
 	}
 
 	/**
@@ -142,18 +124,16 @@ export class DocumentManager extends Base {
 
 	public async edit(id: IdResolvable, text: string, options: DocumentEditOptions = {}): Promise<Document> {
 		// If no token return
-		if (!this.client.apiToken) throw new Error(NO_TOKEN);
+		if (!this.client.apiToken) throw new Error(ErrorMessage("NO_TOKEN"));
 
 		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = parseId(id, this.client.rest.hostnameCheckRegExp);
-
-		// If the id is emtpy return
-		if (!documentId) throw new Error(NO_ID);
+		const documentId = parseId(id, this.client.rest.hostnameRe);
 
 		// If no newText was provided reutrn
-		if (!text) throw new Error(NO_TEXT);
+		if (!text) throw new Error(ErrorMessage("NO_TEXT"));
 
-		if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError(OPTIONS_WRONG_TYPE);
+		if (!options || typeof options !== "object" || Array.isArray(options))
+			throw new TypeError(ErrorMessage("OPTIONS_WRONG_TYPE"));
 
 		const validateOptions = validateSchema(options as never, EditOptionsSchema);
 
@@ -167,31 +147,15 @@ export class DocumentManager extends Base {
 
 		const content = stringify(text);
 
-		try {
-			const data = await this.client.rest.request<ResponseDocument>("PATCH", "/document", {
-				data: {
-					id: documentId,
-					content,
-					settings,
-				},
-			});
+		const data = await this.client.rest.request<ResponseDocument>("PATCH", "/document", {
+			data: {
+				id: documentId,
+				content,
+				settings,
+			},
+		});
 
-			return new Document(this.client, data);
-		} catch (error) {
-			if (error instanceof ImperialError) {
-				switch (error.status) {
-					case 404:
-						throw new DocumentNotFound(error);
-
-					case 401:
-						throw new NotAllowed(error);
-
-					default: // Empty because we throw bellow
-				}
-			}
-
-			throw error;
-		}
+		return new Document(this.client, data);
 	}
 
 	/**
@@ -202,30 +166,11 @@ export class DocumentManager extends Base {
 	 */
 	public async delete(id: IdResolvable): Promise<void> {
 		// If not token return
-		if (!this.client.apiToken) throw new Error(NO_TOKEN);
+		if (!this.client.apiToken) throw new Error(ErrorMessage("NO_TOKEN"));
 
 		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = parseId(id, this.client.rest.hostnameCheckRegExp);
+		const documentId = parseId(id, this.client.rest.hostnameRe);
 
-		// If the id is emtpy return
-		if (!documentId) throw new Error(NO_ID);
-
-		try {
-			await this.client.rest.request("DELETE", `/document/${encodeURIComponent(documentId)}`);
-		} catch (error) {
-			if (error instanceof ImperialError) {
-				switch (error.status) {
-					case 404:
-						throw new DocumentNotFound(error);
-
-					case 401:
-						throw new NotAllowed(error);
-
-					default: // Empty because we throw bellow
-				}
-			}
-
-			throw error;
-		}
+		await this.client.rest.request("DELETE", `/document/${encodeURIComponent(documentId)}`);
 	}
 }
