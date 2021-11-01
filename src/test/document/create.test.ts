@@ -3,9 +3,9 @@
 import fetchMockJest from "fetch-mock-jest";
 jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
-import { Document, Imperial } from "../lib";
-import { NO_TEXT, OPTIONS_WRONG_TYPE } from "../lib/errors/Messages";
-import { IMPERIAL_TOKEN, RESPONSE } from "./common";
+import { Document, Imperial } from "../../lib";
+import { ErrorMessage } from "../../lib/errors/Messages";
+import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
 const fetchMock: typeof fetchMockJest = require("node-fetch");
 
 describe("createDocument", () => {
@@ -15,7 +15,7 @@ describe("createDocument", () => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
 		fetchMock.post(`${client.rest.api}/document`, {
-			body: RESPONSE,
+			body: RESPONSE_DOCUMENT,
 			headers: { "Content-Type": "application/json" },
 		});
 	});
@@ -23,9 +23,9 @@ describe("createDocument", () => {
 	it("should create a document - fully valid", async () => {
 		const document = await client.document.create("i am a valid request");
 
-		expect(document.id).toBe(RESPONSE.data.id);
-		expect(document.settings.public).toBe(RESPONSE.data.settings.public);
-		expect(document.settings.imageEmbed).toBe(RESPONSE.data.settings.imageEmbed);
+		expect(document.id).toBe(RESPONSE_DOCUMENT.data.id);
+		expect(document.settings.public).toBe(RESPONSE_DOCUMENT.data.settings.public);
+		expect(document.settings.imageEmbed).toBe(RESPONSE_DOCUMENT.data.settings.imageEmbed);
 	});
 
 	it("should create a document - text not a string", async () => {
@@ -43,7 +43,7 @@ describe("createDocument", () => {
 	});
 
 	it("should fail to create a document - wrong second parameter", async () => {
-		const error = new TypeError(OPTIONS_WRONG_TYPE);
+		const error = new TypeError(ErrorMessage("OPTIONS_WRONG_TYPE"));
 
 		// @ts-expect-error
 		await expect(client.document.create("STRING", "")).rejects.toThrow(error);
@@ -60,7 +60,7 @@ describe("createDocument", () => {
 
 	it("should fail to create a document - no data", async () => {
 		// @ts-expect-error
-		await expect(client.document.create()).rejects.toThrow(new Error(NO_TEXT));
+		await expect(client.document.create()).rejects.toThrow(new Error(ErrorMessage("NO_TEXT")));
 	});
 
 	afterEach(() => {
