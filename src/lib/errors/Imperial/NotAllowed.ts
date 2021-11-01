@@ -4,7 +4,7 @@ export class NotAllowed extends ImperialError {
 	constructor(...args: ConstructorParameters<typeof ImperialError>) {
 		super(...args);
 
-		this.message = "Sorry! You aren't allowed to modify this document.";
+		this.message = "You're not authorized for this action";
 		this.status = 401;
 	}
 }

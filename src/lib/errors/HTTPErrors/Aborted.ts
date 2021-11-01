@@ -4,6 +4,6 @@ export class Aborted extends ImperialError {
 	constructor(...args: ConstructorParameters<typeof ImperialError>) {
 		super(...args);
 
-		this.message = "Requst was aborted.";
+		this.message = "Requst was aborted";
 	}
 }

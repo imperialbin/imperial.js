@@ -11,7 +11,6 @@ export class ImperialError extends Error {
 
 	constructor(errorData: ImperialErrorInterface = {}) {
 		super(errorData?.message);
-
 		this.name = "ImperialError";
 
 		if ("status" in errorData) this.status = errorData.status;
