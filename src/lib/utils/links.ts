@@ -1,9 +1,9 @@
-import type { Imperial } from "../client/Imperial";
+import type { Imperial } from "../client";
 
 /**
  *  @internal
  */
-export const createFormatedLink = (client: Imperial, id: string): string => `https://${client.rest.hostname}/p/${id}`;
+export const createFormatedLink = (client: Imperial, id: string): string => `https://${client.rest.hostname}/${id}`;
 
 /**
  *  @internal
