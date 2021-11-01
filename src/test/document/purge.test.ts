@@ -3,9 +3,9 @@
 import fetchMockJest from "fetch-mock-jest";
 jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
-import { Imperial } from "../lib";
-import { NO_TOKEN } from "../lib/errors/Messages";
-import { IMPERIAL_TOKEN } from "./common";
+import { Imperial } from "../../lib";
+import { ErrorMessage } from "../../lib/errors/Messages";
+import { IMPERIAL_TOKEN } from "../common";
 const fetchMock: typeof fetchMockJest = require("node-fetch");
 
 const numberDeleted = 420;
@@ -37,7 +37,7 @@ describe("purgeDocument", () => {
 		client.setApiToken();
 
 		// @ts-ignore
-		await expect(client.purgeDocuments()).rejects.toThrowError(new Error(NO_TOKEN));
+		await expect(client.purgeDocuments()).rejects.toThrowError(new Error(ErrorMessage("NO_TOKEN")));
 	});
 
 	afterEach(() => {

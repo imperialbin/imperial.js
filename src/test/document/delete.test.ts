@@ -4,9 +4,9 @@ import fetchMockJest from "fetch-mock-jest";
 import { URL } from "url";
 jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
-import { Imperial } from "../lib";
-import { ID_WRONG_TYPE, NO_ID, NO_TOKEN } from "../lib/errors/Messages";
-import { IMPERIAL_TOKEN, RESPONSE } from "./common";
+import { Imperial } from "../../lib";
+import { ErrorMessage } from "../../lib/errors/Messages";
+import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
 const fetchMock: typeof fetchMockJest = require("node-fetch");
 
 describe("deleteDocument", () => {
@@ -15,26 +15,28 @@ describe("deleteDocument", () => {
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.delete(`${client.rest.api}/document/${RESPONSE.data.id}`, {
+		fetchMock.delete(`${client.rest.api}/document/${RESPONSE_DOCUMENT.data.id}`, {
 			body: { success: true },
 			headers: { "Content-Type": "application/json" },
 		});
 	});
 
 	it("should delete a document - fully valid", async () => {
-		await client.document.delete(RESPONSE.data.id);
+		await client.document.delete(RESPONSE_DOCUMENT.data.id);
 
-		await client.document.delete(new URL(`https://${client.rest.hostname}/p/${RESPONSE.data.id}`));
+		await client.document.delete(new URL(`https://${client.rest.hostname}/${RESPONSE_DOCUMENT.data.id}`));
 	});
 
 	it("should fail to delete a document - no token", async () => {
 		client.setApiToken(undefined);
 
-		await expect(client.document.delete(RESPONSE.data.id)).rejects.toThrow(new Error(NO_TOKEN));
+		await expect(client.document.delete(RESPONSE_DOCUMENT.data.id)).rejects.toThrow(
+			new Error(ErrorMessage("NO_TOKEN")),
+		);
 	});
 
 	it("should fail to delete a document - wrong id type", async () => {
-		const error = new Error(ID_WRONG_TYPE);
+		const error = new TypeError(ErrorMessage("ID_WRONG_TYPE"));
 
 		await expect(client.document.delete({})).rejects.toThrow(error);
 
@@ -47,7 +49,7 @@ describe("deleteDocument", () => {
 
 	it("should fail to delete a document - no id", async () => {
 		// @ts-expect-error
-		await expect(client.document.delete()).rejects.toThrow(new Error(NO_ID));
+		await expect(client.document.delete()).rejects.toThrow(new Error(ErrorMessage("NO_ID")));
 	});
 
 	afterEach(() => {
