@@ -3,7 +3,7 @@ import type { Timestamps as ITimeStamps } from "../../types/document";
 import { getDateDifference } from "../../utils/dateDifference";
 import { Base } from "../Base";
 
-export class Timestamps extends Base {
+export class Timestamps extends Base<ITimeStamps> {
 	constructor(client: Imperial, timestamps: ITimeStamps) {
 		super(client);
 
@@ -23,15 +23,26 @@ export class Timestamps extends Base {
 		if ("expiration" in timestamps) {
 			this.expiration = new Date(timestamps.expiration * 1000);
 		}
+
+		return timestamps;
 	}
 
 	/**
 	 *  The ammount of days the Doucment will expire at from the current moment
+	 *  @returns {number} The ammount of days the Document will expire at from the current moment
 	 */
 	public get daysLeft(): number | null {
 		const daysLeft = getDateDifference(new Date(), this.expiration);
 		if (daysLeft <= 0) return null;
 		return daysLeft;
+	}
+
+	/**
+	 *  The ammount of days the Document will expire at from it's creation date
+	 *  @returns {number} The ammount of days the Document will expire at from it's creation date
+	 */
+	public get expirationDays(): number {
+		return getDateDifference(this.creation, this.expiration);
 	}
 }
 

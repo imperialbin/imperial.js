@@ -2,7 +2,7 @@ import type { Imperial } from "../..";
 import type { Settings as ISettings } from "../../types/document";
 import { Base } from "../Base";
 
-export class Settings extends Base {
+export class Settings extends Base<ISettings> {
 	constructor(client: Imperial, settings: ISettings) {
 		super(client);
 
@@ -58,11 +58,17 @@ export class Settings extends Base {
 			// @ts-ignore
 			this.imageEmbed = false;
 		}
-	}
 
-	public toJSON() {
-		return super.toJSON();
+		return settings;
 	}
 }
 
-export interface Settings extends ISettings {}
+export interface Settings {
+	language: string;
+	imageEmbed: boolean;
+	instantDelete: boolean;
+	encrypted: boolean;
+	password: string | null;
+	public: boolean;
+	editors: string[];
+}
