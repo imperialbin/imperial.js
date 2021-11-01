@@ -1,4 +1,4 @@
-import { SCHEMA_FAILED_VALIDATION /* , SCHEMA_INVALID_KEY */ } from "../errors/Messages";
+import { ErrorMessage } from "../errors/Messages";
 
 export interface Schema {
 	[key: string]: {
@@ -20,7 +20,10 @@ export function validateSchema<T extends Record<string, unknown>>(object: T, sch
 				(object[key] !== undefined && !schema[key].test(object[key])) ||
 				(object[key] === undefined && schema[key].required),
 		)
-		.map((key) => new Error(SCHEMA_FAILED_VALIDATION(key, schema[key].message, schema[key].required)));
+		.map(
+			(key) =>
+				new Error(ErrorMessage("SCHEMA_FAILED_VALIDATION")(key, schema[key].message, schema[key].required)),
+		);
 
 	if (errors.length > 0) return errors[0];
 
