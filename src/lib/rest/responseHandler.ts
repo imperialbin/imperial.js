@@ -1,7 +1,7 @@
 import type { Response } from "node-fetch";
 import { URL } from "url";
 import { noError, statusMessage } from "./statusCode";
-import { ImperialError } from "../../errors/ImperialError";
+import { ImperialError, NotAllowed, NotFound } from "../errors";
 
 interface InternalResponse<T> {
 	success: boolean;
@@ -24,7 +24,7 @@ export const handleResponse = async <T extends unknown>(response: Response): Pro
 	}
 
 	// remove not needed data
-	const { success, message, data } = json ?? {};
+	const { success, data } = json ?? {};
 
 	// extract the status code
 	const { status } = response;
@@ -37,8 +37,22 @@ export const handleResponse = async <T extends unknown>(response: Response): Pro
 	}
 
 	// find an error message
-	const errorMsg = message ?? statusMessage(status) ?? `Status code ${status ?? null}`;
+	const { pathname: path } = new URL(response.url);
 
-	// throw an error
-	throw new ImperialError({ message: errorMsg, status, path: new URL(response.url).pathname });
+	switch (status) {
+		case 401: {
+			throw new NotAllowed({ path });
+		}
+
+		case 404: {
+			throw new NotFound({ path });
+		}
+
+		default: {
+			const message = json?.message ?? statusMessage(status) ?? `Status: ${status ?? null}`;
+
+			// throw an error
+			throw new ImperialError({ message, status, path });
+		}
+	}
 };

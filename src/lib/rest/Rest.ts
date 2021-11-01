@@ -1,10 +1,11 @@
 import AbortController from "abort-controller";
-import fetch, { Response } from "node-fetch";
-import { FailedToFetch } from "../../errors";
-import { Aborted } from "../../errors/HTTPErrors/Aborted";
-import { BaseClient } from "../BaseClient";
-import type { Imperial } from "../Imperial";
+import type { Response } from "node-fetch";
+import { FailedToFetch } from "../errors";
+import { Aborted } from "../errors/HTTPErrors/Aborted";
+import { BaseClient } from "../client/BaseClient";
+import type { Imperial } from "../client";
 import { handleResponse } from "./responseHandler";
+import fetch from "../utils/fetch";
 
 type Methods = "POST" | "GET" | "PATCH" | "DELETE";
 
@@ -26,7 +27,7 @@ export class Rest extends BaseClient {
 	/**
 	 *  Imperial's hostname
 	 */
-	readonly hostname = "imperialb.in";
+	readonly hostname = "staging.impb.in";
 
 	/**
 	 *  Api Vesrion
@@ -41,7 +42,7 @@ export class Rest extends BaseClient {
 	/**
 	 *  Regular Expression that is used to match against in functions
 	 */
-	readonly hostnameCheckRegExp = /^(www\.)?imp(erial)?b(\.in|in.com)$/i;
+	readonly hostnameRe = new RegExp(`${this.hostname}`, "i"); // /^(www\.)?imp(erial)?b(\.in|in.com)$/i;
 
 	async request<T extends unknown>(method: Methods, path: string, options: Options = {}): Promise<T> {
 		// default headers
