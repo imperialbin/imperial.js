@@ -1,8 +1,8 @@
 import type { Document as IDocument, DocumentEditOptions } from "../../types/document";
 import { createFormatedLink, createRawLink } from "../../utils/links";
 import { Base } from "../Base";
-import type { Imperial } from "../../client/Imperial";
-import { DocumentNotFound } from "../../errors/Imperial/DocumentNotFound";
+import type { Imperial } from "../../client";
+import { NotFound } from "../../errors/Imperial/NotFound";
 import { Settings } from "./Settings";
 import { Timestamps } from "./Timestamps";
 /**
@@ -10,7 +10,7 @@ import { Timestamps } from "./Timestamps";
  *  All data from the Document can be accesed here
  *  @author pxseu <https://github.com/pxseu> & hexiro <https://github.com/Hexiro>
  */
-export class Document extends Base {
+export class Document extends Base<IDocument> {
 	constructor(client: Imperial, document: IDocument) {
 		super(client);
 
@@ -46,19 +46,23 @@ export class Document extends Base {
 		if ("timestamps" in document) {
 			this.timestamps = new Timestamps(this.client, document.timestamps);
 		}
+
+		return document;
 	}
 
 	/**
 	 * 	URL of the Document, to view in Imperial
+	 *  @returns {string} The url in format https://{hostname}/{id}
 	 */
-	public get link(): string {
+	public get formatted(): string {
 		return createFormatedLink(this.client, this.id);
 	}
 
 	/**
 	 * 	URL to a plain text version of the Document
+	 *  @returns {string} The url in format https://{hostname}/r/{id}
 	 */
-	public get rawLink(): string {
+	public get raw(): string {
 		return createRawLink(this.client, this.id);
 	}
 
@@ -83,7 +87,7 @@ export class Document extends Base {
 	 *  @returns Deleted Document
 	 */
 	public async delete(): Promise<Document> {
-		if (this.deleted) throw new DocumentNotFound();
+		if (this.deleted) throw new NotFound();
 
 		await this.client.document.delete(this.id);
 
@@ -124,13 +128,23 @@ export class Document extends Base {
 	 *  @returns Edited Document
 	 */
 	public async edit(text: string): Promise<Document> {
-		if (this.deleted) throw new DocumentNotFound();
+		if (this.deleted) throw new NotFound();
 
 		const document = await this.client.document.edit(this.id, text);
 
 		const old = this._update(document.toJSON());
 
 		return old;
+	}
+
+	/**
+	 *  Revalidate the Document
+	 *  @returns Current document
+	 */
+	public async revalidate(): Promise<this> {
+		const data = await this.client.document.get(this.id);
+		this._update(data.toJSON());
+		return this;
 	}
 
 	/**
@@ -145,6 +159,8 @@ export class Document extends Base {
 	 */
 	public toJSON() {
 		return super.toJSON({
+			longerUrls: true,
+			shortUrls: true,
 			deleted: false,
 		});
 	}
@@ -178,7 +194,7 @@ export interface Document {
 	views: number;
 
 	/**
-	 *  Whether this Document has been deleted
+	 *  Internal value to track if this current object had the .delete method called
 	 */
 	deleted: boolean;
 
