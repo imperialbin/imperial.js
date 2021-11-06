@@ -5,7 +5,7 @@ import { URL } from "url";
 jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
 import { Document, Imperial } from "../../lib";
-import { ErrorMessage } from "../../lib/errors/Messages";
+import { Error, TypeError } from "../../lib/errors";
 import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
 const fetchMock: typeof fetchMockJest = require("node-fetch");
 
@@ -55,18 +55,18 @@ describe("editDocument", () => {
 	it("should fail to edit a document - no token", async () => {
 		client.setApiToken(undefined);
 
-		await expect(async () => {
-			await client.document.edit(RESPONSE_DOCUMENT.data.id, "i am a valid edit");
-		}).rejects.toThrow(new Error(ErrorMessage("NO_TOKEN")));
+		await expect(client.document.edit(RESPONSE_DOCUMENT.data.id, "i am a valid edit")).rejects.toThrow(
+			new Error("NO_TOKEN"),
+		);
 	});
 
 	it("should fail to delete a document - no id", async () => {
 		// @ts-expect-error
-		await expect(client.document.edit()).rejects.toThrow(new Error(ErrorMessage("NO_ID")));
+		await expect(client.document.edit()).rejects.toThrow(new Error("NO_ID"));
 	});
 
 	it("should fail to edit a document - wrong type of id", async () => {
-		const error = new TypeError(ErrorMessage("ID_WRONG_TYPE"));
+		const error = new TypeError("ID_WRONG_TYPE");
 
 		// @ts-expect-error
 		await expect(client.document.edit({})).rejects.toThrow(error);
@@ -83,9 +83,7 @@ describe("editDocument", () => {
 
 	it("should fail to delete a document - no text", async () => {
 		// @ts-expect-error
-		await expect(client.document.edit(RESPONSE_DOCUMENT.data.id)).rejects.toThrow(
-			new Error(ErrorMessage("NO_TEXT")),
-		);
+		await expect(client.document.edit(RESPONSE_DOCUMENT.data.id)).rejects.toThrow(new Error("NO_TEXT"));
 	});
 
 	afterEach(() => {

@@ -4,7 +4,7 @@ import fetchMockJest from "fetch-mock-jest";
 jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
 import { Imperial } from "../../lib";
-import { ErrorMessage } from "../../lib/errors/Messages";
+import { Error, TypeError } from "../../lib/errors";
 import { IMPERIAL_TOKEN, RESPONSE_USER, TEST_USERNAME } from "../common";
 const fetchMock: typeof fetchMockJest = require("node-fetch");
 
@@ -25,7 +25,7 @@ describe("getDocument", () => {
 	});
 
 	it("should fail to fetch a document - wrong id type", async () => {
-		const error = new TypeError(ErrorMessage("USERNAME_WRONG_TYPE"));
+		const error = new TypeError("USERNAME_WRONG_TYPE");
 
 		// @ts-expect-error
 		await expect(client.users.get({})).rejects.toThrow(error);
@@ -42,7 +42,7 @@ describe("getDocument", () => {
 
 	it("should fail to fetch a document - no id", async () => {
 		// @ts-expect-error
-		await expect(client.users.get()).rejects.toThrow(new Error(ErrorMessage("NO_USERNAME")));
+		await expect(client.users.get()).rejects.toThrow(new Error("NO_USERNAME"));
 	});
 
 	afterEach(() => {

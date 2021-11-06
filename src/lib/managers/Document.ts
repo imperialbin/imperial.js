@@ -148,9 +148,6 @@ export class DocumentManager extends Base {
 	 */
 	@requireToken
 	public async delete(id: IdResolvable): Promise<void> {
-		// If not token return
-		if (!this.client.apiToken) throw new Error("NO_TOKEN");
-
 		// Make the user inputed data encoded so it doesn't break stuff
 		const documentId = parseId(id, this.client.rest.hostnameRe);
 

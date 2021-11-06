@@ -5,7 +5,7 @@ import { URL } from "url";
 jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
 import { Imperial } from "../../lib";
-import { ErrorMessage } from "../../lib/errors/Messages";
+import { Error, TypeError } from "../../lib/errors";
 import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
 const fetchMock: typeof fetchMockJest = require("node-fetch");
 
@@ -30,13 +30,11 @@ describe("deleteDocument", () => {
 	it("should fail to delete a document - no token", async () => {
 		client.setApiToken(undefined);
 
-		await expect(client.document.delete(RESPONSE_DOCUMENT.data.id)).rejects.toThrow(
-			new Error(ErrorMessage("NO_TOKEN")),
-		);
+		await expect(client.document.delete(RESPONSE_DOCUMENT.data.id)).rejects.toThrow(new Error("NO_TOKEN"));
 	});
 
 	it("should fail to delete a document - wrong id type", async () => {
-		const error = new TypeError(ErrorMessage("ID_WRONG_TYPE"));
+		const error = new TypeError("ID_WRONG_TYPE");
 
 		await expect(client.document.delete({})).rejects.toThrow(error);
 
@@ -49,7 +47,7 @@ describe("deleteDocument", () => {
 
 	it("should fail to delete a document - no id", async () => {
 		// @ts-expect-error
-		await expect(client.document.delete()).rejects.toThrow(new Error(ErrorMessage("NO_ID")));
+		await expect(client.document.delete()).rejects.toThrow(new Error("NO_ID"));
 	});
 
 	afterEach(() => {
