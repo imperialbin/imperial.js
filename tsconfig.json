@@ -17,6 +17,7 @@
         "noImplicitReturns": true,
         "downlevelIteration": true,
         "noUnusedParameters": true,
+        "experimentalDecorators": true,
         "importsNotUsedAsValues": "error",
         "forceConsistentCasingInFileNames": true,
         // false stuff
