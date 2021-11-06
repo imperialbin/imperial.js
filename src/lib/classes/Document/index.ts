@@ -2,9 +2,9 @@ import type { Document as IDocument, DocumentEditOptions } from "../../types/doc
 import { createFormatedLink, createRawLink } from "../../utils/links";
 import { Base } from "../Base";
 import type { Imperial } from "../../client";
-import { NotFound } from "../../errors/Imperial/NotFound";
 import { Settings } from "./Settings";
 import { Timestamps } from "./Timestamps";
+import { Error as ImpError } from "../../errors";
 /**
  *  Imperial Document,
  *  All data from the Document can be accesed here
@@ -14,7 +14,7 @@ export class Document extends Base<IDocument> {
 	constructor(client: Imperial, document: IDocument) {
 		super(client);
 
-		if (!document) throw new Error("Document: No data provided");
+		if (!document) throw new Error("Document is not defined");
 
 		this._patch(document);
 		this.deleted = false;
@@ -87,7 +87,7 @@ export class Document extends Base<IDocument> {
 	 *  @returns Deleted Document
 	 */
 	public async delete(): Promise<Document> {
-		if (this.deleted) throw new NotFound();
+		if (this.deleted) throw new ImpError("NOT_FOUND");
 
 		await this.client.document.delete(this.id);
 
@@ -128,7 +128,7 @@ export class Document extends Base<IDocument> {
 	 *  @returns Edited Document
 	 */
 	public async edit(text: string): Promise<Document> {
-		if (this.deleted) throw new NotFound();
+		if (this.deleted) throw new ImpError("NOT_FOUND");
 
 		const document = await this.client.document.edit(this.id, text);
 

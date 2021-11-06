@@ -1,9 +1,9 @@
 import URL from "./url";
 import type { IdResolvable } from "../types/common";
-import { ErrorMessage } from "../errors/Messages";
+import { Error, TypeError } from "../errors";
 
 const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {
-	if (!url.protocol.match(/^https?:$/)) throw new Error(ErrorMessage("ID_WRONG_TYPE"));
+	if (!url.protocol.toLowerCase().startsWith("http")) throw new TypeError("ID_WRONG_TYPE");
 
 	const splitPath = url.pathname.split("/");
 
@@ -12,7 +12,7 @@ const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {
 		return splitPath[splitPath.length - 1];
 	}
 
-	throw new Error(ErrorMessage("NO_ID"));
+	throw new Error("NO_ID");
 };
 
 /**
@@ -20,10 +20,10 @@ const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {
  *  @internal
  */
 export const parseId = function (id: IdResolvable, hostnameRegex: RegExp): string {
-	if (!id) throw new Error(ErrorMessage("NO_ID"));
+	if (!id) throw new Error("NO_ID");
 
 	if (id instanceof URL) return getIdFromUrl(id, hostnameRegex);
-	if (typeof id !== "string") throw new Error(ErrorMessage("ID_WRONG_TYPE"));
+	if (typeof id !== "string") throw new TypeError("ID_WRONG_TYPE");
 
 	try {
 		// Try to parse a url

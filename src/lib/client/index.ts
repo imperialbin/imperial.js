@@ -1,11 +1,9 @@
 import type { ImperialOptions } from "../types/common";
 import { validateToken } from "../utils/validToken";
 import { Rest } from "../rest/Rest";
-import { defaultOptions } from "../utils/defaultOptions";
 import { DocumentManager } from "../managers/Document";
 import { UsersManager } from "../managers/Users";
 import { MeManager } from "../managers/Me";
-import { ErrorMessage } from "../errors/Messages";
 
 /**
  *  The Imperial class
@@ -37,7 +35,7 @@ export class Imperial {
 		const token = typeof tokenOrOptions === "string" || tokenOrOptions === null ? tokenOrOptions : undefined;
 
 		this.setApiToken(token);
-		this.options = { ...defaultOptions, ...options };
+		this.options = { requestTimeout: 30000, ...options };
 
 		Object.defineProperty(this, "rest", { value: new Rest(this) });
 		Object.defineProperty(this, "document", { value: new DocumentManager(this) });
@@ -66,10 +64,7 @@ export class Imperial {
 	 *  // shows if the token is valid
 	 */
 	public async verify(): Promise<void> {
-		// If no token return
-		if (!this.apiToken) throw new Error(ErrorMessage("NO_TOKEN"));
-
-		await this.rest.request("GET", `/checkApiToken/${encodeURIComponent(this.apiToken)}`);
+		await this.rest.request("GET", `/checkApiToken/${encodeURIComponent(this.apiToken!)}`);
 	}
 }
 

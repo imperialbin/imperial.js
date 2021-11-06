@@ -1,11 +1,10 @@
 import AbortController from "abort-controller";
 import type { Response } from "node-fetch";
-import { FailedToFetch } from "../errors";
-import { Aborted } from "../errors/HTTPErrors/Aborted";
-import { BaseClient } from "../client/BaseClient";
+import { Error } from "../errors";
+import { Base } from "../client/Base";
 import type { Imperial } from "../client";
-import { handleResponse } from "./responseHandler";
 import fetch from "../utils/fetch";
+import URL from "../utils/url";
 
 type Methods = "POST" | "GET" | "PATCH" | "DELETE";
 
@@ -18,7 +17,7 @@ interface Options {
  *  Class for ease of rest Api requests
  *  @internal
  */
-export class Rest extends BaseClient {
+export class Rest extends Base {
 	/**
 	 *  Useragent
 	 */
@@ -44,7 +43,7 @@ export class Rest extends BaseClient {
 	 */
 	readonly hostnameRe = new RegExp(`${this.hostname}`, "i"); // /^(www\.)?imp(erial)?b(\.in|in.com)$/i;
 
-	async request<T extends unknown>(method: Methods, path: string, options: Options = {}): Promise<T> {
+	public async request<T extends unknown>(method: Methods, path: string, options: Options = {}): Promise<T> {
 		// default headers
 		const defaultHeaders: Record<string, any> = {
 			"Content-Type": "application/json",
@@ -68,7 +67,7 @@ export class Rest extends BaseClient {
 			try {
 				body = JSON.stringify(options.data);
 			} catch (error: any) {
-				throw new Error(`Failed to serialize data to JSON: ${error?.message}`);
+				throw new Error("FAILED_PARSE");
 			}
 
 		// create the controller
@@ -90,17 +89,58 @@ export class Rest extends BaseClient {
 			});
 		} catch (error: any) {
 			// if error was an aborted error, throw a custom error
-			if (error?.name === "AbortError") throw new Aborted();
+			if (error?.name === "AbortError") throw new Error("ABORTED");
 
 			// else throw the error
-			throw new FailedToFetch(error);
+			throw new Error("FETCH_ERROR");
 		} finally {
 			// clear the timeout
 			clearTimeout(abortTimeout);
 		}
 
 		// handle the response
-		return handleResponse(response);
+		return this.handleResponse(response);
+	}
+
+	// eslint-disable-next-line class-methods-use-this
+	private async handleResponse<T extends unknown>(response: Response): Promise<T> {
+		let json: { success: true; data: unknown } | undefined;
+
+		// try to parse the json data
+		try {
+			json = await response.json();
+		} catch (e) {
+			// Ignore parse error
+		}
+
+		// remove not needed data
+		const { success, data } = json ?? {};
+
+		// extract the status code
+		const { status } = response;
+
+		// if everything is okay resolve
+		if (status && response.ok && success === true) {
+			return data as T;
+		}
+
+		// find an error message
+		const { pathname: path } = new URL(response.url);
+
+		switch (status) {
+			case 401: {
+				throw new Error("NOT_AUTHORIZED", status, path);
+			}
+
+			case 404: {
+				throw new Error("NOT_FOUND", status, path);
+			}
+
+			default: {
+				// throw an error
+				throw new Error("HTTP_ERROR", status, path);
+			}
+		}
 	}
 }
 

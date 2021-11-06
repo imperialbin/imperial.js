@@ -1,7 +1,7 @@
 import type { User as IUser } from "../types/users";
 import { User } from "../classes/User";
-import { ErrorMessage } from "../errors/Messages";
-import { Base } from "./Base";
+import { Error, TypeError } from "../errors";
+import { Base } from "../client/Base";
 
 export class UsersManager extends Base {
 	/**
@@ -10,9 +10,8 @@ export class UsersManager extends Base {
 	 *  @example client.users.get("pxseu").then(console.log) // Logs the user to the console.
 	 */
 	public async get(username: string): Promise<User> {
-		if (!this.client.apiToken) throw new Error(ErrorMessage("NO_TOKEN"));
-		if (!username) throw new Error(ErrorMessage("NO_USERNAME"));
-		if (typeof username !== "string") throw new TypeError(ErrorMessage("USERNAME_WRONG_TYPE"));
+		if (!username) throw new Error("NO_USERNAME");
+		if (typeof username !== "string") throw new TypeError("USERNAME_WRONG_TYPE");
 
 		const data = await this.client.rest.request<IUser>("GET", `/user/${encodeURIComponent(username)}`);
 

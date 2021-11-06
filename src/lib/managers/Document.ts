@@ -1,11 +1,9 @@
-import { Base } from "./Base";
-import { ErrorMessage } from "../errors/Messages";
+import { Base } from "../client/Base";
+import { Error, TypeError } from "../errors";
 import type { IdResolvable } from "../types/common";
 import type { DocumentEditOptions, Document as ResponseDocument, DocumentCreateOptions } from "../types/document";
-import { CreateOptionsSchema, EditOptionsSchema } from "../utils/schemas";
 import { parseId } from "../utils/parseId";
 import { parsePassword } from "../utils/parsePassword";
-import { validateSchema } from "../utils/schemaValidator";
 import { Document } from "../classes/Document";
 import { stringify } from "../utils/stringify";
 
@@ -33,17 +31,10 @@ export class DocumentManager extends Base {
 	 */
 	public async create(text: string, options: DocumentCreateOptions = {}): Promise<Document> {
 		// If no text or text is an emtpy string reutrn
-		if (!text) throw new Error(ErrorMessage("NO_TEXT"));
+		if (!text) throw new Error("NO_TEXT");
 
 		if (!options || typeof options !== "object" || Array.isArray(options))
-			throw new TypeError(ErrorMessage("OPTIONS_WRONG_TYPE"));
-
-		const validateOptions = validateSchema(options as never, CreateOptionsSchema);
-
-		// If the returned data is an error reject with it
-		if (validateOptions instanceof Error) {
-			throw validateOptions;
-		}
+			throw new TypeError("OPTIONS_WRONG_TYPE");
 
 		// Internal options to not modify parameters
 		const settings = options as DocumentCreateOptions;
@@ -90,8 +81,7 @@ export class DocumentManager extends Base {
 		// If no password was set try to extract it from the id
 		const documentPassword = password ?? parsePassword(id);
 
-		if (documentPassword && typeof documentPassword !== "string")
-			throw new TypeError(ErrorMessage("PASSWORD_WRONG_TYPE"));
+		if (documentPassword && typeof documentPassword !== "string") throw new TypeError("PASSWORD_WRONG_TYPE");
 
 		const data = await this.client.rest.request<ResponseDocument>(
 			"GET",
@@ -124,23 +114,16 @@ export class DocumentManager extends Base {
 
 	public async edit(id: IdResolvable, text: string, options: DocumentEditOptions = {}): Promise<Document> {
 		// If no token return
-		if (!this.client.apiToken) throw new Error(ErrorMessage("NO_TOKEN"));
+		if (!this.client.apiToken) throw new Error("NO_TOKEN");
 
 		// Make the user inputed data encoded so it doesn't break stuff
 		const documentId = parseId(id, this.client.rest.hostnameRe);
 
 		// If no newText was provided reutrn
-		if (!text) throw new Error(ErrorMessage("NO_TEXT"));
+		if (!text) throw new Error("NO_TEXT");
 
 		if (!options || typeof options !== "object" || Array.isArray(options))
-			throw new TypeError(ErrorMessage("OPTIONS_WRONG_TYPE"));
-
-		const validateOptions = validateSchema(options as never, EditOptionsSchema);
-
-		// If the returned data is an error reject with it
-		if (validateOptions instanceof Error) {
-			throw validateOptions;
-		}
+			throw new TypeError("OPTIONS_WRONG_TYPE");
 
 		// Internal options to not modify parameters
 		const settings = options as DocumentEditOptions;
@@ -166,7 +149,7 @@ export class DocumentManager extends Base {
 	 */
 	public async delete(id: IdResolvable): Promise<void> {
 		// If not token return
-		if (!this.client.apiToken) throw new Error(ErrorMessage("NO_TOKEN"));
+		if (!this.client.apiToken) throw new Error("NO_TOKEN");
 
 		// Make the user inputed data encoded so it doesn't break stuff
 		const documentId = parseId(id, this.client.rest.hostnameRe);
