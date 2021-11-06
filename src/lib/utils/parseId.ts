@@ -1,4 +1,4 @@
-import URL from "./url";
+import { URL } from "url";
 import type { IdResolvable } from "../types/common";
 import { Error, TypeError } from "../errors";
 

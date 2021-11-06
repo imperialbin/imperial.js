@@ -1,4 +1,4 @@
-import URL from "./url";
+import { URL } from "url";
 import { TypeError } from "../errors";
 
 const getPasswordFromUrl = (url: URL): string | null => {

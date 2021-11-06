@@ -1,10 +1,9 @@
 import AbortController from "abort-controller";
-import type { Response } from "node-fetch";
+import fetch, { Response } from "node-fetch";
+import { URL } from "url";
 import { Error } from "../errors";
 import { Base } from "../client/Base";
 import type { Imperial } from "../client";
-import fetch from "../utils/fetch";
-import URL from "../utils/url";
 
 type Methods = "POST" | "GET" | "PATCH" | "DELETE";
 
