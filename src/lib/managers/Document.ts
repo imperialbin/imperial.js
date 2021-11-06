@@ -6,6 +6,7 @@ import { parseId } from "../utils/parseId";
 import { parsePassword } from "../utils/parsePassword";
 import { Document } from "../classes/Document";
 import { stringify } from "../utils/stringify";
+import { requireToken } from "../utils/decorators";
 
 export class DocumentManager extends Base {
 	/**
@@ -71,9 +72,6 @@ export class DocumentManager extends Base {
 	 */
 	public get(id: IdResolvable, password: string): Promise<Document>;
 
-	/**
-	 *  Gets the Document from Imperial
-	 */
 	public async get(id: IdResolvable, password?: string): Promise<Document> {
 		// Make the user inputed data encoded so it doesn't break stuff
 		const documentId = parseId(id, this.client.rest.hostnameRe);
@@ -112,6 +110,7 @@ export class DocumentManager extends Base {
 	 */
 	public async edit(id: IdResolvable, text: string, options: DocumentEditOptions): Promise<Document>;
 
+	@requireToken
 	public async edit(id: IdResolvable, text: string, options: DocumentEditOptions = {}): Promise<Document> {
 		// If no token return
 		if (!this.client.apiToken) throw new Error("NO_TOKEN");
@@ -147,6 +146,7 @@ export class DocumentManager extends Base {
 	 *  @example deleteDocument("someid").then(console.log);
 	 *  // Logs the response to the console
 	 */
+	@requireToken
 	public async delete(id: IdResolvable): Promise<void> {
 		// If not token return
 		if (!this.client.apiToken) throw new Error("NO_TOKEN");
