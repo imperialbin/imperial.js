@@ -2,6 +2,7 @@ import { Error as ImpError } from "../errors";
 import { Base } from "../client/Base";
 /**
  *  Check if the client has a token provided
+ *  Method must be a promise
  *  @internal
  */
 export const requireToken: MethodDecorator = (_target, _key, descriptor) => {
@@ -17,7 +18,7 @@ export const requireToken: MethodDecorator = (_target, _key, descriptor) => {
 				throw new Error("type check");
 			}
 
-			if (!this.client._token) throw new ImpError("NO_TOKEN");
+			if (!this.client._token) return Promise.reject(new ImpError("NO_TOKEN"));
 
 			return originalMethod.apply(this, args);
 		},
