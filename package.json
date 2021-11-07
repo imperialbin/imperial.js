@@ -6,6 +6,7 @@
 	"types": "./lib/index.d.ts",
 	"scripts": {
 		"build": "rimraf lib && tsc",
+		"w": "yarn build -w",
 		"lint": "eslint src",
 		"format": "prettier --write \"src/**/*.ts\"",
 		"test": "jest",
@@ -22,7 +23,7 @@
 		"imperial",
 		"imperialb.in"
 	],
-	"author": "pxseu <contact.pxseu@gmail.com>",
+	"author": "pxseu <me+npm@pxseu.com>",
 	"license": "MPL-2.0",
 	"bugs": {
 		"url": "https://github.com/imperialbin/imperial.js/issues"
