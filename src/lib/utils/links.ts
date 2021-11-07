@@ -1,4 +1,4 @@
-import type { Imperial } from "../client";
+import type { Imperial } from "../client/Imperial";
 
 /**
  *  @internal

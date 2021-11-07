@@ -1,4 +1,4 @@
-import type { Imperial } from "../client";
+import type { Imperial } from "../client/Imperial";
 import type { User as IUser } from "../types/users";
 import { Base } from "./Base";
 

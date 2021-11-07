@@ -14,6 +14,7 @@ const makeImperialError = <T extends Record<string, string>>(messages: T, Base: 
 
 			if (status) this.status = status;
 			if (path) this.path = path;
+
 			global.Error.captureStackTrace(this, ImperialError);
 		}
 
@@ -33,5 +34,7 @@ const makeImperialError = <T extends Record<string, string>>(messages: T, Base: 
 	};
 };
 
+/** @internal */
 export const Error = makeImperialError(ErrorMessages, global.Error);
+/** @internal */
 export const TypeError = makeImperialError(TypeMessages, global.TypeError);

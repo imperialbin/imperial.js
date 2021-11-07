@@ -1,7 +1,7 @@
 import type { Document as IDocument, DocumentEditOptions } from "../../types/document";
 import { createFormatedLink, createRawLink } from "../../utils/links";
 import { Base } from "../Base";
-import type { Imperial } from "../../client";
+import type { Imperial } from "../../client/Imperial";
 import { Settings } from "./Settings";
 import { Timestamps } from "./Timestamps";
 import { Error as ImpError } from "../../errors";

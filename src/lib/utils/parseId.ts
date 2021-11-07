@@ -23,6 +23,7 @@ export const parseId = function (id: IdResolvable, hostnameRegex: RegExp): strin
 	if (!id) throw new Error("NO_ID");
 
 	if (id instanceof URL) return getIdFromUrl(id, hostnameRegex);
+
 	if (typeof id !== "string") throw new TypeError("ID_WRONG_TYPE");
 
 	try {

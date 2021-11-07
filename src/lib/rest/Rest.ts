@@ -3,7 +3,7 @@ import fetch, { Response } from "node-fetch";
 import { URL } from "url";
 import { Error } from "../errors";
 import { Base } from "../client/Base";
-import type { Imperial } from "../client";
+import type { Imperial } from "../client/Imperial";
 
 type Methods = "POST" | "GET" | "PATCH" | "DELETE";
 

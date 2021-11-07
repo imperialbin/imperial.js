@@ -1,5 +1,6 @@
 import { URL } from "url";
 import { TypeError } from "../errors";
+import type { IdResolvable } from "../types/common";
 
 const getPasswordFromUrl = (url: URL): string | null => {
 	if (!url.protocol.toLowerCase().startsWith("http")) throw new TypeError("PASSWORD_WRONG_TYPE");
@@ -13,10 +14,14 @@ const getPasswordFromUrl = (url: URL): string | null => {
  * 	Extract the password the passed id is an URL
  *  @internal
  */
-export const parsePassword = function (id: string | URL): string | null {
+export const parsePassword = function (id: IdResolvable): string | null {
+	if (!id) throw new Error("NO_ID");
+
 	if (id instanceof URL) {
 		return getPasswordFromUrl(id);
 	}
+
+	if (typeof id !== "string") throw new TypeError("PASSWORD_WRONG_TYPE");
 
 	try {
 		// Try to parse a url

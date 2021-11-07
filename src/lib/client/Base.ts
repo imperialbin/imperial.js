@@ -1,4 +1,4 @@
-import type { Imperial } from ".";
+import type { Imperial } from "./Imperial";
 
 export abstract class Base {
 	constructor(client: Imperial) {

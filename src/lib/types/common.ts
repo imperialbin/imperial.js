@@ -8,4 +8,4 @@ export interface ImperialOptions {
 /**
  *  Id or url of the document
  */
-export type IdResolvable = string | any;
+export type IdResolvable = string | unknown;

@@ -1,5 +1,5 @@
 import { objectify } from "../utils/objectify";
-import type { Imperial } from "../client";
+import type { Imperial } from "../client/Imperial";
 
 export abstract class Base<T> {
 	constructor(client: Imperial) {

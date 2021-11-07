@@ -1,3 +1,4 @@
+/** @internal */
 export const ErrorMessages = {
 	NO_TEXT: "No `text` was provided",
 	NO_TOKEN: "This method requires a token to be set in the constructor",
@@ -12,6 +13,7 @@ export const ErrorMessages = {
 	HTTP_ERROR: "There was an error with the HTTP request",
 } as const;
 
+/** @internal */
 export const TypeMessages = {
 	TEXT_WRONG_TYPE: "Parameter `text` must be a string",
 	ID_WRONG_TYPE: "Parameter `id` must be a string or an URL",
