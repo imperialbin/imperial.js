@@ -1,16 +1,17 @@
 {
 	"name": "imperial.js",
-	"version": "3.0.0-7",
+	"version": "3.0.0-9",
 	"description": "Imperial API wrapper for Node.js",
-	"main": "./lib/index.js",
-	"types": "./lib/index.d.ts",
+	"main": "./lib/cjs/index.js",
+	"types": "./lib/dts/index.d.ts",
 	"scripts": {
-		"build": "rimraf lib && tsc",
-		"w": "yarn build -w",
-		"lint": "eslint src",
+		"ci": "rimraf node_modules && yarn install --frozen-lockfile",
+		"clean": "rimraf lib",
+		"build": "tsc -p tsconfig.json",
+		"w": "nodemon --config nodemon.json",
+		"lint": "eslint --ext .ts src/ --fix",
 		"format": "prettier --write \"src/**/*.ts\"",
 		"test": "jest",
-		"ci": "rm -rf node_modules && yarn install --frozen-lockfile",
 		"postinstall": "husky install",
 		"prepublishOnly": "pinst --disable",
 		"postpublish": "pinst --enable"
@@ -31,24 +32,25 @@
 	"homepage": "https://github.com/imperialbin/imperial.js#readme",
 	"dependencies": {
 		"abort-controller": "^3.0.0",
-		"node-fetch": "^2.6.1"
+		"node-fetch": "2.6.7"
 	},
 	"engines": {
 		"node": ">=8"
 	},
 	"devDependencies": {
+		"@pxseu/eslint-config": "^1.0.1",
+		"@pxseu/prettier-config": "^1.0.0",
 		"@types/jest": "^26.0.20",
 		"@types/node": "^16.9.1",
 		"@types/node-fetch": "^2.5.12",
-		"@typescript-eslint/eslint-plugin": "^4.13.0",
-		"@typescript-eslint/parser": "^4.13.0",
+		"@typescript-eslint/eslint-plugin": "^5.12.0",
+		"@typescript-eslint/parser": "^5.12.0",
 		"eslint": "^7.17.0",
-		"eslint-config-airbnb-typescript": "^12.3.1",
 		"eslint-config-prettier": "^7.1.0",
-		"eslint-plugin-import": "^2.22.1",
 		"fetch-mock-jest": "^1.5.1",
 		"husky": "^6.0.0",
 		"jest": "^26.6.3",
+		"nodemon": "^2.0.15",
 		"pinst": "^2.1.6",
 		"prettier": "^2.2.1",
 		"rimraf": "^3.0.2",
@@ -63,7 +65,7 @@
 			"**/test/**/*.test.ts"
 		],
 		"transform": {
-			"^.+\\.ts$": "ts-jest"
+			"^.+\\.|ts$": "ts-jest"
 		}
 	}
 }

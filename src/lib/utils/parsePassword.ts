@@ -1,6 +1,6 @@
+import type { IdResolvable } from "../types/common";
 import { URL } from "url";
 import { TypeError } from "../errors";
-import type { IdResolvable } from "../types/common";
 
 const getPasswordFromUrl = (url: URL): string | null => {
 	if (!url.protocol.toLowerCase().startsWith("http")) throw new TypeError("PASSWORD_WRONG_TYPE");

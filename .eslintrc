@@ -1,29 +1,9 @@
 {
     "root": true,
+    "extends": [
+        "@pxseu/eslint-config"
+    ],
     "parserOptions": {
         "project": "./tsconfig.eslint.json"
-    },
-    "extends": [
-        "airbnb-typescript/base",
-        "prettier"
-    ],
-    "rules": {
-        "@typescript-eslint/quotes": [
-            "error",
-            "double"
-        ],
-        "@typescript-eslint/indent": [
-            "error",
-            "tab"
-        ],
-        "func-names": [
-            "error",
-            "as-needed"
-        ],
-        "no-underscore-dangle": "off",
-        "import/prefer-default-export": "off",
-        "consistent-return": "off",
-        "arrow-body-style": "off",
-        "no-restricted-syntax": "off"
     }
 }

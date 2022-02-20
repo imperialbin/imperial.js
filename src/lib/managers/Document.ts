@@ -1,7 +1,7 @@
-import { Base } from "../client/Base";
-import { Error, TypeError } from "../errors";
 import type { IdResolvable } from "../types/common";
 import type { DocumentEditOptions, Document as ResponseDocument, DocumentCreateOptions } from "../types/document";
+import { Base } from "../client/Base";
+import { Error, TypeError } from "../errors";
 import { parseId } from "../utils/parseId";
 import { parsePassword } from "../utils/parsePassword";
 import { Document } from "../classes/Document";

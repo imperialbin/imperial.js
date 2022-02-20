@@ -1,5 +1,5 @@
-import { URL } from "url";
 import type { IdResolvable } from "../types/common";
+import { URL } from "url";
 import { Error, TypeError } from "../errors";
 
 const getIdFromUrl = (url: URL, hostnameRegex: RegExp): string => {

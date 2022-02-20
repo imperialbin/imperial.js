@@ -3,14 +3,12 @@
         "moduleResolution": "node",
         "target": "ES2017",
         "module": "CommonJS",
-        "outDir": "./lib/",
+        "outDir": "./lib/cjs/",
         "strict": true,
         "pretty": true,
-        "declaration": true,
+        "declaration": false,
         "skipLibCheck": true,
-        "noEmitOnError": true,
         "stripInternal": true,
-        "noUnusedLocals": true,
         "isolatedModules": true,
         "esModuleInterop": true,
         "noImplicitReturns": true,
@@ -19,9 +17,6 @@
         "experimentalDecorators": true,
         "importsNotUsedAsValues": "error",
         "forceConsistentCasingInFileNames": true,
-        // false stuff
-        "allowJs": false,
-        "removeComments": false,
         "lib": [
             "ES2017"
         ]

@@ -1,7 +1,7 @@
 import type { Document as IDocument } from "../types/document";
+import type { MeUser } from "../types/me";
 import { Document } from "../classes/Document";
 import { Base } from "../client/Base";
-import type { MeUser } from "../types/me";
 import { requireToken } from "../utils/decorators";
 
 export class MeManager extends Base {

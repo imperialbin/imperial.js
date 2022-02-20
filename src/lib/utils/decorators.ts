@@ -7,17 +7,18 @@ import { Base } from "../client/Base";
  *  @internal
  */
 export const requireToken: MethodDecorator = (_target, _key, descriptor) => {
-	const originalMethod = descriptor.value as unknown as Function;
+	const originalMethod = descriptor.value as unknown as (...args: any[]) => Promise<any>;
 
 	if (!originalMethod) {
 		throw new Error("Method not provided!?");
 	}
 
 	return {
+		...descriptor,
 		value: function value(...args: any[]) {
 			// this should never be throw???!?!?!?!
 			if (!(this instanceof Base)) {
-				throw new Error("type check");
+				return Promise.reject("type check");
 			}
 
 			// reject a promise because the method is async
@@ -26,5 +27,5 @@ export const requireToken: MethodDecorator = (_target, _key, descriptor) => {
 			// return the orignal method
 			return originalMethod.apply(this, args as string[]);
 		},
-	} as any;
+	} as unknown as PropertyDescriptor;
 };

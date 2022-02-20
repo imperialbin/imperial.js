@@ -1,0 +1,7 @@
+{
+	"watch": ["src", "package.json", "tsconfig.*"],
+	"ext": "ts",
+	"exec": "yarn clean && yarn build",
+	"delay": 500,
+	"signal": "SIGTERM"
+}

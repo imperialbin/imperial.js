@@ -1,6 +1,6 @@
 {
     "extends": "../../tsconfig.json",
     "include": [
-        "./*"
-, "document/purgeDocuments.test.ts", "document/getDocument.test.ts", "document/editDocument.test.ts", "document/Document.test.ts", "document/deleteDocument.test.ts", "document/createDocument.test.ts", "common.ts"    ]
+        "./*",
+    ]
 }

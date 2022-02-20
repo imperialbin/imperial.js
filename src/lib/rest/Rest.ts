@@ -1,9 +1,9 @@
+import type { Imperial } from "../client/Imperial";
 import AbortController from "abort-controller";
 import fetch, { Response } from "node-fetch";
 import { URL } from "url";
 import { Error } from "../errors";
 import { Base } from "../client/Base";
-import type { Imperial } from "../client/Imperial";
 
 type Methods = "POST" | "GET" | "PATCH" | "DELETE";
 
@@ -37,26 +37,26 @@ export class Rest extends Base {
 	 */
 	readonly api = `https://staging-balls-api.impb.in/${this.version}` as const;
 
+	readonly defaultHeaders: Record<string, any> = {
+		"Content-Type": "application/json",
+		"User-Agent": this.useragent,
+		Accept: "application/json",
+	};
+
 	/**
 	 *  Regular Expression that is used to match against in functions
 	 */
 	readonly hostnameRe = new RegExp(`${this.hostname}`, "i"); // /^(www\.)?imp(erial)?b(\.in|in.com)$/i;
 
 	public async request<T extends unknown>(method: Methods, path: string, options: Options = {}): Promise<T> {
-		// default headers
-		const defaultHeaders: Record<string, any> = {
-			"Content-Type": "application/json",
-			"User-Agent": this.useragent,
-		};
-
-		// add authorization header if apiToken is set
-		if (this.client.apiToken) defaultHeaders.Authorization = this.client.apiToken;
-
 		// set the headers
 		const headers = {
 			...options.headers,
-			...defaultHeaders,
+			...this.defaultHeaders,
 		};
+
+		// add authorization header if apiToken is set
+		if (this.client.apiToken) headers.Authorization = this.client.apiToken;
 
 		// set the data
 		let body: string | undefined;
@@ -85,6 +85,7 @@ export class Rest extends Base {
 				body,
 				signal: controller.signal,
 				redirect: "error",
+				compress: true,
 			});
 		} catch (error: any) {
 			// if error was an aborted error, throw a custom error
