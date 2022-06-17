@@ -3,6 +3,7 @@ import AbortController from "abort-controller";
 import axios, { AxiosRequestHeaders, AxiosResponse } from "axios";
 import { Error } from "../errors";
 import { Base } from "../client/Base";
+import { URL } from "url";
 
 type Methods = "POST" | "GET" | "PATCH" | "DELETE";
 
@@ -114,7 +115,7 @@ export class Rest extends Base {
 		}
 
 		// find an error message
-		const path = response.config.url?.split("/").slice(1).join("/");
+		const path = new URL(response.config.url ?? "http://noop").pathname;
 
 		switch (status) {
 			case 401: {
