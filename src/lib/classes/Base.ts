@@ -1,4 +1,4 @@
-import { objectify } from "../utils/objectify";
+import { Util } from "../utils/Util";
 import type { Imperial } from "../client/Imperial";
 
 export abstract class Base<T> {
@@ -31,6 +31,13 @@ export abstract class Base<T> {
 	}
 
 	/**
+	 *  @internal
+	 */
+	public _equals(other: this): boolean {
+		return other instanceof this.constructor && this.toJSON() === other.toJSON();
+	}
+
+	/**
 	 *  Convert the class to a plain object
 	 *  @param props - Properties to exclude from the object
 	 *  @example
@@ -38,9 +45,9 @@ export abstract class Base<T> {
 	 *  > { id: 'abc123', content: "hello" }
 	 */
 
-	public toJSON(...props: Parameters<typeof objectify>[1][]): T {
+	public toJSON(...props: Parameters<typeof Util.objectify>[1][]): T {
 		// a little hack so typing do not yell at me
-		return objectify(this as Record<string, unknown>, ...props);
+		return Util.objectify(this as Record<string, unknown>, ...props);
 	}
 }
 

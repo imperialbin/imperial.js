@@ -1,31 +1,23 @@
-/* eslint-disable import/first */
-/* eslint-disable import/newline-after-import */
-import fetchMockJest from "fetch-mock-jest";
-import { URL } from "url";
-jest.mock("node-fetch", () => fetchMockJest.sandbox());
-
 import { Document, Imperial } from "../../lib";
 import { Error, TypeError } from "../../lib/errors";
 import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
-const fetchMock: typeof fetchMockJest = require("node-fetch");
+import MockAdapter from "axios-mock-adapter";
+import type { AxiosRequestConfig } from "axios";
+import { URL } from "url";
 
-describe("editDocument", () => {
+describe("createDocument", () => {
 	let client: Imperial;
+	let mock: MockAdapter;
 
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.patch(`${client.rest.api}/document`, (_: any, req: any) => {
-			if (JSON.parse(req.body).id !== RESPONSE_DOCUMENT.data.id)
-				return {
-					body: { success: false },
-					status: 400,
-				};
+		mock = new MockAdapter(client.rest.axios);
 
-			return {
-				body: RESPONSE_DOCUMENT,
-				headers: { "Content-Type": "application/json" },
-			};
+		mock.onPatch(`${client.rest.api}/document`).reply((config: AxiosRequestConfig) => {
+			if (JSON.parse(config.data).id !== RESPONSE_DOCUMENT.data.id) return [400, { success: false }];
+
+			return [200, RESPONSE_DOCUMENT, { "Content-Type": "application/json" }];
 		});
 	});
 
@@ -87,6 +79,6 @@ describe("editDocument", () => {
 	});
 
 	afterEach(() => {
-		fetchMock.reset();
+		mock.reset();
 	});
 });

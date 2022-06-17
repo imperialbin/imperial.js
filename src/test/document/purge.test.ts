@@ -1,29 +1,18 @@
-/* eslint-disable import/first */
-/* eslint-disable import/newline-after-import */
-import fetchMockJest from "fetch-mock-jest";
-jest.mock("node-fetch", () => fetchMockJest.sandbox());
-
 import { Imperial } from "../../lib";
 import { Error } from "../../lib/errors";
 import { IMPERIAL_TOKEN } from "../common";
-const fetchMock: typeof fetchMockJest = require("node-fetch");
+import MockAdapter from "axios-mock-adapter";
 
-const numberDeleted = 420;
+const numberDeleted = 0;
 
-describe("purgeDocument", () => {
+describe("createDocument", () => {
 	let client: Imperial;
+	let mock: MockAdapter;
 
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.delete(`${client.rest.api}/purgeDocuments`, {
-			body: {
-				success: true,
-				message: "Deleted a total of 420 documents!",
-				numberDeleted,
-			},
-			headers: { "Content-Type": "application/json" },
-		});
+		mock = new MockAdapter(client.rest.axios);
 	});
 
 	it.skip("should purge document - valid", async () => {
@@ -41,6 +30,6 @@ describe("purgeDocument", () => {
 	});
 
 	afterEach(() => {
-		fetchMock.reset();
+		mock.reset();
 	});
 });

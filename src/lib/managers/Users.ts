@@ -2,7 +2,7 @@ import type { User as IUser } from "../types/users";
 import { User } from "../classes/User";
 import { Error, TypeError } from "../errors";
 import { Base } from "../client/Base";
-import { requireToken } from "../utils/decorators";
+import { requireToken } from "../utils/Decorators";
 
 export class UsersManager extends Base {
 	/**
@@ -15,7 +15,7 @@ export class UsersManager extends Base {
 		if (!username) throw new Error("NO_USERNAME");
 		if (typeof username !== "string") throw new TypeError("USERNAME_WRONG_TYPE");
 
-		const data = await this.client.rest.request<IUser>("GET", `/user/${encodeURIComponent(username)}`);
+		const data = await this.client.rest.request<IUser>("GET", `/users/${encodeURIComponent(username)}`);
 
 		return new User(this.client, data);
 	}

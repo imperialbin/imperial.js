@@ -1,22 +1,22 @@
 /* eslint-disable import/first */
 /* eslint-disable import/newline-after-import */
-import fetchMockJest from "fetch-mock-jest";
-jest.mock("node-fetch", () => fetchMockJest.sandbox());
 
 import { Document, Imperial } from "../../lib";
 import { Error, TypeError } from "../../lib/errors";
 import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
-const fetchMock: typeof fetchMockJest = require("node-fetch");
+import MockAdapter from "axios-mock-adapter";
 
 describe("createDocument", () => {
 	let client: Imperial;
+	let mock: MockAdapter;
 
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.post(`${client.rest.api}/document`, {
-			body: RESPONSE_DOCUMENT,
-			headers: { "Content-Type": "application/json" },
+		mock = new MockAdapter(client.rest.axios);
+
+		mock.onPost(`${client.rest.api}/document`).reply(200, RESPONSE_DOCUMENT, {
+			"Content-Type": "application/json",
 		});
 	});
 
@@ -25,7 +25,7 @@ describe("createDocument", () => {
 
 		expect(document.id).toBe(RESPONSE_DOCUMENT.data.id);
 		expect(document.settings.public).toBe(RESPONSE_DOCUMENT.data.settings.public);
-		expect(document.settings.imageEmbed).toBe(RESPONSE_DOCUMENT.data.settings.imageEmbed);
+		expect(document.settings.imageEmbed).toBe(RESPONSE_DOCUMENT.data.settings.image_embed);
 	});
 
 	it("should create a document - text not a string", async () => {
@@ -64,6 +64,6 @@ describe("createDocument", () => {
 	});
 
 	afterEach(() => {
-		fetchMock.reset();
+		mock.reset();
 	});
 });

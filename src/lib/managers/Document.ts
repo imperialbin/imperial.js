@@ -2,11 +2,9 @@ import type { IdResolvable } from "../types/common";
 import type { DocumentEditOptions, Document as ResponseDocument, DocumentCreateOptions } from "../types/document";
 import { Base } from "../client/Base";
 import { Error, TypeError } from "../errors";
-import { parseId } from "../utils/parseId";
-import { parsePassword } from "../utils/parsePassword";
+import { Util } from "../utils/Util";
 import { Document } from "../classes/Document";
-import { stringify } from "../utils/stringify";
-import { requireToken } from "../utils/decorators";
+import { requireToken } from "../utils/Decorators";
 
 export class DocumentManager extends Base {
 	/**
@@ -43,7 +41,7 @@ export class DocumentManager extends Base {
 		// If there is a password provided, make the document default to encypted
 		settings.encrypted = !!settings?.password;
 
-		const content = stringify(text);
+		const content = Util.stringify(text);
 
 		const data = await this.client.rest.request<ResponseDocument>("POST", "/document", {
 			data: {
@@ -74,10 +72,10 @@ export class DocumentManager extends Base {
 
 	public async get(id: IdResolvable, password?: string): Promise<Document> {
 		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = parseId(id, this.client.rest.hostnameRe);
+		const documentId = Util.parseId(id, this.client.rest.hostnameRe);
 
 		// If no password was set try to extract it from the id
-		const documentPassword = password ?? parsePassword(id);
+		const documentPassword = password ?? Util.parsePassword(id);
 
 		if (documentPassword && typeof documentPassword !== "string") throw new TypeError("PASSWORD_WRONG_TYPE");
 
@@ -116,7 +114,7 @@ export class DocumentManager extends Base {
 		if (!this.client.apiToken) throw new Error("NO_TOKEN");
 
 		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = parseId(id, this.client.rest.hostnameRe);
+		const documentId = Util.parseId(id, this.client.rest.hostnameRe);
 
 		// If no newText was provided reutrn
 		if (!text) throw new Error("NO_TEXT");
@@ -127,7 +125,7 @@ export class DocumentManager extends Base {
 		// Internal options to not modify parameters
 		const settings = options as DocumentEditOptions;
 
-		const content = stringify(text);
+		const content = Util.stringify(text);
 
 		const data = await this.client.rest.request<ResponseDocument>("PATCH", "/document", {
 			data: {
@@ -149,7 +147,7 @@ export class DocumentManager extends Base {
 	@requireToken
 	public async delete(id: IdResolvable): Promise<void> {
 		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = parseId(id, this.client.rest.hostnameRe);
+		const documentId = Util.parseId(id, this.client.rest.hostnameRe);
 
 		await this.client.rest.request("DELETE", `/document/${encodeURIComponent(documentId)}`);
 	}

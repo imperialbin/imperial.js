@@ -7,6 +7,7 @@ describe("Document", () => {
 	let document: Document;
 
 	beforeEach(() => {
+		// @ts-ignore
 		document = new Document(client, { ...RESPONSE_DOCUMENT.data, content });
 	});
 
@@ -16,7 +17,7 @@ describe("Document", () => {
 		expect(document.formatted).toBe(`https://${client.rest.hostname}/${RESPONSE_DOCUMENT.data.id}`);
 		expect(document.content).toBe(content);
 		expect(document.timestamps.creation).toBeInstanceOf(Date);
-		expect(document.timestamps.daysLeft).toBe(null);
+		expect(document.timestamps.daysLeft).toBe(0);
 	});
 
 	it("should not be null", () => {
@@ -24,7 +25,7 @@ describe("Document", () => {
 
 		document = new Document(client, {
 			...json,
-			timestamps: { ...json.timestamps, expiration: (new Date().valueOf() + DAY) / 1000 },
+			timestamps: { ...json.timestamps, expiration: new Date(new Date().valueOf() + DAY).toJSON() },
 		});
 		expect(document.timestamps.daysLeft).not.toBe(null);
 	});

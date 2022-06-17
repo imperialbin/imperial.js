@@ -1,6 +1,6 @@
 import type { Imperial } from "../..";
 import type { Timestamps as ITimeStamps } from "../../types/document";
-import { getDateDifference } from "../../utils/dateDifference";
+import { Util } from "../../utils/Util";
 import { Base } from "../Base";
 
 export class Timestamps extends Base<ITimeStamps> {
@@ -17,11 +17,13 @@ export class Timestamps extends Base<ITimeStamps> {
 	 */
 	public _patch(timestamps: ITimeStamps) {
 		if ("creation" in timestamps) {
-			this.creation = new Date(timestamps.creation * 1000);
+			this.creation = new Date(timestamps.creation);
 		}
 
 		if ("expiration" in timestamps) {
-			this.expiration = new Date(timestamps.expiration * 1000);
+			this.expiration = new Date(timestamps.expiration as string);
+		} else if (this.expiration!.valueOf() === 0) {
+			this.expiration = null;
 		}
 
 		return timestamps;
@@ -31,9 +33,9 @@ export class Timestamps extends Base<ITimeStamps> {
 	 *  The ammount of days the Doucment will expire at from the current moment
 	 *  @returns {number} The ammount of days the Document will expire at from the current moment
 	 */
-	public get daysLeft(): number | null {
-		const daysLeft = getDateDifference(new Date(), this.expiration);
-		if (daysLeft <= 0) return null;
+	public get daysLeft(): number {
+		const daysLeft = Util.getDateDifference(new Date(), this.expiration ?? new Date(0));
+		if (daysLeft <= 0) return 0;
 		return daysLeft;
 	}
 
@@ -42,11 +44,11 @@ export class Timestamps extends Base<ITimeStamps> {
 	 *  @returns {number} The ammount of days the Document will expire at from it's creation date
 	 */
 	public get expirationDays(): number {
-		return getDateDifference(this.creation, this.expiration);
+		return Util.getDateDifference(this.creation, this.expiration ?? new Date(0));
 	}
 }
 
 export interface Timestamps {
 	creation: Date;
-	expiration: Date;
+	expiration: Date | null;
 }

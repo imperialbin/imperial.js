@@ -2,19 +2,20 @@
 	"name": "imperial.js",
 	"version": "3.0.0-9",
 	"description": "Imperial API wrapper for Node.js",
-	"main": "./lib/cjs/index.js",
+	"main": "./lib/index.js",
+	"module": "./lib/index.mjs",
 	"types": "./lib/dts/index.d.ts",
 	"scripts": {
 		"ci": "rimraf node_modules && yarn install --frozen-lockfile",
-		"clean": "rimraf lib",
-		"build": "tsc -p tsconfig.json",
-		"w": "nodemon --config nodemon.json",
+		"build": "tsup",
+		"w": "yarn build --watch",
 		"lint": "eslint --ext .ts src/ --fix",
 		"format": "prettier --write \"src/**/*.ts\"",
 		"test": "jest",
 		"postinstall": "husky install",
 		"prepublishOnly": "pinst --disable",
-		"postpublish": "pinst --enable"
+		"postpublish": "pinst --enable",
+		"release": "yarn release && yarn publish"
 	},
 	"repository": {
 		"type": "git",
@@ -25,14 +26,14 @@
 		"imperialb.in"
 	],
 	"author": "pxseu <me+npm@pxseu.com>",
-		"license": "Apache-2.0",
+	"license": "Apache-2.0",
 	"bugs": {
 		"url": "https://github.com/imperialbin/imperial.js/issues"
 	},
 	"homepage": "https://github.com/imperialbin/imperial.js#readme",
 	"dependencies": {
 		"abort-controller": "^3.0.0",
-		"node-fetch": "2.6.7"
+		"axios": "^0.27.2"
 	},
 	"engines": {
 		"node": ">=8"
@@ -45,17 +46,17 @@
 		"@types/node-fetch": "^2.5.12",
 		"@typescript-eslint/eslint-plugin": "^5.12.0",
 		"@typescript-eslint/parser": "^5.12.0",
+		"axios-mock-adapter": "^1.21.1",
 		"eslint": "^7.17.0",
 		"eslint-config-prettier": "^7.1.0",
-		"fetch-mock-jest": "^1.5.1",
 		"husky": "^6.0.0",
 		"jest": "^26.6.3",
 		"nodemon": "^2.0.15",
 		"pinst": "^2.1.6",
 		"prettier": "^2.2.1",
-		"rimraf": "^3.0.2",
 		"ts-jest": "^26.5.1",
-		"typescript": "^4.1.5"
+		"tsup": "^6.1.2",
+		"typescript": "^4.7.3"
 	},
 	"jest": {
 		"roots": [

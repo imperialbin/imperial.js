@@ -11,9 +11,8 @@ describe("Document", () => {
 
 	it("should be valid", () => {
 		expect(user).toBeInstanceOf(User);
+		expect(user.id).toBe(RESPONSE_USER.data.id);
 		expect(user.icon).toBe(RESPONSE_USER.data.icon);
-		expect(user.banned).toBe(RESPONSE_USER.data.banned);
-		expect(user.memberPlus).toBe(RESPONSE_USER.data.memberPlus);
 		expect(user.toString()).toBe(RESPONSE_USER.data.username);
 	});
 });

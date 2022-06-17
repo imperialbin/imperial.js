@@ -1,0 +1,10 @@
+{
+	"entry": ["src/lib/index.ts"],
+	"outDir": "lib",
+	"splitting": false,
+	"sourcemap": true,
+	"clean": true,
+	"dts": true,
+	"format": ["cjs", "esm"],
+	"tsconfig": "tsconfig.json"
+}

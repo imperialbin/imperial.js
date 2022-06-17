@@ -1,7 +1,6 @@
 import type { Imperial } from "../client/Imperial";
 import AbortController from "abort-controller";
-import fetch, { Response } from "node-fetch";
-import { URL } from "url";
+import axios, { AxiosRequestHeaders, AxiosResponse } from "axios";
 import { Error } from "../errors";
 import { Base } from "../client/Base";
 
@@ -9,7 +8,7 @@ type Methods = "POST" | "GET" | "PATCH" | "DELETE";
 
 interface Options {
 	data?: Record<string, unknown>;
-	headers?: Record<string, unknown>;
+	headers?: AxiosRequestHeaders;
 }
 
 /**
@@ -25,17 +24,17 @@ export class Rest extends Base {
 	/**
 	 *  Imperial's hostname
 	 */
-	readonly hostname = "staging.impb.in";
+	readonly hostname = "ok-i-pull-up.up.railway.app";
 
 	/**
 	 *  Api Vesrion
 	 */
-	readonly version = "v1"; // soon "/1"
+	readonly version = "v1";
 
 	/**
 	 *  Imperial Api url
 	 */
-	readonly api = `https://staging-balls-api.impb.in/${this.version}` as const;
+	readonly api = `https://ok-i-pull-up.up.railway.app/${this.version}` as const;
 
 	readonly defaultHeaders: Record<string, any> = {
 		"Content-Type": "application/json",
@@ -43,28 +42,29 @@ export class Rest extends Base {
 		Accept: "application/json",
 	};
 
+	readonly axios = axios.create({
+		headers: this.defaultHeaders,
+	});
+
 	/**
+	 *
 	 *  Regular Expression that is used to match against in functions
 	 */
 	readonly hostnameRe = new RegExp(`${this.hostname}`, "i"); // /^(www\.)?imp(erial)?b(\.in|in.com)$/i;
 
 	public async request<T extends unknown>(method: Methods, path: string, options: Options = {}): Promise<T> {
-		// set the headers
-		const headers = {
-			...options.headers,
-			...this.defaultHeaders,
-		};
+		const headers = { ...options.headers };
 
 		// add authorization header if apiToken is set
 		if (this.client.apiToken) headers.Authorization = this.client.apiToken;
 
 		// set the data
-		let body: string | undefined;
+		let data: string | undefined;
 
 		// if `options.data` is set, serialize it to a string
 		if (options.data)
 			try {
-				body = JSON.stringify(options.data);
+				data = JSON.stringify(options.data);
 			} catch (error: any) {
 				throw new Error("FAILED_PARSE");
 			}
@@ -75,17 +75,15 @@ export class Rest extends Base {
 		// create a timeout to abort the request after
 		const abortTimeout = setTimeout(() => controller.abort(), this.client.options.requestTimeout);
 
-		let response: Response;
+		let response: AxiosResponse;
 
 		try {
 			// make the request
-			response = await fetch(`${this.api}${path}`, {
+			response = await this.axios(`${this.api}${path}`, {
 				headers,
 				method,
-				body,
+				data,
 				signal: controller.signal,
-				redirect: "error",
-				compress: true,
 			});
 		} catch (error: any) {
 			// if error was an aborted error, throw a custom error
@@ -103,29 +101,20 @@ export class Rest extends Base {
 	}
 
 	// eslint-disable-next-line class-methods-use-this
-	private async handleResponse<T extends unknown>(response: Response): Promise<T> {
-		let json: { success: true; data: unknown } | undefined;
-
-		// try to parse the json data
-		try {
-			json = await response.json();
-		} catch (e) {
-			// Ignore parse error
-		}
-
+	private async handleResponse<T extends unknown>(response: AxiosResponse): Promise<T> {
 		// remove not needed data
-		const { success, data } = json ?? {};
+		const { success, data } = response.data ?? {};
 
 		// extract the status code
 		const { status } = response;
 
 		// if everything is okay resolve
-		if (status && response.ok && success === true) {
+		if (status >= 200 && status < 300 && success === true) {
 			return data as T;
 		}
 
 		// find an error message
-		const { pathname: path } = new URL(response.url);
+		const path = response.config.url?.split("/").slice(1).join("/");
 
 		switch (status) {
 			case 401: {

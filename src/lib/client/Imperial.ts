@@ -1,5 +1,5 @@
 import type { ImperialOptions } from "../types/common";
-import { validateToken } from "../utils/validToken";
+import { Util } from "../utils/Util";
 import { Rest } from "../rest/Rest";
 import { DocumentManager } from "../managers/Document";
 import { UsersManager } from "../managers/Users";
@@ -55,7 +55,7 @@ export class Imperial {
 	 *
 	 */
 	public setApiToken(token: string | null | undefined = null): void {
-		if (validateToken(token)) Object.defineProperty(this, "_token", { value: token, configurable: true });
+		if (Util.validateToken(token)) Object.defineProperty(this, "_token", { value: token, configurable: true });
 	}
 
 	/**

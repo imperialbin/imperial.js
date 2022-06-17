@@ -1,10 +1,12 @@
 import type { Document as IDocument, DocumentEditOptions } from "../../types/document";
-import { createFormatedLink, createRawLink } from "../../utils/links";
+import { Util } from "../../utils/Util";
 import { Base } from "../Base";
 import type { Imperial } from "../../client/Imperial";
 import { Settings } from "./Settings";
 import { Timestamps } from "./Timestamps";
 import { Error as ImpError } from "../../errors";
+import { User } from "../User";
+
 /**
  *  Imperial Document,
  *  All data from the Document can be accesed here
@@ -33,18 +35,30 @@ export class Document extends Base<IDocument> {
 			this.content = null;
 		}
 
+		if ("creator" in document && document.creator !== null) {
+			this.creator = new User(this.client, document.creator);
+		} else {
+			this.creator = null;
+		}
+
+		if ("gist_url" in document) {
+			this.gistUrl = document.gist_url;
+		} else if (typeof this.gistUrl !== "string") {
+			this.gistUrl = null;
+		}
+
 		if ("views" in document) {
 			this.views = document.views;
 		} else if (typeof this.views !== "number") {
 			this.views = 0;
 		}
 
-		if ("settings" in document) {
-			this.settings = new Settings(this.client, document.settings);
-		}
-
 		if ("timestamps" in document) {
 			this.timestamps = new Timestamps(this.client, document.timestamps);
+		}
+
+		if ("settings" in document) {
+			this.settings = new Settings(this.client, document.settings);
 		}
 
 		return document;
@@ -55,7 +69,7 @@ export class Document extends Base<IDocument> {
 	 *  @returns {string} The url in format https://{hostname}/{id}
 	 */
 	public get formatted(): string {
-		return createFormatedLink(this.client, this.id);
+		return Util.createFormatedLink(this.client, this.id);
 	}
 
 	/**
@@ -63,7 +77,7 @@ export class Document extends Base<IDocument> {
 	 *  @returns {string} The url in format https://{hostname}/r/{id}
 	 */
 	public get raw(): string {
-		return createRawLink(this.client, this.id);
+		return Util.createRawLink(this.client, this.id);
 	}
 
 	/**
@@ -187,6 +201,16 @@ export interface Document {
 	 *  Content of the Document
 	 */
 	content: string;
+
+	/**
+	 *  Creator of the Document
+	 */
+	creator: User | null;
+
+	/**
+	 *  Gist URL of the Document
+	 */
+	gistUrl: string | null;
 
 	/**
 	 * 	Current view count of the Document

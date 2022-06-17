@@ -15,8 +15,9 @@ export class Settings extends Base<ISettings> {
 	 *  @internal
 	 */
 	public _patch(settings: ISettings) {
-		if ("instantDelete" in settings) {
-			this.instantDelete = settings.instantDelete;
+		if ("instant_delete" in settings || "instantDelete" in settings) {
+			// @ts-expect-error instantDelete is used when copying from a class
+			this.instantDelete = settings.instant_delete ?? settings.instantDelete;
 		} else if (typeof this.instantDelete !== "boolean") {
 			this.instantDelete = false;
 		}
@@ -48,14 +49,13 @@ export class Settings extends Base<ISettings> {
 		if ("language" in settings) {
 			this.language = settings.language;
 		} else if (typeof this.language !== "string") {
-			// @ts-ignore
 			this.language = null;
 		}
 
-		if ("imageEmbed" in settings) {
-			this.imageEmbed = settings.imageEmbed;
+		if ("image_embed" in settings || "imageEmbed" in settings) {
+			// @ts-expect-error imageEmbed is used when copying from a class
+			this.imageEmbed = settings.image_embed ?? settings.imageEmbed;
 		} else if (typeof this.imageEmbed !== "boolean") {
-			// @ts-ignore
 			this.imageEmbed = false;
 		}
 
@@ -64,7 +64,7 @@ export class Settings extends Base<ISettings> {
 }
 
 export interface Settings {
-	language: string;
+	language: string | null;
 	imageEmbed: boolean;
 	instantDelete: boolean;
 	encrypted: boolean;

@@ -1,7 +1,9 @@
+import type { User } from "./users";
+
 export interface Settings {
 	language: string;
-	imageEmbed: boolean;
-	instantDelete: boolean;
+	image_embed: boolean;
+	instant_delete: boolean;
 	encrypted: boolean;
 	password: string | null;
 	public: boolean;
@@ -9,8 +11,8 @@ export interface Settings {
 }
 
 export interface Timestamps {
-	creation: number;
-	expiration: number;
+	creation: string;
+	expiration: string | null;
 }
 
 export interface Links {
@@ -22,6 +24,8 @@ export interface Document {
 	id: string;
 	content: string;
 	views: number;
+	gist_url: string | null;
+	creator: User | null;
 	links: Links;
 	timestamps: Timestamps;
 	settings: Settings;
@@ -29,8 +33,8 @@ export interface Document {
 
 export interface DocumentEditOptions {
 	language?: string;
-	imageEmbed?: boolean;
-	instantDelete?: boolean;
+	image_embed?: boolean;
+	instant_delete?: boolean;
 	public?: boolean;
 	editors?: string[];
 }

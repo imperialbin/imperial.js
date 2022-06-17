@@ -1,24 +1,25 @@
-/* eslint-disable import/first */
-/* eslint-disable import/newline-after-import */
-import fetchMockJest from "fetch-mock-jest";
-import { URL } from "url";
-jest.mock("node-fetch", () => fetchMockJest.sandbox());
-
 import { Imperial } from "../../lib";
 import { Error, TypeError } from "../../lib/errors";
 import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
-const fetchMock: typeof fetchMockJest = require("node-fetch");
+import { URL } from "url";
+import MockAdapter from "axios-mock-adapter";
 
-describe("deleteDocument", () => {
+describe("createDocument", () => {
 	let client: Imperial;
+	let mock: MockAdapter;
 
 	beforeEach(() => {
 		client = new Imperial(IMPERIAL_TOKEN);
 
-		fetchMock.delete(`${client.rest.api}/document/${RESPONSE_DOCUMENT.data.id}`, {
-			body: { success: true },
-			headers: { "Content-Type": "application/json" },
-		});
+		mock = new MockAdapter(client.rest.axios);
+
+		mock.onDelete(`${client.rest.api}/document/${RESPONSE_DOCUMENT.data.id}`).reply(
+			200,
+			{ success: true },
+			{
+				"Content-Type": "application/json",
+			},
+		);
 	});
 
 	it("should delete a document - fully valid", async () => {
@@ -51,6 +52,6 @@ describe("deleteDocument", () => {
 	});
 
 	afterEach(() => {
-		fetchMock.reset();
+		mock.reset();
 	});
 });

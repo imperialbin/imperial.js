@@ -5,5 +5,8 @@
     ],
     "parserOptions": {
         "project": "./tsconfig.eslint.json"
+    },
+    "rules": {
+        "@typescript-eslint/indent": "off"
     }
 }

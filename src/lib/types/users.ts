@@ -1,6 +1,7 @@
 export interface User {
+	id: number;
 	username: string;
-	icon: string;
-	memberPlus: boolean;
-	banned: boolean;
+	icon: string | null;
+	documents_made: number;
+	flags: number;
 }

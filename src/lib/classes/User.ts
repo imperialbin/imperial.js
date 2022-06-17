@@ -1,12 +1,16 @@
 import type { Imperial } from "../client/Imperial";
 import type { User as IUser } from "../types/users";
 import { Base } from "./Base";
+import { UserFlagsBitfield } from "../utils/UserFlagsBitfield";
 
 export class User extends Base<IUser> {
 	constructor(client: Imperial, user: IUser) {
 		super(client);
 
 		if (!user) throw new Error("User: No data provided");
+
+		// @ts-expect-error fallback to null
+		this.flags = null;
 
 		this._patch(user);
 	}
@@ -15,29 +19,28 @@ export class User extends Base<IUser> {
 	 *  @internal
 	 */
 	public _patch(user: IUser) {
+		this.id = user.id;
+
 		if ("username" in user) {
 			this.username = user.username;
-		} else if (typeof user.username !== "string") {
-			// @ts-ignore
-			this.username = null;
-		}
-
-		if ("memberPlus" in user) {
-			this.memberPlus = user.memberPlus;
-		} else if (typeof user.memberPlus !== "boolean") {
-			this.memberPlus = false;
+		} else if (typeof this.username !== "string") {
+			// @ts-expect-error fallback to null
+			this.username ??= null;
 		}
 
 		if ("icon" in user) {
 			this.icon = user.icon;
-		} else if (typeof user.icon !== "string") {
-			this.icon = "/assets/img/pfp.png";
+		} else if (typeof this.icon !== "string") {
+			this.icon = null;
 		}
 
-		if ("banned" in user) {
-			this.banned = user.banned;
-		} else if (typeof user.banned !== "boolean") {
-			this.banned = false;
+		if ("flags" in user) {
+			this.flags = new UserFlagsBitfield(user.flags);
+		}
+
+		if ("documents_made" in user || "documentsMade" in user) {
+			// @ts-expect-error documentsMade is used when copying from a class
+			this.documentsMade = user.documents_made ?? user.documentsMade;
 		}
 
 		return user;
@@ -51,7 +54,7 @@ export class User extends Base<IUser> {
 	public async revalidate(): Promise<User> {
 		const user = this._clone();
 		const data = await this.client.users.get(user.username);
-		user._patch(data);
+		user._patch(data.toJSON());
 		return user;
 	}
 
@@ -71,8 +74,9 @@ export class User extends Base<IUser> {
 }
 
 export interface User {
+	id: number;
 	username: string;
-	icon: string;
-	memberPlus: boolean;
-	banned: boolean;
+	icon: string | null;
+	flags: UserFlagsBitfield;
+	documentsMade: number;
 }
