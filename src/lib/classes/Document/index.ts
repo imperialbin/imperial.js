@@ -141,10 +141,10 @@ export class Document extends Base<IDocument> {
 	 *  @param content The new content of the Document
 	 *  @returns Edited Document
 	 */
-	public async edit(text: string): Promise<Document> {
+	public async edit(content: string): Promise<Document> {
 		if (this.deleted) throw new ImpError("NOT_FOUND");
 
-		const document = await this.client.document.edit(this.id, text);
+		const document = await this.client.document.edit(this.id, content);
 
 		const old = this._update(document.toJSON());
 
@@ -178,18 +178,9 @@ export class Document extends Base<IDocument> {
 			deleted: false,
 		});
 	}
-
-	// Aliases
-
-	/**
-	 *  Explode the Document (Alias of `.delete`)
-	 */
-	public explode(
-		...args: Parameters<typeof Document.prototype.delete>
-	): ReturnType<typeof Document.prototype.delete> {
-		return this.delete(...args);
-	}
 }
+
+Document.prototype.explode = Document.prototype.delete;
 
 export interface Document {
 	/**
@@ -231,4 +222,9 @@ export interface Document {
 	 *  Timestamps of the Document
 	 */
 	timestamps: Timestamps;
+
+	/**
+	 *  Explode the Document (Alias of `Document#delete`)
+	 */
+	explode(...args: Parameters<typeof Document.prototype.delete>): ReturnType<typeof Document.prototype.delete>;
 }

@@ -1,7 +1,4 @@
-import { URL } from "url";
 import type { Imperial } from "../client/Imperial";
-import { Error, TypeError } from "../errors";
-import type { IdResolvable } from "../types/common";
 
 export class Util {
 	/**
@@ -91,67 +88,5 @@ export class Util {
 		}
 
 		return out;
-	}
-
-	static getIdFromUrl(url: URL, hostnameRegex: RegExp): string {
-		if (!url.protocol.toLowerCase().startsWith("http")) throw new TypeError("ID_WRONG_TYPE");
-
-		const splitPath = url.pathname.split("/");
-
-		if (hostnameRegex.test(url.hostname) && splitPath.length > 0) {
-			// If the domain matches imperial extract data after last slash
-			return splitPath[splitPath.length - 1];
-		}
-
-		throw new Error("NO_ID");
-	}
-
-	/**
-	 *  Extract the id from a string or URL object
-	 *  @internal
-	 */
-	static parseId(id: IdResolvable, hostnameRegex: RegExp): string {
-		if (!id) throw new Error("NO_ID");
-
-		if (id instanceof URL) return this.getIdFromUrl(id, hostnameRegex);
-
-		if (typeof id !== "string") throw new TypeError("ID_WRONG_TYPE");
-
-		try {
-			// Try to parse a url
-			return this.getIdFromUrl(new URL(id), hostnameRegex);
-		} catch (e) {
-			return id;
-		}
-	}
-
-	static getPasswordFromUrl(url: URL): string | null {
-		if (!url.protocol.toLowerCase().startsWith("http")) throw new TypeError("PASSWORD_WRONG_TYPE");
-		const password = url.searchParams.get("password");
-
-		if (!password) return null;
-		return password;
-	}
-
-	/**
-	 * 	Extract the password the passed id is an URL
-	 *  @internal
-	 */
-	static parsePassword(id: IdResolvable): string | null {
-		if (!id) throw new Error("NO_ID");
-
-		if (id instanceof URL) {
-			return this.getPasswordFromUrl(id);
-		}
-
-		if (typeof id !== "string") throw new TypeError("PASSWORD_WRONG_TYPE");
-
-		try {
-			// Try to parse a url
-			return this.getPasswordFromUrl(new URL(id));
-		} catch (e) {
-			// Return undefined if the parsing failed
-			return null;
-		}
 	}
 }

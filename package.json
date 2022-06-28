@@ -4,7 +4,7 @@
 	"description": "Imperial API wrapper for Node.js",
 	"main": "./lib/index.js",
 	"module": "./lib/index.mjs",
-	"types": "./lib/dts/index.d.ts",
+	"types": "./lib/index.d.ts",
 	"scripts": {
 		"ci": "rm -rf node_modules && yarn install --frozen-lockfile",
 		"build": "tsup",

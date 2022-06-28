@@ -1,4 +1,3 @@
-import type { IdResolvable } from "../types/common";
 import type { DocumentEditOptions, Document as ResponseDocument, DocumentCreateOptions } from "../types/document";
 import { Base } from "../client/Base";
 import { Error, TypeError } from "../errors";
@@ -55,35 +54,31 @@ export class DocumentManager extends Base {
 
 	/**
 	 *  Gets a Document from Imperial
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param id Id of the document 
 	 *  @example getDocument("someid").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public get(id: IdResolvable): Promise<Document>;
+	public get(id: string): Promise<Document>;
 
 	/**
 	 *  Gets a Document from Imperial
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param id Id of the document 
 	 *  @param password Password to an encrypted document.
 	 *  @example getDocument("someid", "you shall not pass").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public get(id: IdResolvable, password: string): Promise<Document>;
+	public get(id: string, password: string): Promise<Document>;
 
-	public async get(id: IdResolvable, password?: string): Promise<Document> {
-		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = Util.parseId(id, this.client.rest.hostnameRe);
+	public async get(id: string, password?: string): Promise<Document> {
+		if (!id) throw new Error("NO_ID");
 
-		// If no password was set try to extract it from the id
-		const documentPassword = password ?? Util.parsePassword(id);
+		if (typeof id !== "string") throw new TypeError("ID_WRONG_TYPE");
 
-		if (documentPassword && typeof documentPassword !== "string") throw new TypeError("PASSWORD_WRONG_TYPE");
+		if (password && typeof password !== "string") throw new TypeError("PASSWORD_WRONG_TYPE");
 
 		const data = await this.client.rest.request<ResponseDocument>(
 			"GET",
-			`/document/${encodeURIComponent(documentId)}${
-				documentPassword ? `?password=${encodeURIComponent(documentPassword)}` : ""
-			}`,
+			`/document/${encodeURIComponent(id)}${password ? `?password=${encodeURIComponent(password)}` : ""}`,
 		);
 
 		return new Document(this.client, data);
@@ -91,30 +86,31 @@ export class DocumentManager extends Base {
 
 	/**
 	 *  Edits the Documents content | **Requires an API Token**
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *  @param text Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param id Id of the document 
+	 *  @param text Id of the document 
 	 *  @example editDocument("someid", "i am the new text!").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public async edit(id: IdResolvable, text: string): Promise<Document>;
+	public async edit(id: string, text: string): Promise<Document>;
 
 	/**
 	 *  Edits the Documents content | **Requires an API Token**
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
-	 *  @param text Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param id Id of the document 
+	 *  @param text Id of the document 
 	 *  @param options Options for the document
 	 *  @example editDocument("someid", "i am the new text!").then(console.log);
 	 *  // Logs the response to the console
 	 */
-	public async edit(id: IdResolvable, text: string, options: DocumentEditOptions): Promise<Document>;
+	public async edit(id: string, text: string, options: DocumentEditOptions): Promise<Document>;
 
 	@requireToken
-	public async edit(id: IdResolvable, text: string, options: DocumentEditOptions = {}): Promise<Document> {
+	public async edit(id: string, text: string, options: DocumentEditOptions = {}): Promise<Document> {
 		// If no token return
 		if (!this.client.apiToken) throw new Error("NO_TOKEN");
 
-		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = Util.parseId(id, this.client.rest.hostnameRe);
+		if (!id) throw new Error("NO_ID");
+
+		if (typeof id !== "string") throw new TypeError("ID_WRONG_TYPE");
 
 		// If no newText was provided reutrn
 		if (!text) throw new Error("NO_TEXT");
@@ -129,7 +125,7 @@ export class DocumentManager extends Base {
 
 		const data = await this.client.rest.request<ResponseDocument>("PATCH", "/document", {
 			data: {
-				id: documentId,
+				id,
 				content,
 				settings,
 			},
@@ -140,15 +136,16 @@ export class DocumentManager extends Base {
 
 	/**
 	 *  Deletes a Document from Imperial | **Requires an API Token**
-	 *  @param id Id of the document or a URL to it. It will try to parse a URL and extract the Id.
+	 *  @param id Id of the document 
 	 *  @example deleteDocument("someid").then(console.log);
 	 *  // Logs the response to the console
 	 */
 	@requireToken
-	public async delete(id: IdResolvable): Promise<void> {
-		// Make the user inputed data encoded so it doesn't break stuff
-		const documentId = Util.parseId(id, this.client.rest.hostnameRe);
+	public async delete(id: string): Promise<void> {
+		if (!id) throw new Error("NO_ID");
 
-		await this.client.rest.request("DELETE", `/document/${encodeURIComponent(documentId)}`);
+		if (typeof id !== "string") throw new TypeError("ID_WRONG_TYPE");
+
+		await this.client.rest.request("DELETE", `/document/${encodeURIComponent(id)}`);
 	}
 }
