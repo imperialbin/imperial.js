@@ -3,7 +3,6 @@ import { Error, TypeError } from "../../lib/errors";
 import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
 import MockAdapter from "axios-mock-adapter";
 import type { AxiosRequestConfig } from "axios";
-import { URL } from "url";
 
 describe("createDocument", () => {
 	let client: Imperial;
@@ -23,11 +22,6 @@ describe("createDocument", () => {
 
 	it("should edit a document - fully valid", async () => {
 		await client.document.edit(RESPONSE_DOCUMENT.data.id, "i am a valid edit");
-
-		await client.document.edit(
-			new URL(`https://${client.rest.hostname}/${RESPONSE_DOCUMENT.data.id}`),
-			"i am a valid edit",
-		);
 	});
 
 	it("should edit a document - text not a string", async () => {

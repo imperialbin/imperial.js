@@ -1,7 +1,6 @@
 import { Imperial } from "../../lib";
 import { Error, TypeError } from "../../lib/errors";
 import { IMPERIAL_TOKEN, RESPONSE_DOCUMENT } from "../common";
-import { URL } from "url";
 import MockAdapter from "axios-mock-adapter";
 
 describe("createDocument", () => {
@@ -24,8 +23,6 @@ describe("createDocument", () => {
 
 	it("should delete a document - fully valid", async () => {
 		await client.document.delete(RESPONSE_DOCUMENT.data.id);
-
-		await client.document.delete(new URL(`https://${client.rest.hostname}/${RESPONSE_DOCUMENT.data.id}`));
 	});
 
 	it("should fail to delete a document - no token", async () => {
@@ -37,12 +34,17 @@ describe("createDocument", () => {
 	it("should fail to delete a document - wrong id type", async () => {
 		const error = new TypeError("ID_WRONG_TYPE");
 
+		// @ts-expect-error test
 		await expect(client.document.delete({})).rejects.toThrow(error);
+
+		// @ts-expect-error test
 
 		await expect(client.document.delete([])).rejects.toThrow(error);
 
+		// @ts-expect-error test
 		await expect(client.document.delete(12345)).rejects.toThrow(error);
 
+		// @ts-expect-error test
 		await expect(client.document.delete(() => {})).rejects.toThrow(error);
 	});
 

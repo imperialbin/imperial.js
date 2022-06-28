@@ -54,7 +54,7 @@ export class DocumentManager extends Base {
 
 	/**
 	 *  Gets a Document from Imperial
-	 *  @param id Id of the document 
+	 *  @param id Id of the document
 	 *  @example getDocument("someid").then(console.log);
 	 *  // Logs the response to the console
 	 */
@@ -62,7 +62,7 @@ export class DocumentManager extends Base {
 
 	/**
 	 *  Gets a Document from Imperial
-	 *  @param id Id of the document 
+	 *  @param id Id of the document
 	 *  @param password Password to an encrypted document.
 	 *  @example getDocument("someid", "you shall not pass").then(console.log);
 	 *  // Logs the response to the console
@@ -86,8 +86,8 @@ export class DocumentManager extends Base {
 
 	/**
 	 *  Edits the Documents content | **Requires an API Token**
-	 *  @param id Id of the document 
-	 *  @param text Id of the document 
+	 *  @param id Id of the document
+	 *  @param text Id of the document
 	 *  @example editDocument("someid", "i am the new text!").then(console.log);
 	 *  // Logs the response to the console
 	 */
@@ -95,8 +95,8 @@ export class DocumentManager extends Base {
 
 	/**
 	 *  Edits the Documents content | **Requires an API Token**
-	 *  @param id Id of the document 
-	 *  @param text Id of the document 
+	 *  @param id Id of the document
+	 *  @param text Id of the document
 	 *  @param options Options for the document
 	 *  @example editDocument("someid", "i am the new text!").then(console.log);
 	 *  // Logs the response to the console
@@ -136,7 +136,7 @@ export class DocumentManager extends Base {
 
 	/**
 	 *  Deletes a Document from Imperial | **Requires an API Token**
-	 *  @param id Id of the document 
+	 *  @param id Id of the document
 	 *  @example deleteDocument("someid").then(console.log);
 	 *  // Logs the response to the console
 	 */
