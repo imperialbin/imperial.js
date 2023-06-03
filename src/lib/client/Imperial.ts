@@ -57,15 +57,6 @@ export class Imperial {
 	public setApiToken(token: string | null | undefined = null): void {
 		if (Util.validateToken(token)) Object.defineProperty(this, "_token", { value: token, configurable: true });
 	}
-
-	/**
-	 *  Verify if your token is valid | **Requires an API Token**
-	 *  @example verify().then(console.log)
-	 *  // shows if the token is valid
-	 */
-	public async verify(): Promise<void> {
-		await this.rest.request("GET", `/checkApiToken/${encodeURIComponent(this.apiToken!)}`);
-	}
 }
 
 export interface Imperial {
