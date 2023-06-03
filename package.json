@@ -32,7 +32,8 @@
 	"homepage": "https://github.com/imperialbin/imperial.js#readme",
 	"dependencies": {
 		"abort-controller": "^3.0.0",
-		"axios": "^0.27.2"
+		"axios": "^0.27.2",
+		"permer": "^1.2.0"
 	},
 	"engines": {
 		"node": ">=8"
@@ -55,6 +56,7 @@
 		"prettier": "^2.2.1",
 		"ts-jest": "^26.5.1",
 		"tsup": "^6.1.2",
+		"tsx": "^3.12.7",
 		"typescript": "^4.7.3"
 	},
 	"jest": {
