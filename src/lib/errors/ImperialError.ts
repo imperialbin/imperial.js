@@ -1,20 +1,40 @@
-interface ImperialErrorInterface {
-	message?: string;
-	status?: number;
-	path?: string;
-}
+import { ErrorMessages, TypeMessages } from "./Messages";
 
-export class ImperialError extends Error {
-	public status?: number;
+const errCode = Symbol("code");
 
-	public path?: string;
+const makeImperialError = <T extends Record<string, string>>(messages: T, Base: typeof global.Error) => {
+	type MessageKeys = keyof typeof messages;
 
-	constructor(errorData: ImperialErrorInterface = {}) {
-		super(errorData?.message);
+	return class ImperialError extends Base {
+		public [errCode]: string;
 
-		this.name = "ImperialError";
+		constructor(message: MessageKeys, public status?: number, public path?: string) {
+			super(messages[message]);
+			this[errCode] = message.toString();
 
-		if ("status" in errorData) this.status = errorData.status;
-		if ("path" in errorData) this.path = errorData.path;
-	}
-}
+			if (status) this.status = status;
+			if (path) this.path = path;
+
+			global.Error.captureStackTrace(this, ImperialError);
+		}
+
+		get name() {
+			return `${super.name} [${this[errCode]}]`;
+		}
+
+		get code() {
+			return this[errCode];
+		}
+
+		/**
+		 *  Base Error class
+		 *  @internal
+		 */
+		static E = Base;
+	};
+};
+
+/** @internal */
+export const Error = makeImperialError(ErrorMessages, global.Error);
+/** @internal */
+export const TypeError = makeImperialError(TypeMessages, global.TypeError);

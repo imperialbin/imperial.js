@@ -104,3 +104,7 @@ dist
 .tern-port
 /lib
 /test.js
+/mjs
+/cjs
+/dts
+src/playground

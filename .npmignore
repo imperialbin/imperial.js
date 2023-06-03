@@ -13,5 +13,8 @@ yarn-error.log
 jest.config.js
 .gitignore
 .prettierrc.json
-tsconfig.eslint.json
+tsconfig.*
 examples/
+*.tgz
+nodemon.json
+src/playground
