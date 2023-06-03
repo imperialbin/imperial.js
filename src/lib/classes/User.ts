@@ -56,7 +56,7 @@ export class User extends Base<IUser> {
 	}
 
 	/**
-	 *  Concatonate the username insted of the object
+	 *  Concatonate the username instead of the object
 	 */
 	public toString() {
 		return this.username;

@@ -9,8 +9,8 @@ import { User } from "../User";
 
 /**
  *  Imperial Document,
- *  All data from the Document can be accesed here
- *  @author pxseu <https://github.com/pxseu> & hexiro <https://github.com/Hexiro>
+ *  All data from the Document can be accessed here
+ *  @author pxseu <https://github.com/pxseu> & hexiro <https://github.com/Hexiro> & cody <https://github.com/Looskie>
  */
 export class Document extends Base<IDocument> {
 	constructor(client: Imperial, document: IDocument) {
@@ -69,7 +69,7 @@ export class Document extends Base<IDocument> {
 	 *  @returns {string} The url in format https://{hostname}/{id}
 	 */
 	public get formatted(): string {
-		return Util.createFormatedLink(this.client, this.id);
+		return Util.createFormattedLink(this.client, this.id);
 	}
 
 	/**
@@ -81,14 +81,14 @@ export class Document extends Base<IDocument> {
 	}
 
 	/**
-	 *  Wheather is the Document URL longer
+	 *  Whether is the Document URL longer
 	 */
 	public get longerUrls(): boolean {
 		return this.id.length === 26;
 	}
 
 	/**
-	 *  Wheather is the Document URL shorter
+	 *  Whether is the Document URL shorter
 	 */
 	public get shortUrls(): boolean {
 		return this.id.length === 4;
@@ -162,7 +162,7 @@ export class Document extends Base<IDocument> {
 	}
 
 	/**
-	 *  Concatonate the content insted of the object
+	 *  Concatenate the content instead of the object
 	 */
 	public toString(): string {
 		return this.content;

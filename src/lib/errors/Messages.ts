@@ -6,7 +6,7 @@ export const ErrorMessages = {
 	NO_USERNAME: "No `username` was provided",
 	NOT_FOUND: "The user or document was not found",
 	NOT_AUTHORIZED: "You are not allowed to perform this action",
-	PASSWORD_REQUIRED: "You must provide a password to unencrypt the document",
+	PASSWORD_REQUIRED: "You must provide a password to decrypt the document",
 	ABORTED: "The request was aborted",
 	FETCH_ERROR: "There was an error fetching the data",
 	FAILED_PARSE: "The response data could not be parsed",

@@ -19,7 +19,7 @@ export class Util {
 	/**
 	 * @internal
 	 */
-	static createFormatedLink = (client: Imperial, id: string): string => `https://${client.rest.hostname}/${id}`;
+	static createFormattedLink = (client: Imperial, id: string): string => `https://${client.rest.hostname}/${id}`;
 
 	/**
 	 * @internal

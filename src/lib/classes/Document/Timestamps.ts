@@ -30,8 +30,8 @@ export class Timestamps extends Base<ITimeStamps> {
 	}
 
 	/**
-	 *  The ammount of days the Doucment will expire at from the current moment
-	 *  @returns {number} The ammount of days the Document will expire at from the current moment
+	 *  The amount of days the document will expire at from the current moment
+	 *  @returns {number} The amount of days the Document will expire at from the current moment
 	 */
 	public get daysLeft(): number {
 		const daysLeft = Util.getDateDifference(new Date(), this.expiration ?? new Date(0));
@@ -40,8 +40,8 @@ export class Timestamps extends Base<ITimeStamps> {
 	}
 
 	/**
-	 *  The ammount of days the Document will expire at from it's creation date
-	 *  @returns {number} The ammount of days the Document will expire at from it's creation date
+	 *  The amount of days the Document will expire at from it's creation date
+	 *  @returns {number} The amount of days the Document will expire at from it's creation date
 	 */
 	public get expirationDays(): number {
 		return Util.getDateDifference(this.creation, this.expiration ?? new Date(0));

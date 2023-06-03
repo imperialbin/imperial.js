@@ -28,7 +28,7 @@ export class DocumentManager extends Base {
 	 *  Create a Document
 	 */
 	public async create(text: string, options: DocumentCreateOptions = {}): Promise<Document> {
-		// If no text or text is an emtpy string reutrn
+		// If no text or text is an empty string return
 		if (!text) throw new Error("NO_TEXT");
 
 		if (!options || typeof options !== "object" || Array.isArray(options))
@@ -37,7 +37,7 @@ export class DocumentManager extends Base {
 		// Internal options to not modify parameters
 		let settings: DocumentCreateOptions = Util.snakeify(options as Record<string, string>);
 
-		// If there is a password provided, make the document default to encypted
+		// If there is a password provided, make the document default to encrypted
 		settings.encrypted = !!settings?.password;
 
 		const content = Util.stringify(text);
@@ -112,7 +112,7 @@ export class DocumentManager extends Base {
 
 		if (typeof id !== "string") throw new TypeError("ID_WRONG_TYPE");
 
-		// If no newText was provided reutrn
+		// If no newText was provided return
 		if (!text) throw new Error("NO_TEXT");
 
 		if (!options || typeof options !== "object" || Array.isArray(options))

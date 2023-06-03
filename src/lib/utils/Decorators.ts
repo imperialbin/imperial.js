@@ -24,7 +24,7 @@ export const requireToken: MethodDecorator = (_target, _key, descriptor) => {
 			// reject a promise because the method is async
 			if (!this.client._token) return Promise.reject(new ImpError("NO_TOKEN"));
 
-			// return the orignal method
+			// return the original method
 			return originalMethod.apply(this, args as string[]);
 		},
 	} as unknown as PropertyDescriptor;
