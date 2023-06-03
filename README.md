@@ -1,6 +1,6 @@
 # imperial.js
 
-> A hastebin alternative but with user experience in mind with much more features!
+Share code with anyone in a matter of seconds.
 
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/made-with-typescript.svg)](https://forthebadge.com)
@@ -8,7 +8,7 @@
 
 ## About
 
-This is an official API wrapper for the [Imperial](http://imperialb.in/) API.
+This is an official API wrapper for the [IMPERIAL](http://imperialb.in/) API.
 It's written in typescript and has premade type declarations.
 
 ## Installation
