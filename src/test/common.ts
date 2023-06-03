@@ -1,8 +1,8 @@
 export const DAY = 86_400_000;
 
-export const IMPERIAL_TOKEN = "IMPERIAL-00000000-0000-0000-0000-000000000000";
+export const IMPERIAL_TOKEN = "imperial_xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
-export const TEST_USERNAME = "test";
+export const TEST_USERNAME = "cody";
 
 export const RESPONSE_DOCUMENT = {
 	success: true,
@@ -16,8 +16,8 @@ export const RESPONSE_DOCUMENT = {
 		gist_url: null,
 		views: 0,
 		links: {
-			raw: "https://ok-i-pull-up.up.railway.app/r/hNrAbalk",
-			formatted: "https://ok-i-pull-up.up.railway.app/p/hNrAbalk",
+			raw: "https://impb.in/r/hNrAbalk",
+			formatted: "https://impb.in/hNrAbalk",
 		},
 		timestamps: {
 			creation: "2022-06-16T14:40:31.848286719Z",

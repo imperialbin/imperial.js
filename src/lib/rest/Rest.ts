@@ -25,7 +25,7 @@ export class Rest extends Base {
 	/**
 	 *  Imperial's hostname
 	 */
-	readonly hostname = "ok-i-pull-up.up.railway.app";
+	readonly hostname = "api.impb.in";
 
 	/**
 	 *  Api Vesrion
@@ -35,7 +35,7 @@ export class Rest extends Base {
 	/**
 	 *  Imperial Api url
 	 */
-	readonly api = `https://ok-i-pull-up.up.railway.app/${this.version}` as const;
+	readonly api = `https://api.impb.in/${this.version}` as const;
 
 	readonly defaultHeaders: Record<string, any> = {
 		"Content-Type": "application/json",
@@ -90,8 +90,10 @@ export class Rest extends Base {
 			// if error was an aborted error, throw a custom error
 			if (error?.name === "AbortError") throw new Error("ABORTED");
 
+			const maybeErrorObject = error?.response?.data?.error;
+
 			// else throw the error
-			throw new Error("FETCH_ERROR");
+			throw new Error(maybeErrorObject?.code?.toUpperCase() ?? "FETCH_ERROR");
 		} finally {
 			// clear the timeout
 			clearTimeout(abortTimeout);

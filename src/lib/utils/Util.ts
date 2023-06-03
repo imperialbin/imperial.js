@@ -37,7 +37,7 @@ export class Util {
 		return String(data);
 	}
 
-	private static TokenRegex = /^IMPERIAL-[a-zA-Z\d]{8}(-[a-zA-Z\d]{4}){3}-[a-zA-Z\d]{12}$/;
+	private static TokenRegex = /^imperial_.+/;
 
 	/**
 	 *  Simple token validation function
@@ -54,6 +54,17 @@ export class Util {
 		if (typeof token === "undefined" || token === null) return true;
 		if (typeof token !== "string") return false;
 		return this.TokenRegex.test(token);
+	}
+
+	static snakeify<T extends Record<string, unknown>>(object: T) {
+		if (!this.isObject(object)) return object;
+
+		const out: Record<string, unknown> = {};
+		for (const [key] of Object.entries(object)) {
+			out[key.replace(/([A-Z])/g, "_$1").toLowerCase()] = object[key];
+		}
+
+		return out;
 	}
 
 	static isObject = (object: unknown) => typeof object === "object" && object !== null;

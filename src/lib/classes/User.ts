@@ -1,7 +1,6 @@
 import type { Imperial } from "../client/Imperial";
 import type { User as IUser } from "../types/users";
 import { Base } from "./Base";
-import { UserFlagsBitfield } from "../utils/UserFlagsBitfield";
 
 export class User extends Base<IUser> {
 	constructor(client: Imperial, user: IUser) {
@@ -9,8 +8,6 @@ export class User extends Base<IUser> {
 
 		if (!user) throw new Error("User: No data provided");
 
-		// @ts-expect-error fallback to null
-		this.flags = null;
 
 		this._patch(user);
 	}
@@ -35,7 +32,7 @@ export class User extends Base<IUser> {
 		}
 
 		if ("flags" in user) {
-			this.flags = new UserFlagsBitfield(user.flags);
+			this.flags = user.flags;
 		}
 
 		if ("documents_made" in user || "documentsMade" in user) {
@@ -77,6 +74,6 @@ export interface User {
 	id: number;
 	username: string;
 	icon: string | null;
-	flags: UserFlagsBitfield;
+	flags: number;
 	documentsMade: number;
 }

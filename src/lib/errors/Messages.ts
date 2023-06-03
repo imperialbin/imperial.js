@@ -11,6 +11,12 @@ export const ErrorMessages = {
 	FETCH_ERROR: "There was an error fetching the data",
 	FAILED_PARSE: "The response data could not be parsed",
 	HTTP_ERROR: "There was an error with the HTTP request",
+
+	// IMPERIAL errors
+	UNAUTHORIZED: "You are not authorized to perform this action",
+	BAD_AUTH: "You have no permission to perform this action",
+	BAD_REQUEST: "The request was malformed",
+	INTERNAL_ERROR: "There was an internal error",
 } as const;
 
 /** @internal */

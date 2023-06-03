@@ -31,7 +31,7 @@ export class Settings extends Base<ISettings> {
 		if ("password" in settings) {
 			this.password = settings.password;
 		} else if (typeof this.password !== "string") {
-			this.password = null;
+			this.password = undefined;
 		}
 
 		if ("public" in settings) {
@@ -68,7 +68,7 @@ export interface Settings {
 	imageEmbed: boolean;
 	instantDelete: boolean;
 	encrypted: boolean;
-	password: string | null;
+	password?: string;
 	public: boolean;
 	editors: string[];
 }

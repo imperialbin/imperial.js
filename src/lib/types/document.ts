@@ -5,7 +5,7 @@ export interface Settings {
 	image_embed: boolean;
 	instant_delete: boolean;
 	encrypted: boolean;
-	password: string | null;
+	password?: string;
 	public: boolean;
 	editors: string[];
 }
@@ -33,8 +33,8 @@ export interface Document {
 
 export interface DocumentEditOptions {
 	language?: string;
-	image_embed?: boolean;
-	instant_delete?: boolean;
+	imageEmbed?: boolean;
+	instantDelete?: boolean;
 	public?: boolean;
 	editors?: string[];
 }

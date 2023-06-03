@@ -17,3 +17,4 @@ tsconfig.*
 examples/
 *.tgz
 nodemon.json
+src/playground

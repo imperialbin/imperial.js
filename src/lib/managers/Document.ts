@@ -35,7 +35,7 @@ export class DocumentManager extends Base {
 			throw new TypeError("OPTIONS_WRONG_TYPE");
 
 		// Internal options to not modify parameters
-		const settings = options as DocumentCreateOptions;
+		let settings: DocumentCreateOptions = Util.snakeify(options as Record<string, string>);
 
 		// If there is a password provided, make the document default to encypted
 		settings.encrypted = !!settings?.password;
